@@ -1,0 +1,11 @@
+[
+    {
+        "name": "CL compile",
+        "command": "CRTBNDCL PGM(&CURLIB/&NAME) SRCSTMF('&RELATIVEPATH') OPTION(*EVENTF) DBGVIEW(*SOURCE)",
+        "deployFirst": true,
+        "environment": "ile",
+        "extensions": [
+            "CLLE"
+        ]
+    }
+]

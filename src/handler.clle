@@ -1,0 +1,179 @@
+
+PGM        PARM(&WCHOPTSET &SESSID &ERRDTCT &EVTDTA)
+
+/* Parameters */
+DCL        VAR(&WCHOPTSET) TYPE(*CHAR) LEN(10)
+DCL        VAR(&SESSID) TYPE(*CHAR) LEN(10)
+DCL        VAR(&ERRDTCT) TYPE(*CHAR) LEN(10)
+DCL        VAR(&EVTDTA) TYPE(*CHAR) LEN(2048) /* This should be long +
+         enough to handle most situations, since the fixed portion +
+         is around 450 bytes long - modify as needed */
+
+/* Doesn't work to use *DEFINED on an incoming parameter */
+DCL        VAR(&EVTDTADFND) TYPE(*CHAR) LEN(2048)
+
+/* Event data elements - fixed-length data */
+DCL        VAR(&LENWCHINF) TYPE(*INT) STG(*DEFINED) LEN(4) +
+         DEFVAR(&EVTDTADFND 1)
+DCL        VAR(&MSGID) TYPE(*CHAR) STG(*DEFINED) LEN(7) +
+         DEFVAR(&EVTDTADFND 5)
+DCL        VAR(&RSVD1) TYPE(*CHAR) STG(*DEFINED) LEN(1) +
+         DEFVAR(&EVTDTADFND 12)
+DCL        VAR(&MSGQNAM) TYPE(*CHAR) STG(*DEFINED) LEN(10) +
+         DEFVAR(&EVTDTADFND 13)
+DCL        VAR(&MSGQLIB) TYPE(*CHAR) STG(*DEFINED) LEN(10) +
+         DEFVAR(&EVTDTADFND 23)
+DCL        VAR(&JOBNAM) TYPE(*CHAR) STG(*DEFINED) LEN(10) +
+         DEFVAR(&EVTDTADFND 33)
+DCL        VAR(&JOBUSR) TYPE(*CHAR) STG(*DEFINED) LEN(10) +
+         DEFVAR(&EVTDTADFND 43)
+DCL        VAR(&JOBNBR) TYPE(*CHAR) STG(*DEFINED) LEN(6) +
+         DEFVAR(&EVTDTADFND 53)
+DCL        VAR(&RSVD2) TYPE(*CHAR) STG(*DEFINED) LEN(4) +
+         DEFVAR(&EVTDTADFND 59)
+DCL        VAR(&SNDPGMNAM) TYPE(*CHAR) STG(*DEFINED) LEN(256) +
+         DEFVAR(&EVTDTADFND 63)
+DCL        VAR(&SNDMODNAM) TYPE(*CHAR) STG(*DEFINED) LEN(10) +
+         DEFVAR(&EVTDTADFND 319)
+DCL        VAR(&OFSSNDPRC) TYPE(*INT) STG(*DEFINED) LEN(4) +
+         DEFVAR(&EVTDTADFND 329)
+DCL        VAR(&LENSNDPRC) TYPE(*INT) STG(*DEFINED) LEN(4) +
+         DEFVAR(&EVTDTADFND 333)
+DCL        VAR(&RCVPGMNAM) TYPE(*CHAR) STG(*DEFINED) LEN(10) +
+         DEFVAR(&EVTDTADFND 337)
+DCL        VAR(&RCVMODNAM) TYPE(*CHAR) STG(*DEFINED) LEN(10) +
+         DEFVAR(&EVTDTADFND 347)
+DCL        VAR(&OFSRCVPRC) TYPE(*INT) STG(*DEFINED) LEN(4) +
+         DEFVAR(&EVTDTADFND 357)
+DCL        VAR(&LENRCVPRC) TYPE(*INT) STG(*DEFINED) LEN(4) +
+         DEFVAR(&EVTDTADFND 361)
+DCL        VAR(&MSGSEV) TYPE(*INT) STG(*DEFINED) LEN(4) +
+         DEFVAR(&EVTDTADFND 365)
+DCL        VAR(&MSGTYP) TYPE(*CHAR) STG(*DEFINED) LEN(10) +
+         DEFVAR(&EVTDTADFND 369)
+DCL        VAR(&MSGTIMSTP) TYPE(*CHAR) STG(*DEFINED) LEN(8) +
+         DEFVAR(&EVTDTADFND 379)
+DCL        VAR(&MSGKEY) TYPE(*CHAR) STG(*DEFINED) LEN(4) +
+         DEFVAR(&EVTDTADFND 387)
+DCL        VAR(&MSGFNAM) TYPE(*CHAR) STG(*DEFINED) LEN(10) +
+         DEFVAR(&EVTDTADFND 391)
+DCL        VAR(&MSGFLIB) TYPE(*CHAR) STG(*DEFINED) LEN(10) +
+         DEFVAR(&EVTDTADFND 401)
+DCL        VAR(&RSVD3) TYPE(*CHAR) STG(*DEFINED) LEN(2) +
+         DEFVAR(&EVTDTADFND 411)
+DCL        VAR(&OFSCMPDTA) TYPE(*INT) STG(*DEFINED) LEN(4) +
+         DEFVAR(&EVTDTADFND 413)
+DCL        VAR(&LENCMPDTA) TYPE(*INT) STG(*DEFINED) LEN(4) +
+         DEFVAR(&EVTDTADFND 417)
+DCL        VAR(&CMPAGAINST) TYPE(*CHAR) STG(*DEFINED) LEN(10) +
+         DEFVAR(&EVTDTADFND 421)
+DCL        VAR(&RSVD4) TYPE(*CHAR) STG(*DEFINED) LEN(2) +
+         DEFVAR(&EVTDTADFND 431)
+DCL        VAR(&CMPDTACSID) TYPE(*INT) STG(*DEFINED) LEN(4) +
+         DEFVAR(&EVTDTADFND 433)
+DCL        VAR(&OFSCDTAFND) TYPE(*INT) STG(*DEFINED) LEN(4) +
+         DEFVAR(&EVTDTADFND 437)
+DCL        VAR(&OFSRPLDTA) TYPE(*INT) STG(*DEFINED) LEN(4) +
+         DEFVAR(&EVTDTADFND 441)
+DCL        VAR(&LENRPLDTA) TYPE(*INT) STG(*DEFINED) LEN(4) +
+         DEFVAR(&EVTDTADFND 445)
+DCL        VAR(&RPLDTACSID) TYPE(*INT) STG(*DEFINED) LEN(4) +
+         DEFVAR(&EVTDTADFND 449)
+DCL        VAR(&SNDUSRPRF) TYPE(*CHAR) STG(*DEFINED) LEN(10) +
+         DEFVAR(&EVTDTADFND 453) /* 6.1 */
+DCL        VAR(&TGTJOBNAM) TYPE(*CHAR) STG(*DEFINED) LEN(10) +
+         DEFVAR(&EVTDTADFND 463) /* 6.1 */
+DCL        VAR(&TGTJOBUSR) TYPE(*CHAR) STG(*DEFINED) LEN(10) +
+         DEFVAR(&EVTDTADFND 473) /* 6.1 */
+DCL        VAR(&TGTJOBNBR) TYPE(*CHAR) STG(*DEFINED) LEN(6) +
+         DEFVAR(&EVTDTADFND 483) /* 6.1 */
+
+/* Event DATA elements - variable-length data */
+DCL        VAR(&PSNDPRCNAM) TYPE(*PTR)
+DCL        VAR(&BSNDPRCNAM) TYPE(*CHAR) STG(*BASED) LEN(256) +
+         BASPTR(&PSNDPRCNAM)
+DCL        VAR(&SNDPRCNAM) TYPE(*CHAR) LEN(256)
+
+DCL        VAR(&PRCVPRCNAM) TYPE(*PTR)
+DCL        VAR(&BRCVPRCNAM) TYPE(*CHAR) STG(*BASED) LEN(256) +
+         BASPTR(&PRCVPRCNAM)
+DCL        VAR(&RCVPRCNAM) TYPE(*CHAR) LEN(256)
+
+DCL        VAR(&PMSGCMPDTA) TYPE(*PTR)
+DCL        VAR(&BMSGCMPDTA) TYPE(*CHAR) STG(*BASED) LEN(72) +
+         BASPTR(&PMSGCMPDTA)
+DCL        VAR(&MSGCMPDTA) TYPE(*CHAR) LEN(72)
+
+DCL        VAR(&PMSGRPLDTA) TYPE(*PTR)
+DCL        VAR(&BMSGRPLDTA) TYPE(*CHAR) STG(*BASED) LEN(512) +
+         BASPTR(&PMSGRPLDTA)
+DCL        VAR(&MSGRPLDTA) TYPE(*CHAR) LEN(512)
+
+/* Job attributes */
+DCL        VAR(&WCHJOBNAM) TYPE(*CHAR) LEN(10)
+DCL        VAR(&WCHJOBUSR) TYPE(*CHAR) LEN(10)
+DCL        VAR(&WCHJOBNBR) TYPE(*CHAR) LEN(6)
+
+/* Copy parameter to work data */
+CHGVAR     VAR(&EVTDTADFND) VALUE(&EVTDTA)
+
+/* Set pointers to variable-length data */
+/* Sending procedure name */
+CHGVAR     VAR(&PSNDPRCNAM) VALUE(%ADDR(&EVTDTADFND))
+CHGVAR     VAR(%OFS(&PSNDPRCNAM)) VALUE(%OFS(&PSNDPRCNAM) + &OFSSNDPRC)
+
+IF         COND(&LENSNDPRC *GT 0) THEN(DO)
+CHGVAR     VAR(&SNDPRCNAM) VALUE(%SST(&BSNDPRCNAM 1 &LENSNDPRC))
+ENDDO
+
+/* Receiving procedure name */
+CHGVAR     VAR(&PRCVPRCNAM) VALUE(%ADDR(&EVTDTADFND))
+CHGVAR     VAR(%OFS(&PRCVPRCNAM)) VALUE(%OFS(&PRCVPRCNAM) + &OFSRCVPRC)
+
+IF         COND(&LENSNDPRC *GT 0) THEN(DO)
+CHGVAR     VAR(&RCVPRCNAM) VALUE(%SST(&BRCVPRCNAM 1 &LENRCVPRC))
+ENDDO
+
+/* Message compare data */
+CHGVAR     VAR(&PMSGCMPDTA) VALUE(%ADDR(&EVTDTADFND))
+CHGVAR     VAR(%OFS(&PMSGCMPDTA)) VALUE(%OFS(&PMSGCMPDTA) + &OFSCMPDTA)
+
+IF         COND(&LENSNDPRC *GT 0) THEN(DO)
+CHGVAR     VAR(&MSGCMPDTA) VALUE(%SST(&BMSGCMPDTA 1 &LENCMPDTA))
+ENDDO
+
+/* Message replacement data */
+CHGVAR     VAR(&PMSGRPLDTA) VALUE(%ADDR(&EVTDTADFND))
+CHGVAR     VAR(%OFS(&PMSGRPLDTA)) VALUE(%OFS(&PMSGRPLDTA) + &OFSRPLDTA)
+
+IF         COND(&LENSNDPRC *GT 0) THEN(DO)
+CHGVAR     VAR(&MSGRPLDTA) VALUE(%SST(&BMSGRPLDTA 1 &LENRPLDTA))
+ENDDO
+
+/* Here is where the action happens. Some things */
+/* that might be done are to print the job log,  */
+/* print a dump of this program, check object    */
+/* locks, etc. This all depends on the kind of   */
+/* message that is defined in the watch.         */
+
+/* Print job log where error occurred */
+DSPJOBLOG  JOB(&JOBNBR/&JOBUSR/&JOBNAM) OUTPUT(*PRINT)
+
+/* Dump the variables in this program */
+DMPCLPGM
+
+/* Notify system operator that error occurred */
+/* and point to spooled output from this job  */
+RTVJOBA    JOB(&WCHJOBNAM) USER(&WCHJOBUSR) NBR(&WCHJOBNBR)
+SNDPGMMSG  MSG('Error occurred in job ' *CAT &JOBNBR *TCAT '/' *CAT +
+         &JOBUSR *TCAT '/' *CAT &JOBNAM *TCAT ' - WRKJOB ' *CAT +
+         &WCHJOBNBR *TCAT '/' *CAT &WCHJOBUSR *TCAT '/' *CAT +
+         &WCHJOBNAM *TCAT ' OPTION(*SPLF) and WRKJOB ' *CAT &JOBNBR +
+         *TCAT '/' *CAT &JOBUSR *TCAT '/' *CAT &JOBNAM *TCAT ' to +
+         see more information.') TOMSGQ(*SYSOPR)
+
+/* Return blank for error-detected, */
+/* so that watch is not ended       */
+CHGVAR     VAR(&ERRDTCT) VALUE(' ')
+
+ENDPGM
