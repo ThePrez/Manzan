@@ -1,8 +1,14 @@
-# Manzan
+# Manzan (WIP!! DO NOT USE!!)
 
 # Objective
 
-Provide a gateway to making IBM i watch facilities and exit program facilities easily consumable by user applications, external resources, and/or open source technologies. 
+Provide a gateway to making IBM i watch facilities and exit program facilities easily consumable by user applications, external resources, and/or open source technologies. Identified use cases include:
+- Monitoring system events for Kafka, ELK, SMS, FluentD, Grafana Loki, or AI
+- More comprehensive integration with syslog facilities
+- Queryable system events
+- Consolidated auditing/reporting activity. 
+
+In short, this project aims to make IBM i more integrated with infrastructure monitoring of a heterogeneous IT infrastructure, whether on-prem or cloud.
 
 # Architecture
 
@@ -19,6 +25,10 @@ There are three publishers:
 - **MSGQ publisher**: Publishes a small description of the event to a Manzan-provided data queue or a user-configured queue.
 
 Manzan also includes these components not included in the above graphic:
-- **Apache Camel**: An Apache Camel route to publish JSON data to some new medium, for instance Kafka, ELK, SMS, or AI
+- **Apache Camel**: An Apache Camel route to publish JSON data to some new medium, for instance those identified in the use cases above
 - **Base Template classes**: A set of pre-made configurations that perform common system monitoring tasks
 - **Configuration manager**: Handles user configuration for all of the above. 
+
+# Why the name "Manzan"?
+
+(documentation forthcoming)
