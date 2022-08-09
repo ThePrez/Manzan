@@ -154,10 +154,10 @@ int to_utf8(char *out, size_t out_len, const char *in)
 }
 #define NTS(dest, src) extract_nts_trim(dest, sizeof(dest), src, sizeof(src))
 #define CNTS(src) NTS(cheater_buf, src)
-
+static FILE* fd = NULL;
 #define DEBUG_ENABLED 1
 #ifdef DEBUG_ENABLED
-#define STRDBG() FILE *fd = fopen("/home/LINUX/m.txt", "w")
+#define STRDBG() fd = fopen("/home/LINUX/m.txt", "w")
 #define DEBUG(...) fprintf(fd, __VA_ARGS__)
 #define ENDDBG() fclose(fd)
 #else
@@ -166,8 +166,22 @@ int to_utf8(char *out, size_t out_len, const char *in)
 #define ENDDBG()
 #endif
 
-int publish_message(char *_msgid, char *_job_name, char *_user_name, char *_job_number)
-{
+int publish_message(char *_msgid, char *_job_name, char *_user_name, char *_job_number, char* _message)
+{ 
+  DEBUG("Publishing to JSON\n");
+  char json[4096];
+  memset(json, 0x00, sizeof(json));
+  sprintf(json, "{\n\"msg_id\": \"%s\",\n\"job\": \"%s/%s/%s\",\n\"message\": \"%s\"\n}\n", 
+          _msgid,
+          _job_name,
+          _user_name,
+          _job_number,
+          _message);
+  DEBUG("%s\n", json);
+  char buffity_buf[4444];
+  char buffity_buf_utf8[4455];
+  to_utf8(buffity_buf_utf8, sizeof(buffity_buf_utf8), json);
+  QSNDDTAQ("MANZANDTAQ", "JESSEG    ", 1 + strlen(buffity_buf_utf8), buffity_buf_utf8);
   return 0;
 }
 int main(int _argc, char **argv)
@@ -214,7 +228,7 @@ int main(int _argc, char **argv)
         "*NO       ",
         // 10 	Error code 	I/O 	Char(*)
         err_plc);
-    DEBUG("Full message is '%s'\n", msg_info_buf.message);
+    DEBUG("The full message is '%s'\n", msg_info_buf.message);
 
     char msgid[8];
     NTS(msgid, msg_event->message_watched);
@@ -224,8 +238,9 @@ int main(int _argc, char **argv)
     NTS(user_name, msg_event->user_name);
     char job_number[11];
     NTS(job_number, msg_event->job_number);
-
-    publish_message(msgid, job_name, user_name, job_number);
+    DEBUG("About to publish...\n");
+    publish_message(msgid, job_name, user_name, job_number, msg_info_buf.message);
+    DEBUG("Published\n");
   }
   ENDDBG();
 }
