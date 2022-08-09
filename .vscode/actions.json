@@ -1,11 +1,19 @@
-[
-    {
+[{
         "name": "CL compile",
-        "command": "CRTBNDCL PGM(&CURLIB/&NAME) SRCSTMF('&RELATIVEPATH') OPTION(*EVENTF) DBGVIEW(*SOURCE)",
+        "command": "CRTBNDCL PGM(&CURLIB/&NAME) SRCSTMF('&PARENT/&BASENAME') OPTION(*EVENTF) DBGVIEW(*SOURCE)",
         "deployFirst": true,
         "environment": "ile",
         "extensions": [
             "CLLE"
+        ]
+    },
+    {
+        "name": "C compile",
+        "command": "CRTBNDC PGM(&CURLIB/&NAME) SRCSTMF('&PARENT/&BASENAME') OPTION(*EVENTF) SYSIFCOPT(*IFS64IO) DBGVIEW(*SOURCE)",
+        "deployFirst": true,
+        "environment": "ile",
+        "extensions": [
+            "C"
         ]
     }
 ]
