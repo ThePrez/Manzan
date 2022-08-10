@@ -204,7 +204,7 @@ int main(int _argc, char **argv)
     char *replacement_data = (0 == replacement_data_len) ? "":((char *)msg_event + replacement_data_offset);
 
     RTVM0100 msg_info_buf;
-    memset(&msg_info_buf, 0x00, sizeof(msg_info_buf.message));
+    memset(&msg_info_buf, 0x00, sizeof(msg_info_buf));
     char err_plc[32];
     memset(err_plc, 0x00, sizeof(err_plc));
     QMHRTVM(
