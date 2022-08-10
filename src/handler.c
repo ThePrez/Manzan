@@ -5,6 +5,18 @@
 #include <qsnddtaq.h>
 #include <qtqiconv.h>
 
+static FILE *fd = NULL;
+#define DEBUG_ENABLED 1
+#ifdef DEBUG_ENABLED
+#define STRDBG() fd = fopen("/home/LINUX/m.txt", "a")
+#define DEBUG(...) fprintf(fd, __VA_ARGS__)
+#define ENDDBG() fclose(fd)
+#else
+#define STRDBG()
+#define DEBUG(...)
+#define ENDDBG()
+#endif
+
 #pragma pack(1)
 typedef struct
 {
@@ -139,7 +151,7 @@ int to_utf8(char *out, size_t out_len, const char *in)
   memset(&fromcode, 0, sizeof(fromcode));
   iconv_t cd = QtqIconvOpen(&tocode, &fromcode);
 
-  size_t inleft = strlen(in);
+  size_t inleft = 1+strlen(in);
   size_t outleft = out_len;
   char *input = (char *)in;
   char *output = out;
@@ -147,29 +159,18 @@ int to_utf8(char *out, size_t out_len, const char *in)
   int rc = iconv(cd, &input, &inleft, &output, &outleft);
   if (rc == -1)
   {
-    Qp0zLprintf("Error in converting characters\n");
+    DEBUG("Error in converting characters\n");
     return 9;
   }
   return iconv_close(cd);
 }
 #define NTS(dest, src) extract_nts_trim(dest, sizeof(dest), src, sizeof(src))
 #define CNTS(src) NTS(cheater_buf, src)
-static FILE* fd = NULL;
-#define DEBUG_ENABLED 1
-#ifdef DEBUG_ENABLED
-#define STRDBG() fd = fopen("/home/LINUX/m.txt", "w")
-#define DEBUG(...) fprintf(fd, __VA_ARGS__)
-#define ENDDBG() fclose(fd)
-#else
-#define STRDBG()
-#define DEBUG(...)
-#define ENDDBG()
-#endif
 
 int publish_message(char *_msgid, char *_job_name, char *_user_name, char *_job_number, char* _message)
 { 
   DEBUG("Publishing to JSON\n");
-  char json[4096];
+  char json[1024];
   memset(json, 0x00, sizeof(json));
   sprintf(json, "{\n\"msg_id\": \"%s\",\n\"job\": \"%s/%s/%s\",\n\"message\": \"%s\"\n}\n", 
           _msgid,
@@ -178,10 +179,9 @@ int publish_message(char *_msgid, char *_job_name, char *_user_name, char *_job_
           _job_number,
           _message);
   DEBUG("%s\n", json);
-  char buffity_buf[4444];
-  char buffity_buf_utf8[4455];
+  char buffity_buf_utf8[1024];
   to_utf8(buffity_buf_utf8, sizeof(buffity_buf_utf8), json);
-  QSNDDTAQ("MANZANDTAQ", "JESSEG    ", 1 + strlen(buffity_buf_utf8), buffity_buf_utf8);
+  QSNDDTAQ("MANZANDTAQ", "JESSEG    ", strlen(buffity_buf_utf8), buffity_buf_utf8);
   return 0;
 }
 int main(int _argc, char **argv)
@@ -189,7 +189,7 @@ int main(int _argc, char **argv)
   STRDBG();
   DEBUG("watch program called.\n");
 
-  char cheater_buf[2560];
+  char cheater_buf[32];
   DEBUG("Watch option setting is '%s'\n", CNTS(argv[1]));
   if (0 == strcmp("*MSGID", CNTS(argv[1])))
   {
@@ -201,11 +201,11 @@ int main(int _argc, char **argv)
     DEBUG("Sending user profile is is '%s'\n", CNTS(msg_event->sending_user_profile));
     int replacement_data_offset = msg_event->offset_replacement_data;
     int replacement_data_len = msg_event->length_replacement_data;
-    char *replacement_data = extract_nts_trim(cheater_buf, sizeof(cheater_buf), (char *)msg_event + replacement_data_offset, replacement_data_len);
+    char *replacement_data = (0 == replacement_data_len) ? "":((char *)msg_event + replacement_data_offset);
 
     RTVM0100 msg_info_buf;
     memset(&msg_info_buf, 0x00, sizeof(msg_info_buf.message));
-    char err_plc[1024];
+    char err_plc[32];
     memset(err_plc, 0x00, sizeof(err_plc));
     QMHRTVM(
         // 1 	Message information 	Output 	Char(*)
@@ -241,6 +241,8 @@ int main(int _argc, char **argv)
     DEBUG("About to publish...\n");
     publish_message(msgid, job_name, user_name, job_number, msg_info_buf.message);
     DEBUG("Published\n");
+    //memset(argv[3], ' ', 10);
+    DEBUG("DONE\n");
   }
   ENDDBG();
 }
