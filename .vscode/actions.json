@@ -6,14 +6,21 @@
         "extensions": [
             "CLLE"
         ]
-    },
-    {
+    }, {
         "name": "C compile",
-        "command": "CRTBNDC PGM(&CURLIB/&NAME) SRCSTMF('&PARENT/&BASENAME') OPTION(*EVENTF) SYSIFCOPT(*IFS64IO) DBGVIEW(*SOURCE)",
+        "command": "CRTCMOD MODULE(&CURLIB/&NAME) SRCSTMF('&PARENT/&BASENAME') OPTION(*EVENTF) SYSIFCOPT(*IFS64IO) DBGVIEW(*SOURCE) TERASPACE(*YES *TSIFC) STGMDL(*SNGLVL) DTAMDL(*p128) ",
         "deployFirst": true,
         "environment": "ile",
         "extensions": [
             "C"
+        ]
+    }, {
+        "name": "CPP compile",
+        "command": "CRTCPPMOD MODULE(&CURLIB/&NAME) SRCSTMF('&PARENT/&BASENAME') OPTION(*EVENTF) SYSIFCOPT(*IFS64IO) DBGVIEW(*SOURCE) TERASPACE(*YES *TSIFC) STGMDL(*SNGLVL) DTAMDL(*p128) ",
+        "deployFirst": true,
+        "environment": "ile",
+        "extensions": [
+            "CPP"
         ]
     }
 ]

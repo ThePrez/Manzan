@@ -1,15 +1,19 @@
 #include <stdio.h>
+#include <stdlib.h>
+#include <string>
+#include <unistd.h>
 #include <fcntl.h>
 #include <qp0ztrc.h>
 #include <qmhrtvm.h>
 #include <qsnddtaq.h>
 #include <qtqiconv.h>
+#include <except.h>
 
 static FILE *fd = NULL;
 #define DEBUG_ENABLED 1
 #ifdef DEBUG_ENABLED
 #define STRDBG() fd = fopen("/home/LINUX/m.txt", "a")
-#define DEBUG(...) fprintf(fd, __VA_ARGS__)
+#define DEBUG(...) fprintf(fd, __VA_ARGS__); fflush(fd)
 #define ENDDBG() fclose(fd)
 #else
 #define STRDBG()
@@ -120,15 +124,27 @@ typedef struct
 
 #pragma pack(pop)
 #define MIN(a, b) ((a) < (b) ? (a) : (b))
+
+static int myhandler() {
+  printf("Well shit\n");
+  system("dlyjob 44");
+  DEBUG("Shittity Shit\n");
+  exit(-1); 
+  return 1;
+}
+
 char *
 extract_nts_trim(char *_dest, int _dest_len, char *_src, int _src_len)
 {
+
+//   static volatile _INTRPT_Hndlr_Parms_T my_comarea;
+// // https://www.ibm.com/docs/en/i/7.1?topic=descriptions-exception-handler
+// #pragma exception_handler(myhandler, my_comarea, 0, _C2_ALL, _CTLA_IGNORE_NO_MSG, "MCH0000")
   memset(_dest, 0x00, _dest_len);
   size_t strncpylen = MIN(-1 + _dest_len, _src_len);
   strncpy(_dest, _src, strncpylen);
   for (int i = 0; i < strncpylen; i++)
   {
-    printf("char '%c'\n", _dest[i]);
     if (' ' == _dest[i])
     {
       _dest[i] = 0x00;
@@ -143,6 +159,10 @@ extract_nts_trim(char *_dest, int _dest_len, char *_src, int _src_len)
 }
 int to_utf8(char *out, size_t out_len, const char *in)
 {
+
+//   static volatile _INTRPT_Hndlr_Parms_T my_comarea;
+// // https://www.ibm.com/docs/en/i/7.1?topic=descriptions-exception-handler
+// #pragma exception_handler(myhandler, my_comarea, 0, _C2_ALL, _CTLA_IGNORE_NO_MSG, "MCH0000")
   QtqCode_T tocode;
   memset(&tocode, 0, sizeof(tocode));
   tocode.CCSID = 819;
@@ -165,53 +185,149 @@ int to_utf8(char *out, size_t out_len, const char *in)
   return iconv_close(cd);
 }
 #define NTS(dest, src) extract_nts_trim(dest, sizeof(dest), src, sizeof(src))
-#define CNTS(src) NTS(cheater_buf, src)
 
-int publish_message(char *_msgid, char *_job_name, char *_user_name, char *_job_number, char* _message)
-{ 
-  DEBUG("Publishing to JSON\n");
-  char json[1024];
-  memset(json, 0x00, sizeof(json));
-  sprintf(json, "{\n\"msg_id\": \"%s\",\n\"job\": \"%s/%s/%s\",\n\"message\": \"%s\"\n}\n", 
-          _msgid,
-          _job_name,
-          _user_name,
-          _job_number,
-          _message);
-  DEBUG("%s\n", json);
-  char buffity_buf_utf8[1024];
-  to_utf8(buffity_buf_utf8, sizeof(buffity_buf_utf8), json);
-  QSNDDTAQ("MANZANDTAQ", "JESSEG    ", strlen(buffity_buf_utf8), buffity_buf_utf8);
+#define BUFSTR(dest, src) std::string dest(src, sizeof(src))
+#define BUFSTRN(dest, src, len) std::string dest(src, len)
+
+void json_encode(std::string& str, const char* _src)
+{
+  for(int i=0; _src[i] != 0; i++)
+  {
+    char c = _src[i];
+    switch(c) {
+      case '"':
+        str += "\\\"";
+        break;
+      case '\\':
+        str += "\\\\";
+        break;
+      case '\b':
+        str += "\\b";
+        break;
+      case '\f':
+        str += "\\f";
+        break;
+      case '\n':
+        str += "\\n";
+        break;
+      case '\r':
+        str += "\\r";
+        break;
+      case '\t':
+        str += "\\t";
+        break;
+      case '\0':
+        str += "\\0";
+        return;
+      default:
+        str += c;
+        break;
+    }
+  }
+}
+void append_json_element(std::string& _str, const char *_key, const char *_value)
+{
+  _str += "\"";
+  _str += _key;
+  _str += "\":\"";
+  std::string encoded;
+  json_encode(encoded, _value);
+  _str += encoded;
+  _str += "\"";
+}
+
+int publish_message(const char *_msgid, const char *_job, char* _message)
+{
+  std::string jsonStr;
+  jsonStr += "{\n    ";
+  append_json_element(jsonStr, "msgid", _msgid);
+  jsonStr+=",\n    ";
+  append_json_element(jsonStr, "job", _job);
+  jsonStr+=",\n    ";
+  append_json_element(jsonStr, "message", _message);
+
+  jsonStr += "\n}";
+
+  int json_len = 1+jsonStr.length();
+  char* utf8 = (char*)malloc(56+json_len*2);
+
+  to_utf8(utf8, json_len, jsonStr.c_str());
+  DEBUG("%s\n", jsonStr.c_str());
+  QSNDDTAQ("MANZANDTAQ", "JESSEG    ", strlen(utf8), utf8);
   return 0;
 }
 int main(int _argc, char **argv)
 {
+//   static volatile _INTRPT_Hndlr_Parms_T my_comarea;
+// // https://www.ibm.com/docs/en/i/7.1?topic=descriptions-exception-handler
+// #pragma exception_handler(myhandler, my_comarea, 0, _C2_ALL, _CTLA_HANDLE, "MCH3601")
   STRDBG();
-  DEBUG("watch program called.\n");
 
-  char cheater_buf[32];
-  DEBUG("Watch option setting is '%s'\n", CNTS(argv[1]));
-  if (0 == strcmp("*MSGID", CNTS(argv[1])))
+#ifdef DEBUG_ENABLED
+  if(NULL == fd) { 
+    return 0;
+  }
+#endif
+  //system("CHGJOB LOG(4 00 *SECLVL)");
+  Qp0zLprintf("Liam was here\n");
+      DEBUG("watch program called.\n");
+  BUFSTRN(watch_option, argv[1], 10);
+  DEBUG("Watch option setting is '%s'\n", watch_option.c_str());
+  if (0 == strncmp("*MSGID", watch_option.c_str(), 6))
   {
     DEBUG("Handling message\n");
     // handling message
     msg_event_raw *msg_event = (msg_event_raw *)argv[4];
-    DEBUG("Message watched is '%s'\n", CNTS(msg_event->message_watched));
-    DEBUG("Message type is '%s'\n", CNTS(msg_event->message_type));
-    DEBUG("Sending user profile is is '%s'\n", CNTS(msg_event->sending_user_profile));
+    int len = msg_event->watch_info_length;
+    DEBUG("Watch info length is '%d'\n", len);
+
+    BUFSTR(msgid, msg_event->message_watched);
+    BUFSTR(job_name, msg_event->job_name);
+    BUFSTR(user_name, msg_event->user_name);
+    BUFSTR(job_number, msg_event->job_number);
+    std::string job = job_number+"/"+user_name+"/"+job_name;
+    BUFSTR(message_type, msg_event->message_type);
+    BUFSTR(sending_usrprf, msg_event->sending_user_profile);
+    BUFSTRN(sending_procedure_name, (char *)msg_event + msg_event->offset_send_procedure_name, msg_event->length_send_procedure_name);
+    BUFSTR(sending_module_name, msg_event->sending_module_name);
+    BUFSTR(sending_program_name, msg_event->sending_program_name);
+    sending_program_name.erase(1 + sending_program_name.find_last_not_of(" "));
+
+    if (0 == strcmp(job_name.c_str(), "QSCWCHPS"))
+    {
+      DEBUG("hiding my secrets\n");
+      //  system("SBMJOB CMD(ENDWCH BARRY)");
+      strncpy(argv[3], "*ERROR    ", 10);
+      ENDDBG();
+      return 0;
+    }
+    DEBUG("Message watched is '%s'\n", msgid.c_str());
+    DEBUG("Message type is '%s'\n", message_type.c_str());
+    DEBUG("Sending user profile is is '%s'\n",sending_usrprf.c_str());
+
     int replacement_data_offset = msg_event->offset_replacement_data;
     int replacement_data_len = msg_event->length_replacement_data;
-    char *replacement_data = (0 == replacement_data_len) ? "":((char *)msg_event + replacement_data_offset);
+    DEBUG("Replacement data offset is '%d'\n", replacement_data_offset);
+    DEBUG("REPLACEMENT DATA LENGTH IS '%d'\n", replacement_data_len);
+    DEBUG("Sending procedure is '%s'\n", sending_procedure_name.c_str());
+    DEBUG("Sending module is '%s'\n", sending_module_name.c_str());
+    DEBUG("Sending program is '%s'\n", sending_program_name.c_str());
+    char *replacement_data = (0 == replacement_data_len) ? "":(((char *)msg_event) + replacement_data_offset);
+    char* replacement_data_aligned = (char*)malloc(replacement_data_len);
+    memcpy(replacement_data_aligned, replacement_data, replacement_data_len);
+    // DEBUG("Replacement data is '%s'\n", extract_nts_trim(cheater_buf, sizeof(cheater_buf), replacement_data, replacement_data_len));
+
 
     RTVM0100 msg_info_buf;
     memset(&msg_info_buf, 0x00, sizeof(msg_info_buf));
-    char err_plc[32];
+    char err_plc[64];
     memset(err_plc, 0x00, sizeof(err_plc));
+    DEBUG("About to call RTVM0100\n");
     QMHRTVM(
         // 1 	Message information 	Output 	Char(*)
         &msg_info_buf,
         // 2 	Length of message information 	Input 	Binary(4)
-        sizeof(msg_info_buf),
+        -1+sizeof(msg_info_buf),
         // 3 	Format name 	Input 	Char(8)
         "RTVM0100",
         // 4 	Message identifier 	Input 	Char(7)
@@ -219,7 +335,7 @@ int main(int _argc, char **argv)
         // 5 	Qualified message file name 	Input 	Char(20)
         "QCPFMSG   QSYS      ",
         // 6 	Replacement data 	Input 	Char(*)
-        replacement_data,
+        replacement_data_aligned,
         // 7 	Length of replacement data 	Input 	Binary(4)
         replacement_data_len,
         // 8 	Replace substitution values 	Input 	Char(10)
@@ -228,21 +344,16 @@ int main(int _argc, char **argv)
         "*NO       ",
         // 10 	Error code 	I/O 	Char(*)
         err_plc);
+    DEBUG("RTVM0100 returned\n");
     DEBUG("The full message is '%s'\n", msg_info_buf.message);
 
-    char msgid[8];
-    NTS(msgid, msg_event->message_watched);
-    char job_name[11];
-    NTS(job_name, msg_event->job_name);
-    char user_name[11];
-    NTS(user_name, msg_event->user_name);
-    char job_number[11];
-    NTS(job_number, msg_event->job_number);
-    DEBUG("About to publish...\n");
-    publish_message(msgid, job_name, user_name, job_number, msg_info_buf.message);
-    DEBUG("Published\n");
+   DEBUG("About to publish...\n");
+    publish_message(msgid.c_str(), job.c_str(), msg_info_buf.message);
+    DEBUG("Published\n"); 
     //memset(argv[3], ' ', 10);
     DEBUG("DONE\n");
   }
   ENDDBG();
+//#pragma disable_handler
+  return 0;
 }
