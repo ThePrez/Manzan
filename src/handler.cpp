@@ -138,12 +138,6 @@ typedef struct
 #pragma pack(pop)
 #define MIN(a, b) ((a) < (b) ? (a) : (b))
 
-void myhandler(_INTRPT_Hndlr_Parms_T *_parms)
-{
-  DEBUG("MCH exception happened!\n");
-  exit(-1);
-}
-
 int to_utf8(char *out, size_t out_len, const char *in)
 {
   QtqCode_T tocode;
@@ -260,7 +254,7 @@ int main(int _argc, char **argv)
 {
   static volatile _INTRPT_Hndlr_Parms_T my_commarea;
 // https://www.ibm.com/docs/en/i/7.1?topic=descriptions-exception-handler
-#pragma exception_handler(myhandler, my_commarea, _C1_ALL, _C2_ALL, _CTLA_HANDLE, 0)
+#pragma exception_handler(oh_crap, my_commarea, _C1_ALL, _C2_ALL, _CTLA_HANDLE_NO_MSG, 0)
   STRDBG();
   DEBUG("watch program called.\n");
   BUFSTRN(watch_option, argv[1], 10);
@@ -286,14 +280,6 @@ int main(int _argc, char **argv)
     BUFSTR(sending_program_name, msg_event->sending_program_name);
     sending_program_name.erase(1 + sending_program_name.find_last_not_of(" "));
 
-    if (0 == strcmp(job_name.c_str(), "QSCWCHPS"))
-    {
-      DEBUG("hiding my secrets\n");
-      //  system("SBMJOB CMD(ENDWCH BARRY)");
-      strncpy(argv[3], "*ERROR    ", 10);
-      ENDDBG();
-      return 0;
-    }
     DEBUG("Message watched is '%s'\n", msgid.c_str());
     DEBUG("Message type is '%s'\n", message_type.c_str());
     DEBUG("Sending user profile is is '%s'\n", sending_usrprf.c_str());
@@ -354,4 +340,9 @@ int main(int _argc, char **argv)
   }
   ENDDBG();
   return 0;
+oh_crap:
+  strncpy(argv[3], "*ERROR    ", 10);
+  DEBUG("MCH exception happened!\n");
+  ENDDBG();
+  return 1;
 }
