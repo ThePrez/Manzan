@@ -28,6 +28,12 @@ static FILE *fd = NULL;
 #define ENDDBG()
 #endif
 
+#define BUFSTR(dest, src) std::string dest(src, sizeof(src))
+#define BUFSTRN(dest, src, len) std::string dest(src, len)
+#define ITOA(dest, src) \
+  char dest[32];        \
+  sprintf(dest, "%d", src);
+
 #pragma pack(1)
 typedef struct
 {
@@ -162,9 +168,6 @@ int to_utf8(char *out, size_t out_len, const char *in)
   return iconv_close(cd);
 }
 
-#define BUFSTR(dest, src) std::string dest(src, sizeof(src))
-#define BUFSTRN(dest, src, len) std::string dest(src, len)
-
 void json_encode(std::string &str, const char *_src)
 {
   for (int i = 0; _src[i] != 0; i++)
@@ -212,16 +215,35 @@ void append_json_element(std::string &_str, const char *_key, const char *_value
   _str += encoded;
   _str += "\"";
 }
+void append_json_element(std::string &_str, const char *_key, const int _value)
+{
+  _str += "\"";
+  _str += _key;
+  _str += "\": ";
+  ITOA(value, _value);
+  _str += value;
+}
 
-int publish_message(const char *_msgid, const char *_job, char *_message)
+int publish_message(const char *_msgid, const char *_msg_type, int _msg_severity, const char *_job, char *_message,
+                    const char *_sending_program_name, const char *_sending_module_name, const char *_sending_procedure_name)
 {
   std::string jsonStr;
   jsonStr += "{\n    ";
   append_json_element(jsonStr, "msgid", _msgid);
   jsonStr += ",\n    ";
+  append_json_element(jsonStr, "msgtype", _msg_type);
+  jsonStr += ",\n    ";
+  append_json_element(jsonStr, "severity", _msg_severity);
+  jsonStr += ",\n    ";
   append_json_element(jsonStr, "job", _job);
   jsonStr += ",\n    ";
   append_json_element(jsonStr, "message", _message);
+  jsonStr += ",\n    ";
+  append_json_element(jsonStr, "sending_program_name", _sending_program_name);
+  jsonStr += ",\n    ";
+  append_json_element(jsonStr, "sending_module_name", _sending_module_name);
+  jsonStr += ",\n    ";
+  append_json_element(jsonStr, "sending_procedure_name", _sending_procedure_name);
 
   jsonStr += "\n}";
 
@@ -257,6 +279,7 @@ int main(int _argc, char **argv)
     BUFSTR(job_number, msg_event->job_number);
     std::string job = job_number + "/" + user_name + "/" + job_name;
     BUFSTR(message_type, msg_event->message_type);
+    int message_severity = msg_event->message_severity;
     BUFSTR(sending_usrprf, msg_event->sending_user_profile);
     BUFSTRN(sending_procedure_name, (char *)msg_event + msg_event->offset_send_procedure_name, msg_event->length_send_procedure_name);
     BUFSTR(sending_module_name, msg_event->sending_module_name);
@@ -317,7 +340,14 @@ int main(int _argc, char **argv)
     DEBUG("The full message is '%s'\n", msg_info_buf.message);
 
     DEBUG("About to publish...\n");
-    publish_message(msgid.c_str(), job.c_str(), msg_info_buf.message);
+    publish_message(msgid.c_str(),
+                    message_type.c_str(),
+                    message_severity,
+                    job.c_str(),
+                    msg_info_buf.message,
+                    sending_program_name.c_str(),
+                    sending_module_name.c_str(),
+                    sending_procedure_name.c_str());
     DEBUG("Published\n");
     memset(argv[3], ' ', 10);
     DEBUG("DONE\n");
