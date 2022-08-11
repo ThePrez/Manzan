@@ -99,12 +99,12 @@ int json_publish(std::string &_json)
   DEBUG("Publishing JSON\n");
   DEBUG("%s\n", _json.c_str());
   QSNDDTAQ("MANZANDTAQ", "JESSEG    ", strlen(utf8), utf8);
-  free(utf8); 
+  free(utf8);
   return 0;
 }
 
 int json_publish_message(const char *_session_id, const char *_msgid, const char *_msg_type, int _msg_severity, const char *_job, char *_message,
-                    const char *_sending_program_name, const char *_sending_module_name, const char *_sending_procedure_name)
+                         const char *_sending_program_name, const char *_sending_module_name, const char *_sending_procedure_name)
 {
   std::string jsonStr;
   jsonStr += "{\n    ";

@@ -1,6 +1,7 @@
 #ifndef _MANZAN_H_
 #define _MANZAN_H_
 #include <stdio.h>
+
 #define BUFSTR(dest, src)                         \
   std::string dest(src, sizeof(src));             \
   {                                               \
@@ -19,7 +20,7 @@
   char dest[32];        \
   sprintf(dest, "%d", src);
 
-extern "C" FILE* debug_fd;
+extern "C" FILE *debug_fd;
 void STRDBG();
 void ENDDBG();
 

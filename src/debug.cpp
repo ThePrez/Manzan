@@ -7,7 +7,6 @@
 extern "C" FILE * debug_fd;
 FILE *debug_fd = NULL;
 
-#define DEBUG_ENABLED 1
 void STRDBG()
 {
 #ifdef DEBUG_ENABLED

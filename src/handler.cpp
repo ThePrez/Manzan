@@ -12,6 +12,8 @@
 static FILE *fd = NULL;
 
 #pragma pack(1)
+
+#pragma pack(1)
 typedef struct
 {
   //     0 0 BINARY(4) Length of watch information
@@ -115,13 +117,15 @@ typedef struct
 #pragma pack(pop)
 
 int publish_message(const char *_session_id, const char *_msgid, const char *_msg_type, int _msg_severity, const char *_job, char *_message,
-                         const char *_sending_program_name, const char *_sending_module_name, const char *_sending_procedure_name) {
-  return json_publish_message(_session_id, _msgid, _msg_type,  _msg_severity, _job, _message,
+                    const char *_sending_program_name, const char *_sending_module_name, const char *_sending_procedure_name)
+{
+  return json_publish_message(_session_id, _msgid, _msg_type, _msg_severity, _job, _message,
                               _sending_program_name, _sending_module_name, _sending_procedure_name);
-                         }
+}
 
-int publish_other(const char *_session_id, const char *_event_type) {
-  return json_publish_other(_session_id,_event_type);
+int publish_other(const char *_session_id, const char *_event_type)
+{
+  return json_publish_other(_session_id, _event_type);
 }
 
 int main(int _argc, char **argv)
