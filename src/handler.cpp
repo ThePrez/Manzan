@@ -28,8 +28,20 @@ static FILE *fd = NULL;
 #define ENDDBG()
 #endif
 
-#define BUFSTR(dest, src) std::string dest(src, sizeof(src))
-#define BUFSTRN(dest, src, len) std::string dest(src, len)
+#define BUFSTR(dest, src)                         \
+  std::string dest(src, sizeof(src));             \
+  {                                               \
+    size_t lastChar = dest.find_last_not_of(" "); \
+    if (lastChar != std::string::npos)            \
+      dest.erase(1 + lastChar);                   \
+  }
+#define BUFSTRN(dest, src, len)                   \
+  std::string dest(src, len);                     \
+  {                                               \
+    size_t lastChar = dest.find_last_not_of(" "); \
+    if (lastChar != std::string::npos)            \
+      dest.erase(1 + lastChar);                   \
+  }
 #define ITOA(dest, src) \
   char dest[32];        \
   sprintf(dest, "%d", src);
@@ -218,11 +230,27 @@ void append_json_element(std::string &_str, const char *_key, const int _value)
   _str += value;
 }
 
-int publish_message(const char *_msgid, const char *_msg_type, int _msg_severity, const char *_job, char *_message,
+int json_publish(std::string &_json)
+{
+  int json_len = 1 + _json.length();
+  char *utf8 = (char *)malloc(56 + _json.length() * 2);
+
+  to_utf8(utf8, json_len, _json.c_str());
+  DEBUG("%s\n", _json.c_str());
+  QSNDDTAQ("MANZANDTAQ", "JESSEG    ", strlen(utf8), utf8);
+  free(utf8);
+  return 0;
+}
+
+int publish_message(const char *_session_id, const char *_msgid, const char *_msg_type, int _msg_severity, const char *_job, char *_message,
                     const char *_sending_program_name, const char *_sending_module_name, const char *_sending_procedure_name)
 {
   std::string jsonStr;
   jsonStr += "{\n    ";
+  append_json_element(jsonStr, "event_type", "message");
+  jsonStr += ",\n    ";
+  append_json_element(jsonStr, "session_id", _session_id);
+  jsonStr += "\n}";
   append_json_element(jsonStr, "msgid", _msgid);
   jsonStr += ",\n    ";
   append_json_element(jsonStr, "msgtype", _msg_type);
@@ -241,14 +269,18 @@ int publish_message(const char *_msgid, const char *_msg_type, int _msg_severity
 
   jsonStr += "\n}";
 
-  int json_len = 1 + jsonStr.length();
-  char *utf8 = (char *)malloc(56 + json_len * 2);
+  return json_publish(jsonStr);
+}
 
-  to_utf8(utf8, json_len, jsonStr.c_str());
-  DEBUG("%s\n", jsonStr.c_str());
-  QSNDDTAQ("MANZANDTAQ", "JESSEG    ", strlen(utf8), utf8);
-  free(utf8);
-  return 0;
+int publish_other(const char *_session_id, const char *_event_type)
+{
+  std::string jsonStr;
+  jsonStr += "{\n    ";
+  append_json_element(jsonStr, "event_type", _event_type);
+  jsonStr += ",\n    ";
+  append_json_element(jsonStr, "session_id", _session_id);
+  jsonStr += "\n}";
+  return json_publish(jsonStr);
 }
 int main(int _argc, char **argv)
 {
@@ -258,8 +290,9 @@ int main(int _argc, char **argv)
   STRDBG();
   DEBUG("watch program called.\n");
   BUFSTRN(watch_option, argv[1], 10);
+  BUFSTRN(session_id, argv[2], 10);
   DEBUG("Watch option setting is '%s'\n", watch_option.c_str());
-  if (0 == strncmp("*MSGID", watch_option.c_str(), 6))
+  if (watch_option == "*MSGID")
   {
     DEBUG("Handling message\n");
     // handling message
@@ -326,17 +359,23 @@ int main(int _argc, char **argv)
     DEBUG("The full message is '%s'\n", msg_info_buf.message);
 
     DEBUG("About to publish...\n");
-    publish_message(msgid.c_str(),
-                    message_type.c_str(),
-                    message_severity,
-                    job.c_str(),
-                    msg_info_buf.message,
-                    sending_program_name.c_str(),
-                    sending_module_name.c_str(),
-                    sending_procedure_name.c_str());
+    publish_message(
+        session_id.c_str(),
+        msgid.c_str(),
+        message_type.c_str(),
+        message_severity,
+        job.c_str(),
+        msg_info_buf.message,
+        sending_program_name.c_str(),
+        sending_module_name.c_str(),
+        sending_procedure_name.c_str());
     DEBUG("Published\n");
     memset(argv[3], ' ', 10);
     DEBUG("DONE\n");
+  }
+  else
+  {
+    publish_other(session_id.c_str(), watch_option.c_str());
   }
   ENDDBG();
   return 0;
