@@ -34,7 +34,7 @@
          ]
      }, {
          "name": "Build current",
-         "command": "/QOpenSys/pkgs/bin/gmake BUILDLIB=&CURLIB &BASENAME",
+         "command": "/QOpenSys/pkgs/bin/gmake all BUILDLIB=&CURLIB ERR=*EVENTF",
          "deployFirst": true,
          "environment": "pase",
          "extensions": [
