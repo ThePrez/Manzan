@@ -125,21 +125,15 @@ typedef struct
 #pragma pack(pop)
 #define MIN(a, b) ((a) < (b) ? (a) : (b))
 
-static int myhandler() {
-  printf("Well shit\n");
-  system("dlyjob 44");
-  DEBUG("Shittity Shit\n");
-  exit(-1); 
-  return 1;
+void myhandler(_INTRPT_Hndlr_Parms_T *_parms)
+{
+  DEBUG("MCH exception happened!\n");
+  exit(-1);
 }
 
 char *
 extract_nts_trim(char *_dest, int _dest_len, char *_src, int _src_len)
 {
-
-//   static volatile _INTRPT_Hndlr_Parms_T my_comarea;
-// // https://www.ibm.com/docs/en/i/7.1?topic=descriptions-exception-handler
-// #pragma exception_handler(myhandler, my_comarea, 0, _C2_ALL, _CTLA_IGNORE_NO_MSG, "MCH0000")
   memset(_dest, 0x00, _dest_len);
   size_t strncpylen = MIN(-1 + _dest_len, _src_len);
   strncpy(_dest, _src, strncpylen);
@@ -159,10 +153,6 @@ extract_nts_trim(char *_dest, int _dest_len, char *_src, int _src_len)
 }
 int to_utf8(char *out, size_t out_len, const char *in)
 {
-
-//   static volatile _INTRPT_Hndlr_Parms_T my_comarea;
-// // https://www.ibm.com/docs/en/i/7.1?topic=descriptions-exception-handler
-// #pragma exception_handler(myhandler, my_comarea, 0, _C2_ALL, _CTLA_IGNORE_NO_MSG, "MCH0000")
   QtqCode_T tocode;
   memset(&tocode, 0, sizeof(tocode));
   tocode.CCSID = 819;
@@ -184,7 +174,6 @@ int to_utf8(char *out, size_t out_len, const char *in)
   }
   return iconv_close(cd);
 }
-#define NTS(dest, src) extract_nts_trim(dest, sizeof(dest), src, sizeof(src))
 
 #define BUFSTR(dest, src) std::string dest(src, sizeof(src))
 #define BUFSTRN(dest, src, len) std::string dest(src, len)
@@ -254,13 +243,14 @@ int publish_message(const char *_msgid, const char *_job, char* _message)
   to_utf8(utf8, json_len, jsonStr.c_str());
   DEBUG("%s\n", jsonStr.c_str());
   QSNDDTAQ("MANZANDTAQ", "JESSEG    ", strlen(utf8), utf8);
+  free(utf8);
   return 0;
 }
 int main(int _argc, char **argv)
 {
-//   static volatile _INTRPT_Hndlr_Parms_T my_comarea;
-// // https://www.ibm.com/docs/en/i/7.1?topic=descriptions-exception-handler
-// #pragma exception_handler(myhandler, my_comarea, 0, _C2_ALL, _CTLA_HANDLE, "MCH3601")
+  static volatile _INTRPT_Hndlr_Parms_T my_commarea;
+// https://www.ibm.com/docs/en/i/7.1?topic=descriptions-exception-handler
+#pragma exception_handler(myhandler, my_commarea, _C1_ALL, _C2_ALL, _CTLA_HANDLE, 0)
   STRDBG();
 
 #ifdef DEBUG_ENABLED
@@ -315,8 +305,6 @@ int main(int _argc, char **argv)
     char *replacement_data = (0 == replacement_data_len) ? "":(((char *)msg_event) + replacement_data_offset);
     char* replacement_data_aligned = (char*)malloc(replacement_data_len);
     memcpy(replacement_data_aligned, replacement_data, replacement_data_len);
-    // DEBUG("Replacement data is '%s'\n", extract_nts_trim(cheater_buf, sizeof(cheater_buf), replacement_data, replacement_data_len));
-
 
     RTVM0100 msg_info_buf;
     memset(&msg_info_buf, 0x00, sizeof(msg_info_buf));
@@ -345,15 +333,15 @@ int main(int _argc, char **argv)
         // 10 	Error code 	I/O 	Char(*)
         err_plc);
     DEBUG("RTVM0100 returned\n");
+    free(replacement_data_aligned);
     DEBUG("The full message is '%s'\n", msg_info_buf.message);
 
-   DEBUG("About to publish...\n");
+    DEBUG("About to publish...\n");
     publish_message(msgid.c_str(), job.c_str(), msg_info_buf.message);
     DEBUG("Published\n"); 
     //memset(argv[3], ' ', 10);
     DEBUG("DONE\n");
   }
   ENDDBG();
-//#pragma disable_handler
   return 0;
 }
