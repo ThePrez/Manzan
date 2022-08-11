@@ -10,9 +10,8 @@
 #include <except.h>
 
 static FILE *fd = NULL;
-#define DEBUG_ENABLED 1
 #ifdef DEBUG_ENABLED
-#define STRDBG() fd = fopen("/home/LINUX/m.txt", "a")
+#define STRDBG() fd = fopen("/tmp/manzan_debug.txt", "a")
 #define DEBUG(...)            \
   if (NULL != fd)             \
   {                           \
@@ -250,7 +249,7 @@ int publish_message(const char *_session_id, const char *_msgid, const char *_ms
   append_json_element(jsonStr, "event_type", "message");
   jsonStr += ",\n    ";
   append_json_element(jsonStr, "session_id", _session_id);
-  jsonStr += "\n}";
+  jsonStr += ",\n    ";
   append_json_element(jsonStr, "msgid", _msgid);
   jsonStr += ",\n    ";
   append_json_element(jsonStr, "msgtype", _msg_type);
@@ -268,7 +267,6 @@ int publish_message(const char *_session_id, const char *_msgid, const char *_ms
   append_json_element(jsonStr, "sending_procedure_name", _sending_procedure_name);
 
   jsonStr += "\n}";
-
   return json_publish(jsonStr);
 }
 
@@ -288,18 +286,13 @@ int main(int _argc, char **argv)
 // https://www.ibm.com/docs/en/i/7.1?topic=descriptions-exception-handler
 #pragma exception_handler(oh_crap, my_commarea, _C1_ALL, _C2_ALL, _CTLA_HANDLE_NO_MSG, 0)
   STRDBG();
-  DEBUG("watch program called.\n");
   BUFSTRN(watch_option, argv[1], 10);
   BUFSTRN(session_id, argv[2], 10);
-  DEBUG("Watch option setting is '%s'\n", watch_option.c_str());
+  DEBUG("watch program called. Watch option setting is '%s'\n", watch_option.c_str());
   if (watch_option == "*MSGID")
   {
     DEBUG("Handling message\n");
-    // handling message
     msg_event_raw *msg_event = (msg_event_raw *)argv[4];
-    int len = msg_event->watch_info_length;
-    DEBUG("Watch info length is '%d'\n", len);
-
     BUFSTR(msgid, msg_event->message_watched);
     BUFSTR(job_name, msg_event->job_name);
     BUFSTR(user_name, msg_event->user_name);
@@ -313,17 +306,10 @@ int main(int _argc, char **argv)
     BUFSTR(sending_program_name, msg_event->sending_program_name);
     sending_program_name.erase(1 + sending_program_name.find_last_not_of(" "));
 
-    DEBUG("Message watched is '%s'\n", msgid.c_str());
-    DEBUG("Message type is '%s'\n", message_type.c_str());
-    DEBUG("Sending user profile is is '%s'\n", sending_usrprf.c_str());
-
     int replacement_data_offset = msg_event->offset_replacement_data;
     int replacement_data_len = msg_event->length_replacement_data;
     DEBUG("Replacement data offset is '%d'\n", replacement_data_offset);
     DEBUG("REPLACEMENT DATA LENGTH IS '%d'\n", replacement_data_len);
-    DEBUG("Sending procedure is '%s'\n", sending_procedure_name.c_str());
-    DEBUG("Sending module is '%s'\n", sending_module_name.c_str());
-    DEBUG("Sending program is '%s'\n", sending_program_name.c_str());
     char *replacement_data = (0 == replacement_data_len) ? "" : (((char *)msg_event) + replacement_data_offset);
     char *replacement_data_aligned = (char *)malloc(replacement_data_len);
     memcpy(replacement_data_aligned, replacement_data, replacement_data_len);
@@ -332,7 +318,6 @@ int main(int _argc, char **argv)
     memset(&msg_info_buf, 0x00, sizeof(msg_info_buf));
     char err_plc[64];
     memset(err_plc, 0x00, sizeof(err_plc));
-    DEBUG("About to call RTVM0100\n");
     QMHRTVM(
         // 1 	Message information 	Output 	Char(*)
         &msg_info_buf,
@@ -354,7 +339,6 @@ int main(int _argc, char **argv)
         "*NO       ",
         // 10 	Error code 	I/O 	Char(*)
         err_plc);
-    DEBUG("RTVM0100 returned\n");
     free(replacement_data_aligned);
     DEBUG("The full message is '%s'\n", msg_info_buf.message);
 
