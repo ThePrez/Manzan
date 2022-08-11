@@ -116,14 +116,13 @@ typedef struct
 
 #pragma pack(pop)
 
-int publish_message(const char *_session_id, const char *_msgid, const char *_msg_type, int _msg_severity, const char *_job, char *_message,
-                    const char *_sending_program_name, const char *_sending_module_name, const char *_sending_procedure_name)
+int publish_message(PUBLISH_MESSAGE_FUNCTION_SIGNATURE)
 {
-  return json_publish_message(_session_id, _msgid, _msg_type, _msg_severity, _job, _message,
+  return json_publish_message(_session_id, _msgid, _msg_type, _msg_severity, _job, _sending_usrprf, _message,
                               _sending_program_name, _sending_module_name, _sending_procedure_name);
 }
 
-int publish_other(const char *_session_id, const char *_event_type)
+int publish_other(PUBLISH_OTHER_FUNCTION_SIGNATURE)
 {
   return json_publish_other(_session_id, _event_type);
 }
@@ -147,6 +146,8 @@ int main(int _argc, char **argv)
     BUFSTR(job_number, msg_event->job_number);
     std::string job = job_number + "/" + user_name + "/" + job_name;
     BUFSTR(message_type, msg_event->message_type);
+    BUFSTR(message_timestamp, msg_event->message_timestamp);
+    DEBUG("Timestamp is '%s'\n", message_timestamp.c_str());
     int message_severity = msg_event->message_severity;
     BUFSTR(sending_usrprf, msg_event->sending_user_profile);
     BUFSTRN(sending_procedure_name, (char *)msg_event + msg_event->offset_send_procedure_name, msg_event->length_send_procedure_name);
@@ -197,6 +198,7 @@ int main(int _argc, char **argv)
         message_type.c_str(),
         message_severity,
         job.c_str(),
+        sending_usrprf.c_str(),
         msg_info_buf.message,
         sending_program_name.c_str(),
         sending_module_name.c_str(),

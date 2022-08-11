@@ -20,6 +20,19 @@
   char dest[32];        \
   sprintf(dest, "%d", src);
 
+#define PUBLISH_MESSAGE_FUNCTION_SIGNATURE const char *_session_id,           \
+                                   const char *_msgid,                \
+                                   const char *_msg_type,             \
+                                   int _msg_severity,                 \
+                                   const char *_job,                  \
+                                   const char *_sending_usrprf,       \
+                                   const char *_message,              \
+                                   const char *_sending_program_name, \
+                                   const char *_sending_module_name,  \
+                                   const char *_sending_procedure_name
+
+#define PUBLISH_OTHER_FUNCTION_SIGNATURE const char *_session_id, const char *_event_type
+
 extern "C" FILE *debug_fd;
 void STRDBG();
 void ENDDBG();

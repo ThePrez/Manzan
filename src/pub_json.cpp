@@ -103,8 +103,7 @@ int json_publish(std::string &_json)
   return 0;
 }
 
-int json_publish_message(const char *_session_id, const char *_msgid, const char *_msg_type, int _msg_severity, const char *_job, char *_message,
-                         const char *_sending_program_name, const char *_sending_module_name, const char *_sending_procedure_name)
+int json_publish_message(PUBLISH_MESSAGE_FUNCTION_SIGNATURE)
 {
   std::string jsonStr;
   jsonStr += "{\n    ";
@@ -120,6 +119,8 @@ int json_publish_message(const char *_session_id, const char *_msgid, const char
   jsonStr += ",\n    ";
   append_json_element(jsonStr, "job", _job);
   jsonStr += ",\n    ";
+  append_json_element(jsonStr, "sending_usrprf", _sending_usrprf);
+  jsonStr += ",\n    ";
   append_json_element(jsonStr, "message", _message);
   jsonStr += ",\n    ";
   append_json_element(jsonStr, "sending_program_name", _sending_program_name);
@@ -132,7 +133,7 @@ int json_publish_message(const char *_session_id, const char *_msgid, const char
   return json_publish(jsonStr);
 }
 
-int json_publish_other(const char *_session_id, const char *_event_type)
+int json_publish_other(PUBLISH_OTHER_FUNCTION_SIGNATURE)
 {
   std::string jsonStr;
   jsonStr += "{\n    ";

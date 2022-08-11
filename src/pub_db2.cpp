@@ -8,13 +8,12 @@
 #include <fcntl.h>
 #include <qp0ztrc.h>
 
-int db2_publish_message(const char *_session_id, const char *_msgid, const char *_msg_type, int _msg_severity, const char *_job, char *_message,
-                        const char *_sending_program_name, const char *_sending_module_name, const char *_sending_procedure_name)
+int db2_publish_message(PUBLISH_MESSAGE_FUNCTION_SIGNATURE)
 {
   return 0;
 }
 
-int db2_publish_other(const char *_session_id, const char *_event_type)
+int db2_publish_other(PUBLISH_OTHER_FUNCTION_SIGNATURE)
 {
   return 0;
 }
