@@ -13,8 +13,15 @@ static FILE *fd = NULL;
 #define DEBUG_ENABLED 1
 #ifdef DEBUG_ENABLED
 #define STRDBG() fd = fopen("/home/LINUX/m.txt", "a")
-#define DEBUG(...) fprintf(fd, __VA_ARGS__); fflush(fd)
-#define ENDDBG() fclose(fd)
+#define DEBUG(...)            \
+  if (NULL != fd)             \
+  {                           \
+    fprintf(fd, __VA_ARGS__); \
+    fflush(fd);               \
+  }
+#define ENDDBG()  \
+  if (NULL != fd) \
+  fclose(fd)
 #else
 #define STRDBG()
 #define DEBUG(...)
@@ -131,37 +138,17 @@ void myhandler(_INTRPT_Hndlr_Parms_T *_parms)
   exit(-1);
 }
 
-char *
-extract_nts_trim(char *_dest, int _dest_len, char *_src, int _src_len)
-{
-  memset(_dest, 0x00, _dest_len);
-  size_t strncpylen = MIN(-1 + _dest_len, _src_len);
-  strncpy(_dest, _src, strncpylen);
-  for (int i = 0; i < strncpylen; i++)
-  {
-    if (' ' == _dest[i])
-    {
-      _dest[i] = 0x00;
-      return _dest;
-    }
-    if (0x00 == _dest[i])
-    {
-      return _dest;
-    }
-  }
-  return _dest;
-}
 int to_utf8(char *out, size_t out_len, const char *in)
 {
   QtqCode_T tocode;
   memset(&tocode, 0, sizeof(tocode));
-  tocode.CCSID = 819;
+  tocode.CCSID = 1208;
   QtqCode_T fromcode;
   fromcode.CCSID = 37;
   memset(&fromcode, 0, sizeof(fromcode));
   iconv_t cd = QtqIconvOpen(&tocode, &fromcode);
 
-  size_t inleft = 1+strlen(in);
+  size_t inleft = 1 + strlen(in);
   size_t outleft = out_len;
   char *input = (char *)in;
   char *output = out;
@@ -178,43 +165,44 @@ int to_utf8(char *out, size_t out_len, const char *in)
 #define BUFSTR(dest, src) std::string dest(src, sizeof(src))
 #define BUFSTRN(dest, src, len) std::string dest(src, len)
 
-void json_encode(std::string& str, const char* _src)
+void json_encode(std::string &str, const char *_src)
 {
-  for(int i=0; _src[i] != 0; i++)
+  for (int i = 0; _src[i] != 0; i++)
   {
     char c = _src[i];
-    switch(c) {
-      case '"':
-        str += "\\\"";
-        break;
-      case '\\':
-        str += "\\\\";
-        break;
-      case '\b':
-        str += "\\b";
-        break;
-      case '\f':
-        str += "\\f";
-        break;
-      case '\n':
-        str += "\\n";
-        break;
-      case '\r':
-        str += "\\r";
-        break;
-      case '\t':
-        str += "\\t";
-        break;
-      case '\0':
-        str += "\\0";
-        return;
-      default:
-        str += c;
-        break;
+    switch (c)
+    {
+    case '"':
+      str += "\\\"";
+      break;
+    case '\\':
+      str += "\\\\";
+      break;
+    case '\b':
+      str += "\\b";
+      break;
+    case '\f':
+      str += "\\f";
+      break;
+    case '\n':
+      str += "\\n";
+      break;
+    case '\r':
+      str += "\\r";
+      break;
+    case '\t':
+      str += "\\t";
+      break;
+    case '\0':
+      str += "\\0";
+      return;
+    default:
+      str += c;
+      break;
     }
   }
 }
-void append_json_element(std::string& _str, const char *_key, const char *_value)
+void append_json_element(std::string &_str, const char *_key, const char *_value)
 {
   _str += "\"";
   _str += _key;
@@ -225,20 +213,20 @@ void append_json_element(std::string& _str, const char *_key, const char *_value
   _str += "\"";
 }
 
-int publish_message(const char *_msgid, const char *_job, char* _message)
+int publish_message(const char *_msgid, const char *_job, char *_message)
 {
   std::string jsonStr;
   jsonStr += "{\n    ";
   append_json_element(jsonStr, "msgid", _msgid);
-  jsonStr+=",\n    ";
+  jsonStr += ",\n    ";
   append_json_element(jsonStr, "job", _job);
-  jsonStr+=",\n    ";
+  jsonStr += ",\n    ";
   append_json_element(jsonStr, "message", _message);
 
   jsonStr += "\n}";
 
-  int json_len = 1+jsonStr.length();
-  char* utf8 = (char*)malloc(56+json_len*2);
+  int json_len = 1 + jsonStr.length();
+  char *utf8 = (char *)malloc(56 + json_len * 2);
 
   to_utf8(utf8, json_len, jsonStr.c_str());
   DEBUG("%s\n", jsonStr.c_str());
@@ -252,15 +240,7 @@ int main(int _argc, char **argv)
 // https://www.ibm.com/docs/en/i/7.1?topic=descriptions-exception-handler
 #pragma exception_handler(myhandler, my_commarea, _C1_ALL, _C2_ALL, _CTLA_HANDLE, 0)
   STRDBG();
-
-#ifdef DEBUG_ENABLED
-  if(NULL == fd) { 
-    return 0;
-  }
-#endif
-  //system("CHGJOB LOG(4 00 *SECLVL)");
-  Qp0zLprintf("Liam was here\n");
-      DEBUG("watch program called.\n");
+  DEBUG("watch program called.\n");
   BUFSTRN(watch_option, argv[1], 10);
   DEBUG("Watch option setting is '%s'\n", watch_option.c_str());
   if (0 == strncmp("*MSGID", watch_option.c_str(), 6))
@@ -275,7 +255,7 @@ int main(int _argc, char **argv)
     BUFSTR(job_name, msg_event->job_name);
     BUFSTR(user_name, msg_event->user_name);
     BUFSTR(job_number, msg_event->job_number);
-    std::string job = job_number+"/"+user_name+"/"+job_name;
+    std::string job = job_number + "/" + user_name + "/" + job_name;
     BUFSTR(message_type, msg_event->message_type);
     BUFSTR(sending_usrprf, msg_event->sending_user_profile);
     BUFSTRN(sending_procedure_name, (char *)msg_event + msg_event->offset_send_procedure_name, msg_event->length_send_procedure_name);
@@ -293,7 +273,7 @@ int main(int _argc, char **argv)
     }
     DEBUG("Message watched is '%s'\n", msgid.c_str());
     DEBUG("Message type is '%s'\n", message_type.c_str());
-    DEBUG("Sending user profile is is '%s'\n",sending_usrprf.c_str());
+    DEBUG("Sending user profile is is '%s'\n", sending_usrprf.c_str());
 
     int replacement_data_offset = msg_event->offset_replacement_data;
     int replacement_data_len = msg_event->length_replacement_data;
@@ -302,8 +282,8 @@ int main(int _argc, char **argv)
     DEBUG("Sending procedure is '%s'\n", sending_procedure_name.c_str());
     DEBUG("Sending module is '%s'\n", sending_module_name.c_str());
     DEBUG("Sending program is '%s'\n", sending_program_name.c_str());
-    char *replacement_data = (0 == replacement_data_len) ? "":(((char *)msg_event) + replacement_data_offset);
-    char* replacement_data_aligned = (char*)malloc(replacement_data_len);
+    char *replacement_data = (0 == replacement_data_len) ? "" : (((char *)msg_event) + replacement_data_offset);
+    char *replacement_data_aligned = (char *)malloc(replacement_data_len);
     memcpy(replacement_data_aligned, replacement_data, replacement_data_len);
 
     RTVM0100 msg_info_buf;
@@ -315,7 +295,7 @@ int main(int _argc, char **argv)
         // 1 	Message information 	Output 	Char(*)
         &msg_info_buf,
         // 2 	Length of message information 	Input 	Binary(4)
-        -1+sizeof(msg_info_buf),
+        -1 + sizeof(msg_info_buf),
         // 3 	Format name 	Input 	Char(8)
         "RTVM0100",
         // 4 	Message identifier 	Input 	Char(7)
@@ -338,8 +318,8 @@ int main(int _argc, char **argv)
 
     DEBUG("About to publish...\n");
     publish_message(msgid.c_str(), job.c_str(), msg_info_buf.message);
-    DEBUG("Published\n"); 
-    //memset(argv[3], ' ', 10);
+    DEBUG("Published\n");
+    memset(argv[3], ' ', 10);
     DEBUG("DONE\n");
   }
   ENDDBG();
