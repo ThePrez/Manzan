@@ -1,5 +1,7 @@
 
 #include "userconf.h"
+#include "pub_json.h"
+#include "pub_db2.h"
 #include <fcntl.h>
 #include <stdio.h>
 #include <stdlib.h>
@@ -26,12 +28,17 @@ publisher_info_set *conf_get_publisher_info(const char *_session_id, const char 
   publisher_info_set *ret = (publisher_info_set *)malloc(alloc_len);
   memset(ret, 0, alloc_len);
   ret->num_publishers = num_publishers;
-  strcpy(ret->array[0].library, "JESSEG");
-  strcpy(ret->array[0].srvpgm, "MZNDTAQ");
+  ret->array[0].msg_publish_func_ptr = &json_publish_message;
+  ret->array[0].vlog_publish_func_ptr = &json_publish_vlog;
+  ret->array[0].pal_publish_func_ptr = &json_publish_pal;
+  ret->array[0].other_publish_func_ptr = &json_publish_other;
   strncpy(ret->array[0].name, "Default Data Queue publisher", -1 + sizeof(ret->array[0].name));
-  strcpy(ret->array[0].library, "JESSEG");
-  strcpy(ret->array[0].srvpgm, "MZNDB2");
-  strncpy(ret->array[0].name, "Default Db2 publisher", -1 + sizeof(ret->array[0].name));
+  ret->array[1].msg_publish_func_ptr = &db2_publish_message;
+  ret->array[1].vlog_publish_func_ptr = &db2_publish_vlog;
+  ret->array[1].pal_publish_func_ptr = &db2_publish_pal;
+  ret->array[1].other_publish_func_ptr = &db2_publish_other;
+  strncpy(ret->array[1].name, "Default Db2 publisher", -1 + sizeof(ret->array[0].name));
+
   g_publisher_info_map[map_key] = ret;
   return ret;
 }

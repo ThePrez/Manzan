@@ -1,13 +1,23 @@
 #ifndef _USERCONF_H_
 #define _USERCONF_H_
+#include "manzan.h"
 
-typedef struct {
-   char library[11];
-   char srvpgm[11];
-   char name[512];
+typedef int(msg_publish_func)(PUBLISH_MESSAGE_FUNCTION_SIGNATURE);
+typedef int(vlog_publish_func)(PUBLISH_VLOG_FUNCTION_SIGNATURE);
+typedef int(pal_publish_func)(PUBLISH_PAL_FUNCTION_SIGNATURE);
+typedef int(other_publish_func)(PUBLISH_OTHER_FUNCTION_SIGNATURE);
+
+typedef struct
+{
+  char name[512];
+  msg_publish_func *msg_publish_func_ptr;
+  vlog_publish_func *vlog_publish_func_ptr;
+  pal_publish_func *pal_publish_func_ptr;
+  other_publish_func *other_publish_func_ptr;
 } publisher_info;
 
-typedef struct {
+typedef struct
+{
   int num_publishers;
   publisher_info array[1];
 } publisher_info_set;
