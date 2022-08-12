@@ -103,7 +103,7 @@ int json_publish(std::string &_json)
   return 0;
 }
 
-int json_publish_message(PUBLISH_MESSAGE_FUNCTION_SIGNATURE)
+extern "C" int json_publish_message(PUBLISH_MESSAGE_FUNCTION_SIGNATURE)
 {
   std::string jsonStr;
   jsonStr += "{\n    ";
@@ -133,7 +133,7 @@ int json_publish_message(PUBLISH_MESSAGE_FUNCTION_SIGNATURE)
   return json_publish(jsonStr);
 }
 
-int json_publish_vlog(PUBLISH_VLOG_FUNCTION_SIGNATURE)
+extern "C" int json_publish_vlog(PUBLISH_VLOG_FUNCTION_SIGNATURE)
 {
   std::string jsonStr;
   jsonStr += "{\n    ";
@@ -173,11 +173,12 @@ int json_publish_vlog(PUBLISH_VLOG_FUNCTION_SIGNATURE)
   return json_publish(jsonStr);
 }
 
-int json_publish_pal(PUBLISH_PAL_FUNCTION_SIGNATURE) {
+extern "C" int json_publish_pal(PUBLISH_PAL_FUNCTION_SIGNATURE)
+{
   return 0; //TODO
 }
 
-int json_publish_other(PUBLISH_OTHER_FUNCTION_SIGNATURE)
+extern "C" int json_publish_other(PUBLISH_OTHER_FUNCTION_SIGNATURE)
 {
   std::string jsonStr;
   jsonStr += "{\n    ";

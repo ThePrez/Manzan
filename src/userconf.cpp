@@ -9,15 +9,15 @@
 #include <stdarg.h>
 #include <map>
 
-bool conf_is_enabled()
+extern "C" bool conf_is_enabled()
 {
   return true;
 }
 
 static std::map<std::string, publisher_info_set *> g_publisher_info_map;
-publisher_info_set *conf_get_publisher_info(const char *_session_id, const char *_watch_event)
+extern "C" publisher_info_set *conf_get_publisher_info(const char *_session_id)
 {
-  std::string map_key = std::string(_session_id) + "::" + std::string(_watch_event);
+  std::string map_key(_session_id);
   publisher_info_set *cached = g_publisher_info_map[map_key];
   if (cached)
   {
@@ -39,9 +39,26 @@ publisher_info_set *conf_get_publisher_info(const char *_session_id, const char 
   ret->array[1].other_publish_func_ptr = &db2_publish_other;
   strncpy(ret->array[1].name, "Default Db2 publisher", -1 + sizeof(ret->array[0].name));
 
+  // config style:
+  // /QOpenSys/etc/manzan/publishers/
+  //    default.conf (if no .conf file for this specific session ID)
+  //    BARRY.conf
+  //    JESSEG.conf
+
+  // Looks like
+  // obj=MANZAN/CAMELPUB
+
+  // TODO: loop through some docs based on session id
+  // TODO: find path to object(s) (service programs) for session id
+  // APIs used:
+  //    1. _RSLVSP2 - get lib pointer
+  //    2. _RSLVSP4 - get obj pointer
+  //    3. QleActBndPgmLong - activate service program
+  //    4. QleGetExpLong - foreach event type, use API to get export function
+  //         export msg_publish, export vlog_publish, etc
+  //      4.1. if null pointer, don't support it
+  //    5. put function pointers into ret array
+
   g_publisher_info_map[map_key] = ret;
   return ret;
-}
-void conf_free_publisher_info(publisher_info *_publisher_info)
-{
 }

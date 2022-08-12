@@ -1,5 +1,5 @@
 #include "manzan.h"
-#include "pub_json.h"
+#include "pub_db2.h"
 
 #include <stdio.h>
 #include <stdlib.h>
@@ -8,12 +8,12 @@
 #include <fcntl.h>
 #include <qp0ztrc.h>
 
-int db2_publish_message(PUBLISH_MESSAGE_FUNCTION_SIGNATURE)
+extern "C" int db2_publish_message(PUBLISH_MESSAGE_FUNCTION_SIGNATURE)
 {
   return 0;
 }
 
-int db2_publish_vlog(PUBLISH_VLOG_FUNCTION_SIGNATURE)
+extern "C" int db2_publish_vlog(PUBLISH_VLOG_FUNCTION_SIGNATURE)
 {
   return 0;
 }

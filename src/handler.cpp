@@ -7,8 +7,8 @@
 #include <qmhrtvm.h>
 #include <except.h>
 #include "manzan.h"
-#include "pub_json.h"
 #include "event_data.h"
+#include "userconf.h"
 
 static FILE *fd = NULL;
 
@@ -34,39 +34,29 @@ typedef struct
 
 #pragma pack(pop)
 
-int publish_message(PUBLISH_MESSAGE_FUNCTION_SIGNATURE)
-{
-  return json_publish_message(_session_id, _msgid, _msg_type, _msg_severity, _job, _sending_usrprf, _message,
-                              _sending_program_name, _sending_module_name, _sending_procedure_name);
-}
-
-int publish_vlog(PUBLISH_VLOG_FUNCTION_SIGNATURE)
-{
-  return json_publish_vlog(_session_id, _major_code, _minor_code, _log_id, _timestamp, _tde_number, _task_name,
-                           _server_type, _exception_id, _job, _thread_id, _module_offset, _module_ru_name,
-                           _module_name, _module_entry_point_name);
-}
-
-int publish_pal(PUBLISH_PAL_FUNCTION_SIGNATURE) {
-  return json_publish_pal(_session_id, _system_reference_code, _device_name, _device_type, _model, _serial_number,
-                          _resource_name, _log_identifier, _pal_timestamp, _reference_code, _secondary_code,
-                          _table_identifier, _sequence);
-}
-
-int publish_other(PUBLISH_OTHER_FUNCTION_SIGNATURE)
-{
-  return json_publish_other(_session_id, _event_type);
-}
 
 int main(int _argc, char **argv)
 {
   static volatile _INTRPT_Hndlr_Parms_T my_commarea;
 // https://www.ibm.com/docs/en/i/7.1?topic=descriptions-exception-handler
 #pragma exception_handler(oh_crap, my_commarea, _C1_ALL, _C2_ALL, _CTLA_HANDLE_NO_MSG, 0)
+  if (!conf_is_enabled())
+  {
+    return 0;
+  }
   STRDBG();
+
   BUFSTRN(watch_option, argv[1], 10);
   BUFSTRN(session_id, argv[2], 10);
   DEBUG("watch program called. Watch option setting is '%s'\n", watch_option.c_str());
+  publisher_info_set *publishers = conf_get_publisher_info(session_id.c_str());
+  int num_publishers = publishers->num_publishers;
+  if (0 == num_publishers)
+  {
+    DEBUG("No publishers found for watch option '%s' and session ID '%s'\n", watch_option.c_str(), session_id.c_str());
+    ENDDBG();
+    return 0;
+  }
   if (watch_option == "*MSGID")
   {
     DEBUG("Handling message\n");
@@ -123,18 +113,22 @@ int main(int _argc, char **argv)
     DEBUG("The full message is '%s'\n", msg_info_buf.message);
 
     DEBUG("About to publish...\n");
-    publish_message(
-        session_id.c_str(),
-        msgid.c_str(),
-        message_type.c_str(),
-        message_severity,
-        job.c_str(),
-        sending_usrprf.c_str(),
-        msg_info_buf.message,
-        sending_program_name.c_str(),
-        sending_module_name.c_str(),
-        sending_procedure_name.c_str());
-    DEBUG("Published\n");
+    for (int i = 0; i < num_publishers; i++)
+    {
+      msg_publish_func func = publishers->array[i].msg_publish_func_ptr;
+      func(
+          session_id.c_str(),
+          msgid.c_str(),
+          message_type.c_str(),
+          message_severity,
+          job.c_str(),
+          sending_usrprf.c_str(),
+          msg_info_buf.message,
+          sending_program_name.c_str(),
+          sending_module_name.c_str(),
+          sending_procedure_name.c_str());
+      DEBUG("Published\n");
+    }
     memset(argv[3], ' ', 10);
     DEBUG("DONE\n");
   }
@@ -159,23 +153,28 @@ int main(int _argc, char **argv)
     BUFSTR(lic_module_ru_name, lic_event->lic_module_ru_name);
     BUFSTR(lic_module_name, lic_event->lic_module_name);
     BUFSTR(lic_module_entry_point_name, lic_event->lic_module_entry_point_name);
-    publish_vlog(
-        session_id.c_str(),
-        major_code.c_str(),
-        minor_code.c_str(),
-        log_id.c_str(),
-        timestamp.c_str(),
-        tde_number.c_str(),
-        task_name.c_str(),
-        server_type.c_str(),
-        exception_id.c_str(),
-        job.c_str(),
-        thread_id.c_str(),
-        lic_module_offset.c_str(),
-        lic_module_ru_name.c_str(),
-        lic_module_name.c_str(),
-        lic_module_entry_point_name.c_str());
-  } 
+
+    for (int i = 0; i < num_publishers; i++)
+    {
+      vlog_publish_func func = publishers->array[i].vlog_publish_func_ptr;
+      func(
+          session_id.c_str(),
+          major_code.c_str(),
+          minor_code.c_str(),
+          log_id.c_str(),
+          timestamp.c_str(),
+          tde_number.c_str(),
+          task_name.c_str(),
+          server_type.c_str(),
+          exception_id.c_str(),
+          job.c_str(),
+          thread_id.c_str(),
+          lic_module_offset.c_str(),
+          lic_module_ru_name.c_str(),
+          lic_module_name.c_str(),
+          lic_module_entry_point_name.c_str());
+    }
+  }
   else if (watch_option == "*PAL")
   {
     DEBUG("Handling PAL Entry\n");
@@ -192,24 +191,33 @@ int main(int _argc, char **argv)
     BUFSTR(secondary_code, pal_event->secondary_code);
     BUFSTR(table_identifier, pal_event->table_identifier);
     int sequence = pal_event->sequence;
-    publish_pal(
-        session_id.c_str(),
-        system_reference_code.c_str(),
-        device_name.c_str(),
-        device_type.c_str(),
-        model.c_str(),
-        serial_number.c_str(),
-        resource_name.c_str(),
-        log_identifier.c_str(),
-        pal_timestamp.c_str(),
-        reference_code.c_str(),
-        secondary_code.c_str(),
-        table_identifier.c_str(),
-        sequence);
+
+    for (int i = 0; i < num_publishers; i++)
+    {
+      pal_publish_func func = publishers->array[i].pal_publish_func_ptr;
+      func(
+          session_id.c_str(),
+          system_reference_code.c_str(),
+          device_name.c_str(),
+          device_type.c_str(),
+          model.c_str(),
+          serial_number.c_str(),
+          resource_name.c_str(),
+          log_identifier.c_str(),
+          pal_timestamp.c_str(),
+          reference_code.c_str(),
+          secondary_code.c_str(),
+          table_identifier.c_str(),
+          sequence);
+    }
   }
   else
   {
-    publish_other(session_id.c_str(), watch_option.c_str());
+    for (int i = 0; i < num_publishers; i++)
+    {
+      other_publish_func func = publishers->array[i].other_publish_func_ptr;
+      func(session_id.c_str(), watch_option.c_str());
+    }
   }
   ENDDBG();
   return 0;
