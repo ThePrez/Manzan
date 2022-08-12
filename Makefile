@@ -6,4 +6,7 @@ BUILDLIB := "MANZAN"
 /qsys.lib/${BUILDLIB}.lib/%.module: src/%.cpp
 	system "CRTCPPMOD MODULE(${BUILDLIB}/$*) SRCSTMF('$^') OPTION(*EVENTF) SYSIFCOPT(*IFS64IO) DBGVIEW(*SOURCE) TERASPACE(*YES *TSIFC) STGMDL(*SNGLVL) DTAMDL(*p128) DEFINE(DEBUG_ENABLED)"
 
-all: /qsys.lib/${BUILDLIB}.lib/handler.pgm
+/qsys.lib/${BUILDLIB}.lib/manzandtaq.dtaq:
+	system "CRTDTAQ DTAQ(JESSEG/MANZANDTAQ) MAXLEN(64512) SEQ(*KEYED) KEYLEN(10) SIZE(*MAX2GB) AUTORCL(*YES)"
+
+all: /qsys.lib/${BUILDLIB}.lib/manzandtaq.dtaq /qsys.lib/${BUILDLIB}.lib/handler.pgm 
