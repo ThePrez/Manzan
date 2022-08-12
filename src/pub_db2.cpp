@@ -8,6 +8,12 @@
 #include <fcntl.h>
 #include <qp0ztrc.h>
 
+// TODO: implement this
+//     1. define Db2 tables
+//            // have autoincrement and autotimestamp columns
+//     2. Add Db2 table creation to Makefile
+//     3. Rename this method to .rpgle (if using RPG)
+//     4. implement!
 extern "C" int db2_publish_message(PUBLISH_MESSAGE_FUNCTION_SIGNATURE)
 {
   return 0;
