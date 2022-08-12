@@ -47,6 +47,12 @@ int publish_vlog(PUBLISH_VLOG_FUNCTION_SIGNATURE)
                            _module_name, _module_entry_point_name);
 }
 
+int publish_pal(PUBLISH_PAL_FUNCTION_SIGNATURE) {
+  return json_publish_pal(_session_id, _system_reference_code, _device_name, _device_type, _model, _serial_number,
+                          _resource_name, _log_identifier, _pal_timestamp, _reference_code, _secondary_code,
+                          _table_identifier, _sequence);
+}
+
 int publish_other(PUBLISH_OTHER_FUNCTION_SIGNATURE)
 {
   return json_publish_other(_session_id, _event_type);
@@ -169,6 +175,37 @@ int main(int _argc, char **argv)
         lic_module_ru_name.c_str(),
         lic_module_name.c_str(),
         lic_module_entry_point_name.c_str());
+  } 
+  else if (watch_option == "*PAL")
+  {
+    DEBUG("Handling PAL Entry\n");
+    pal_event_raw *pal_event = (pal_event_raw *)argv[4];
+    BUFSTR(system_reference_code, pal_event->system_reference_code);
+    BUFSTR(device_name, pal_event->device_name);
+    BUFSTR(device_type, pal_event->device_type);
+    BUFSTR(model, pal_event->model);
+    BUFSTR(serial_number, pal_event->serial_number);
+    BUFSTR(resource_name, pal_event->resource_name);
+    BUFSTR(log_identifier, pal_event->log_identifier);
+    BUFSTR(pal_timestamp, pal_event->pal_timestamp);
+    BUFSTR(reference_code, pal_event->reference_code);
+    BUFSTR(secondary_code, pal_event->secondary_code);
+    BUFSTR(table_identifier, pal_event->table_identifier);
+    int sequence = pal_event->sequence;
+    publish_pal(
+        session_id.c_str(),
+        system_reference_code.c_str(),
+        device_name.c_str(),
+        device_type.c_str(),
+        model.c_str(),
+        serial_number.c_str(),
+        resource_name.c_str(),
+        log_identifier.c_str(),
+        pal_timestamp.c_str(),
+        reference_code.c_str(),
+        secondary_code.c_str(),
+        table_identifier.c_str(),
+        sequence);
   }
   else
   {
