@@ -19,6 +19,6 @@ BUILDLIB := "MANZAN"
 	system -kKv "RUNSQLSTM SRCSTMF('./.build/$^') COMMIT(*NONE)"
 	echo "Success"
 
-init: /qsys.lib/${BUILDLIB}.lib /qsys.lib/${BUILDLIB}.lib/manzanmsg.file /qsys.lib/${BUILDLIB}.lib/manzandtaq.dtaq 
+init: /qsys.lib/${BUILDLIB}.lib /qsys.lib/${BUILDLIB}.lib/manzanmsg.file /qsys.lib/${BUILDLIB}.lib/manzanoth.file /qsys.lib/${BUILDLIB}.lib/manzanpal.file /qsys.lib/${BUILDLIB}.lib/manzanvlog.file /qsys.lib/${BUILDLIB}.lib/manzandtaq.dtaq 
 
 all: /qsys.lib/${BUILDLIB}.lib/handler.pgm 
