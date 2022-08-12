@@ -173,6 +173,10 @@ int json_publish_vlog(PUBLISH_VLOG_FUNCTION_SIGNATURE)
   return json_publish(jsonStr);
 }
 
+int json_publish_pal(PUBLISH_PAL_FUNCTION_SIGNATURE) {
+  return 0; //TODO
+}
+
 int json_publish_other(PUBLISH_OTHER_FUNCTION_SIGNATURE)
 {
   std::string jsonStr;

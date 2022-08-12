@@ -13,7 +13,13 @@ int db2_publish_message(PUBLISH_MESSAGE_FUNCTION_SIGNATURE)
   return 0;
 }
 
-int db2_publish_vlog(PUBLISH_VLOG_FUNCTION_SIGNATURE) {
+int db2_publish_vlog(PUBLISH_VLOG_FUNCTION_SIGNATURE)
+{
+  return 0;
+}
+
+int db2_publish_pal(PUBLISH_PAL_FUNCTION_SIGNATURE)
+{
   return 0;
 }
 

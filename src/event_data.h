@@ -87,7 +87,7 @@ typedef struct
 
 typedef struct
 {
-  // Dec Hex 0 0 BINARY(4) Length of watch information
+  // 0 0 BINARY(4) Length of watch information
   int watch_info_length;
   // 4 4 CHAR(4) LIC Log major code
   char lic_log_major_code[4];
@@ -138,6 +138,45 @@ typedef struct
   //     **CHAR(*) LIC log comparison data
   char comparison_data[1];
 } vlog_event_raw;
+
+typedef struct {
+  // 0 0 BINARY(4) Length of watch information
+  int watch_info_length;
+  // 4 4 CHAR(8) System reference code
+  char system_reference_code[8];
+  // 12 C CHAR(10) Device name
+  char device_name[10];
+  // 22 16 CHAR(4) Device type
+  char device_type[4];
+  // 26 1A CHAR(4) Model
+  char model[4];
+  // 30 1E CHAR(15) Serial number
+  char serial_number[15];
+  // 45 2D CHAR(10) Resource name
+  char resource_name[10];
+  // 55 37 CHAR(8) Log identifier
+  char log_identifier[8];
+  // 63 3F CHAR(8) PAL timestamp
+  char pal_timestamp[8];
+  // 71 47 CHAR(4) Reference code
+  char reference_code[4];
+  // 75 4B CHAR(8) Secondary code
+  char secondary_code[8];
+  // 83 53 CHAR(8) Table identifier
+  char table_identifier[8];
+  // 91 5B CHAR(1) Reserved
+  char reserved0[1];
+  // 92 5C BINARY(4) Sequence
+  int sequence;
+  // 96 60 BINARY(4) Offset to comparison data
+  int offset_comparison_data;
+  // 100 64 BINARY(4) Length of comparison data
+  int length_comparison_data;
+  // 104 68 CHAR(10) PAL compare against
+  char pal_compare_against[10];
+  //     **CHAR(*) PAL comparison data
+  char comparison_data[1];
+} pal_event_raw;
 #pragma pack(pop)
 
 #endif

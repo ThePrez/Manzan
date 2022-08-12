@@ -47,6 +47,20 @@
                                         const char *_module_name,    \
                                         const char *_module_entry_point_name
 
+#define PUBLISH_PAL_FUNCTION_SIGNATURE const char *_session_id,            \
+                                       const char *_system_reference_code, \
+                                       const char *_device_name,           \
+                                       const char *_device_type,           \
+                                       const char *_model,                 \
+                                       const char *_serial_number,         \
+                                       const char *_resource_name,         \
+                                       const char *_log_identifier,        \
+                                       const char *_pal_timestamp,         \
+                                       const char *_reference_code,        \
+                                       const char *_secondary_code,        \
+                                       const char *_table_identifier,      \
+                                       int _sequence
+
 #define PUBLISH_OTHER_FUNCTION_SIGNATURE const char *_session_id, const char *_event_type
 
 extern "C" FILE *debug_fd;
