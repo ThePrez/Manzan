@@ -22,24 +22,30 @@
         "extensions": [
             "CPP"
         ]
+    }, {
+        "name": "Initialize filesystem requisites",
+        "command": "/QOpenSys/pkgs/bin/gmake init BUILDLIB=&CURLIB ERR=*EVENTF",
+        "deployFirst": true,
+        "environment": "pase",
+        "extensions": [
+            "GLOBAL"
+        ]
+    }, {
+        "name": "Build all",
+        "command": "/QOpenSys/pkgs/bin/gmake all BUILDLIB=&CURLIB ERR=*EVENTF",
+        "deployFirst": true,
+        "environment": "pase",
+        "extensions": [
+            "GLOBAL"
+        ]
+    }, {
+        "name": "Build current",
+        "command": "/QOpenSys/pkgs/bin/gmake all BUILDLIB=&CURLIB ERR=*EVENTF",
+        "deployFirst": true,
+        "environment": "pase",
+        "extensions": [
+            "GLOBAL"
+        ]
     }
-    ,
-     {
-         "name": "Build all",
-         "command": "/QOpenSys/pkgs/bin/gmake all BUILDLIB=&CURLIB ERR=*EVENTF",
-         "deployFirst": true,
-         "environment": "pase",
-         "extensions": [
-             "GLOBAL"
-         ]
-     }, {
-         "name": "Build current",
-         "command": "/QOpenSys/pkgs/bin/gmake all BUILDLIB=&CURLIB ERR=*EVENTF",
-         "deployFirst": true,
-         "environment": "pase",
-         "extensions": [
-             "GLOBAL"
-         ]
-     }
 
 ]
