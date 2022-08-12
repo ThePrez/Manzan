@@ -121,6 +121,7 @@ int main(int _argc, char **argv)
           msgid.c_str(),
           message_type.c_str(),
           message_severity,
+          message_timestamp.c_str(),
           job.c_str(),
           sending_usrprf.c_str(),
           msg_info_buf.message,

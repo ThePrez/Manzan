@@ -25,7 +25,8 @@
 #define PUBLISH_MESSAGE_FUNCTION_SIGNATURE const char *_session_id,           \
                                            const char *_msgid,                \
                                            const char *_msg_type,             \
-                                           int _msg_severity,                 \
+                                           int         _msg_severity,         \
+                                           const char *_msg_timestamp,        \
                                            const char *_job,                  \
                                            const char *_sending_usrprf,       \
                                            const char *_message,              \
