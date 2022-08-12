@@ -21,15 +21,31 @@
   sprintf(dest, "%d", src);
 
 #define PUBLISH_MESSAGE_FUNCTION_SIGNATURE const char *_session_id,           \
-                                   const char *_msgid,                \
-                                   const char *_msg_type,             \
-                                   int _msg_severity,                 \
-                                   const char *_job,                  \
-                                   const char *_sending_usrprf,       \
-                                   const char *_message,              \
-                                   const char *_sending_program_name, \
-                                   const char *_sending_module_name,  \
-                                   const char *_sending_procedure_name
+                                           const char *_msgid,                \
+                                           const char *_msg_type,             \
+                                           int _msg_severity,                 \
+                                           const char *_job,                  \
+                                           const char *_sending_usrprf,       \
+                                           const char *_message,              \
+                                           const char *_sending_program_name, \
+                                           const char *_sending_module_name,  \
+                                           const char *_sending_procedure_name
+
+#define PUBLISH_VLOG_FUNCTION_SIGNATURE const char *_session_id,     \
+                                        const char *_major_code,     \
+                                        const char *_minor_code,     \
+                                        const char *_log_id,         \
+                                        const char *_timestamp,      \
+                                        const char *_tde_number,     \
+                                        const char *_task_name,      \
+                                        const char *_server_type,    \
+                                        const char *_exception_id,   \
+                                        const char *_job,            \
+                                        const char *_thread_id,      \
+                                        const char *_module_offset,  \
+                                        const char *_module_ru_name, \
+                                        const char *_module_name,    \
+                                        const char *_module_entry_point_name
 
 #define PUBLISH_OTHER_FUNCTION_SIGNATURE const char *_session_id, const char *_event_type
 

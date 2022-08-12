@@ -133,6 +133,46 @@ int json_publish_message(PUBLISH_MESSAGE_FUNCTION_SIGNATURE)
   return json_publish(jsonStr);
 }
 
+int json_publish_vlog(PUBLISH_VLOG_FUNCTION_SIGNATURE)
+{
+  std::string jsonStr;
+  jsonStr += "{\n    ";
+  append_json_element(jsonStr, "event_type", "vlog");
+  jsonStr += ",\n    ";
+  append_json_element(jsonStr, "session_id", _session_id);
+  jsonStr += ",\n    ";
+  append_json_element(jsonStr, "major_code", _major_code);
+  jsonStr += ",\n    ";
+  append_json_element(jsonStr, "minor_code", _minor_code);
+  jsonStr += ",\n    ";
+  append_json_element(jsonStr, "log_id", _log_id);
+  jsonStr += ",\n    ";
+  append_json_element(jsonStr, "timestamp", _timestamp);
+  jsonStr += ",\n    ";
+  append_json_element(jsonStr, "tde_number", _tde_number);
+  jsonStr += ",\n    ";
+  append_json_element(jsonStr, "task_name", _task_name);
+  jsonStr += ",\n    ";
+  append_json_element(jsonStr, "server_type", _server_type);
+  jsonStr += ",\n    ";
+  append_json_element(jsonStr, "exception_id", _exception_id);
+  jsonStr += ",\n    ";
+  append_json_element(jsonStr, "job", _job);
+  jsonStr += ",\n    ";
+  append_json_element(jsonStr, "thread_id", _thread_id);
+  jsonStr += ",\n    ";
+  append_json_element(jsonStr, "module_offset", _module_offset);
+  jsonStr += ",\n    ";
+  append_json_element(jsonStr, "module_ru_name", _module_ru_name);
+  jsonStr += ",\n    ";
+  append_json_element(jsonStr, "module_name", _module_name);
+  jsonStr += ",\n    ";
+  append_json_element(jsonStr, "module_entry_point_name", _module_entry_point_name);
+
+  jsonStr += "\n}";
+  return json_publish(jsonStr);
+}
+
 int json_publish_other(PUBLISH_OTHER_FUNCTION_SIGNATURE)
 {
   std::string jsonStr;
