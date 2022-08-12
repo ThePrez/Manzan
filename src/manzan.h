@@ -20,6 +20,8 @@
   char dest[32];        \
   sprintf(dest, "%d", src);
 
+#define MIN(a,b) ((a)<(b)?(a):(b))
+
 #define PUBLISH_MESSAGE_FUNCTION_SIGNATURE const char *_session_id,           \
                                            const char *_msgid,                \
                                            const char *_msg_type,             \

@@ -90,7 +90,7 @@ void append_json_element(std::string &_str, const char *_key, const int _value)
   _str += value;
 }
 
-int json_publish(std::string &_json)
+int json_publish(const char *_session_id, std::string &_json)
 {
   int json_len = 1 + _json.length();
   char *utf8 = (char *)malloc(56 + _json.length() * 2);
@@ -98,7 +98,17 @@ int json_publish(std::string &_json)
   to_utf8(utf8, json_len, _json.c_str());
   DEBUG("Publishing JSON\n");
   DEBUG("%s\n", _json.c_str());
-  QSNDDTAQ("MANZANDTAQ", "JESSEG    ", strlen(utf8), utf8);
+
+  char dtaq_key[10];
+  memset(dtaq_key, ' ', 10);
+  snprintf(dtaq_key, MIN(10, strlen(_session_id)), "%s", _session_id);
+
+  QSNDDTAQ("MANZANDTAQ",
+           "JESSEG    ", // TODO: How to properly resolve the library here?
+           strlen(utf8),
+           utf8,
+           (_Decimal(3,0))10,
+           dtaq_key);
   free(utf8);
   return 0;
 }
@@ -130,7 +140,7 @@ extern "C" int json_publish_message(PUBLISH_MESSAGE_FUNCTION_SIGNATURE)
   append_json_element(jsonStr, "sending_procedure_name", _sending_procedure_name);
 
   jsonStr += "\n}";
-  return json_publish(jsonStr);
+  return json_publish(_session_id, jsonStr);
 }
 
 extern "C" int json_publish_vlog(PUBLISH_VLOG_FUNCTION_SIGNATURE)
@@ -170,12 +180,12 @@ extern "C" int json_publish_vlog(PUBLISH_VLOG_FUNCTION_SIGNATURE)
   append_json_element(jsonStr, "module_entry_point_name", _module_entry_point_name);
 
   jsonStr += "\n}";
-  return json_publish(jsonStr);
+  return json_publish(_session_id, jsonStr);
 }
 
 extern "C" int json_publish_pal(PUBLISH_PAL_FUNCTION_SIGNATURE)
 {
-  return 0; //TODO
+  return 0; // TODO: Implement this
 }
 
 extern "C" int json_publish_other(PUBLISH_OTHER_FUNCTION_SIGNATURE)
@@ -186,5 +196,5 @@ extern "C" int json_publish_other(PUBLISH_OTHER_FUNCTION_SIGNATURE)
   jsonStr += ",\n    ";
   append_json_element(jsonStr, "session_id", _session_id);
   jsonStr += "\n}";
-  return json_publish(jsonStr);
+  return json_publish(_session_id, jsonStr);
 }
