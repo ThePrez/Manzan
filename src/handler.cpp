@@ -39,7 +39,7 @@ int main(int _argc, char **argv)
 {
   static volatile _INTRPT_Hndlr_Parms_T my_commarea;
 // https://www.ibm.com/docs/en/i/7.1?topic=descriptions-exception-handler
-#pragma exception_handler(oh_crap, my_commarea, _C1_ALL, _C2_ALL, _CTLA_HANDLE_NO_MSG, 0)
+#pragma exception_handler(oh_crap, my_commarea, _C1_ALL, _C2_ALL, _CTLA_HANDLE, 0)
   if (!conf_is_enabled())
   {
     return 0;
@@ -222,6 +222,7 @@ int main(int _argc, char **argv)
   ENDDBG();
   return 0;
 oh_crap:
+  printf("Well, shit\n");
   strncpy(argv[3], "*ERROR    ", 10);
   DEBUG("MCH exception happened!\n");
   ENDDBG();
