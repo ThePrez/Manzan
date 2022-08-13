@@ -222,7 +222,7 @@ int main(int _argc, char **argv)
     BUFSTR(serial_number, pal_event->serial_number);
     BUFSTR(resource_name, pal_event->resource_name);
     BUFSTR(log_identifier, pal_event->log_identifier);
-    std::string pal_timestamp = get_iso8601_timestamp(pal_event->timestamp);
+    std::string pal_timestamp = get_iso8601_timestamp(pal_event->pal_timestamp);
     BUFSTR(reference_code, pal_event->reference_code);
     BUFSTR(secondary_code, pal_event->secondary_code);
     BUFSTR(table_identifier, pal_event->table_identifier);
