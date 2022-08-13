@@ -52,6 +52,6 @@ extern int db2_publish_other(PUBLISH_OTHER_FUNCTION_SIGNATURE)
   strncpy(type, _event_type, 10);
 
   EXEC SQL
-     INSERT INTO JESSEG.MANZANOTH (SESSION_ID,EVENT) VALUES( :sessid, :type);
+     INSERT INTO MANZANOTH (SESSION_ID,EVENT) VALUES( :sessid, :type);
   return 0;
 }
