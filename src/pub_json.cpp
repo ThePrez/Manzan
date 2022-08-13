@@ -99,9 +99,9 @@ int json_publish(const char *_session_id, std::string &_json)
   DEBUG("Publishing JSON\n");
   DEBUG("%s\n", _json.c_str());
 
-  char dtaq_key[10];
-  memset(dtaq_key, ' ', 10);
-  snprintf(dtaq_key, MIN(10, strlen(_session_id)), "%s", _session_id);
+  char dtaq_key[11];
+  memset(dtaq_key, ' ', 11);
+  memcpy(dtaq_key, _session_id, MIN(11, strlen(_session_id)));
 
   QSNDDTAQ("MANZANDTAQ",
            "JESSEG    ", // TODO: How to properly resolve the library here?
@@ -120,7 +120,7 @@ extern "C" int json_publish_message(PUBLISH_MESSAGE_FUNCTION_SIGNATURE)
   append_json_element(jsonStr, "event_type", "message");
   jsonStr += ",\n    ";
   append_json_element(jsonStr, "session_id", _session_id);
-  jsonStr += ",\n    ";
+  jsonStr += ",\n    "; 
   append_json_element(jsonStr, "job", _job);
   jsonStr += ",\n    ";
   append_json_element(jsonStr, "msgid", _msgid);
