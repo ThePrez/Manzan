@@ -6,6 +6,7 @@
 #include <qp0ztrc.h>
 #include <qmhrtvm.h>
 #include <except.h>
+#include <QWCCVTDT.h>
 #include "manzan.h"
 #include "event_data.h"
 #include "userconf.h"
@@ -34,6 +35,40 @@ typedef struct
 
 #pragma pack(pop)
 
+std::string get_iso8601_timestamp(const char *_in)
+{
+  char output[32];
+  memset(output, 0, sizeof(output));
+  char err[32];
+  memset(err, 0, sizeof(err));
+  QWCCVTDT(
+      // 1 	Input format 	Input 	Char(10)
+      "*DTS      ",
+      // 2 	Input variable 	Input 	Char(*)
+      (void *)_in,
+      // 3 	Output format 	Input 	Char(10)
+      "*YYMD     ",
+      // 4 	Output variable 	Output 	Char(*)
+      output,
+      // 5 	Error code 	I/O 	Char(*)
+      err);
+  // ISO8601
+  std::string formatted;
+  formatted += std::string(output, 4);
+  formatted += "-";
+  formatted += std::string(output + 4, 2);
+  formatted += "-";
+  formatted += std::string(output + 6, 2);
+  formatted += " ";
+  formatted += std::string(output + 8, 2);
+  formatted += ":";
+  formatted += std::string(output + 10, 2);
+  formatted += ":";
+  formatted += std::string(output + 12, 2);
+  formatted += ".";
+  formatted += std::string(output + 14, 6);
+  return formatted;
+}
 
 int main(int _argc, char **argv)
 {
@@ -67,7 +102,7 @@ int main(int _argc, char **argv)
     BUFSTR(job_number, msg_event->job_number);
     std::string job = job_number + "/" + user_name + "/" + job_name;
     BUFSTR(message_type, msg_event->message_type);
-    BUFSTR(message_timestamp, msg_event->message_timestamp);
+    std::string message_timestamp = get_iso8601_timestamp(msg_event->message_timestamp);
     DEBUG("Timestamp is '%s'\n", message_timestamp.c_str());
     int message_severity = msg_event->message_severity;
     BUFSTR(sending_usrprf, msg_event->sending_user_profile);
@@ -140,7 +175,7 @@ int main(int _argc, char **argv)
     BUFSTR(major_code, lic_event->lic_log_major_code);
     BUFSTR(minor_code, lic_event->lic_log_minor_code);
     BUFSTR(log_id, lic_event->lic_log_identifier);
-    BUFSTR(timestamp, lic_event->lic_log_timestamp);
+    std::string timestamp = get_iso8601_timestamp(lic_event->lic_log_timestamp);
     BUFSTR(tde_number, lic_event->tde_number);
     BUFSTR(task_name, lic_event->task_name);
     BUFSTR(server_type, lic_event->server_type);
@@ -187,7 +222,7 @@ int main(int _argc, char **argv)
     BUFSTR(serial_number, pal_event->serial_number);
     BUFSTR(resource_name, pal_event->resource_name);
     BUFSTR(log_identifier, pal_event->log_identifier);
-    BUFSTR(pal_timestamp, pal_event->pal_timestamp);
+    std::string pal_timestamp = get_iso8601_timestamp(pal_event->timestamp);
     BUFSTR(reference_code, pal_event->reference_code);
     BUFSTR(secondary_code, pal_event->secondary_code);
     BUFSTR(table_identifier, pal_event->table_identifier);

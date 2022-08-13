@@ -127,7 +127,7 @@ extern "C" int json_publish_message(PUBLISH_MESSAGE_FUNCTION_SIGNATURE)
   jsonStr += ",\n    ";
   append_json_element(jsonStr, "severity", _msg_severity);
   jsonStr += ",\n    ";
-  append_json_element(jsonStr, "message_timestamp", "YYYY-MM-DD HH:MM:SS");
+  append_json_element(jsonStr, "message_timestamp", _msg_timestamp);
   jsonStr += ",\n    ";
   append_json_element(jsonStr, "job", _job);
   jsonStr += ",\n    ";
