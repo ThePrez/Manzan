@@ -6,6 +6,9 @@ BUILDLIB := "MANZAN"
 /qsys.lib/${BUILDLIB}.lib/%.module: src/%.cpp
 	system "CRTCPPMOD MODULE(${BUILDLIB}/$*) SRCSTMF('$^') OPTION(*EVENTF) SYSIFCOPT(*IFS64IO) DBGVIEW(*SOURCE) TERASPACE(*YES *TSIFC) STGMDL(*SNGLVL) DTAMDL(*p128) DEFINE(DEBUG_ENABLED)"
 
+/qsys.lib/${BUILDLIB}.lib/%.module: src/%.sqlc
+	system "CRTSQLCI OBJ(${BUILDLIB}/$*) SRCSTMF('$^') DATFMT(*ISO) TIMFMT(*ISO) CVTCCSID(*JOB) COMPILEOPT('INCDIR(''src'')')""
+
 /qsys.lib/${BUILDLIB.lib}:
 	system "RUNSQL SQL('create schema ${BUILDLIB}') NAMING(*SYS)"
 

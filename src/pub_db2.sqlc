@@ -1,0 +1,47 @@
+//#include "manzan.h"
+//#include "pub_db2.h"
+
+#include <stdio.h>
+#include <stdlib.h>
+#include <string.h>
+#include <unistd.h>
+#include <fcntl.h>
+#include <qp0ztrc.h>
+
+#include <sql.h>
+
+// TODO: implement this
+//     1. define Db2 tables
+//            // have autoincrement and autotimestamp columns
+//     2. Add Db2 table creation to Makefile
+//     3. Rename this method to .rpgle (if using RPG)
+//     4. implement!
+extern int db2_publish_message(PUBLISH_MESSAGE_FUNCTION_SIGNATURE)
+{
+  return 0;
+}
+
+extern int db2_publish_vlog(PUBLISH_VLOG_FUNCTION_SIGNATURE)
+{
+  return 0;
+}
+
+int db2_publish_pal(PUBLISH_PAL_FUNCTION_SIGNATURE)
+{
+  return 0;
+}
+ 
+#define PUBLISH_OTHER_FUNCTION_SIGNATURE const char *_session_id, const char *_event_type
+int db2_publish_other(PUBLISH_OTHER_FUNCTION_SIGNATURE)
+{
+  exec sql include SQLCA;
+  EXEC SQL BEGIN DECLARE SECTION;
+  char sessid[10];
+  char type[10];
+  EXEC SQL END DECLARE SECTION;
+  strncpy(sessid, _session_id, 10);
+  strncpy(type, _event_type, 10);
+  EXEC SQL
+     INSERT INTO JESSEG.MANZANOTH (SESSION_ID,EVENT) VALUES( :sessid, :type);
+  return 0;
+}
