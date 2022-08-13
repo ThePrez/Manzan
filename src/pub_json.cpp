@@ -121,6 +121,8 @@ extern "C" int json_publish_message(PUBLISH_MESSAGE_FUNCTION_SIGNATURE)
   jsonStr += ",\n    ";
   append_json_element(jsonStr, "session_id", _session_id);
   jsonStr += ",\n    ";
+  append_json_element(jsonStr, "job", _job);
+  jsonStr += ",\n    ";
   append_json_element(jsonStr, "msgid", _msgid);
   jsonStr += ",\n    ";
   append_json_element(jsonStr, "msgtype", _msg_type);
@@ -128,8 +130,6 @@ extern "C" int json_publish_message(PUBLISH_MESSAGE_FUNCTION_SIGNATURE)
   append_json_element(jsonStr, "severity", _msg_severity);
   jsonStr += ",\n    ";
   append_json_element(jsonStr, "message_timestamp", _msg_timestamp);
-  jsonStr += ",\n    ";
-  append_json_element(jsonStr, "job", _job);
   jsonStr += ",\n    ";
   append_json_element(jsonStr, "sending_usrprf", _sending_usrprf);
   jsonStr += ",\n    ";
