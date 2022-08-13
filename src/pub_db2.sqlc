@@ -1,5 +1,5 @@
-//#include "manzan.h"
-//#include "pub_db2.h"
+#include "manzan.h"
+#include "pub_db2.h"
 
 #include <stdio.h>
 #include <stdlib.h>
@@ -30,17 +30,27 @@ int db2_publish_pal(PUBLISH_PAL_FUNCTION_SIGNATURE)
 {
   return 0;
 }
- 
-#define PUBLISH_OTHER_FUNCTION_SIGNATURE const char *_session_id, const char *_event_type
-int db2_publish_other(PUBLISH_OTHER_FUNCTION_SIGNATURE)
+#define STACK_CPY(buf, len, input)   \
+                               \
+    char buf[len];          \
+    memset(buf, 0, sizeof(buf));   \
+    strncpy(buf, input, len);   \
+  
+#define COPY_PARM(dest, parm) \
+  memset(dest, 0, sizeof(dest)); \
+  strncpy(dest, parm, -1+sizeof(dest)); 
+
+extern int db2_publish_other(PUBLISH_OTHER_FUNCTION_SIGNATURE)
 {
   exec sql include SQLCA;
-  EXEC SQL BEGIN DECLARE SECTION;
-  char sessid[10];
-  char type[10];
-  EXEC SQL END DECLARE SECTION;
+  char sessid[11];
+  memset(sessid, 0, sizeof(sessid));
   strncpy(sessid, _session_id, 10);
+
+  char type[11]; 
+  memset(type, 0, sizeof(type));
   strncpy(type, _event_type, 10);
+
   EXEC SQL
      INSERT INTO JESSEG.MANZANOTH (SESSION_ID,EVENT) VALUES( :sessid, :type);
   return 0;

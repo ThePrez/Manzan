@@ -66,11 +66,14 @@
 
 #define PUBLISH_OTHER_FUNCTION_SIGNATURE const char *_session_id, const char *_event_type
 
-extern "C" FILE *debug_fd;
+
+#ifdef __cplusplus
 extern "C"
 {
-  void STRDBG();
-  void ENDDBG();
+#endif
+  extern FILE *debug_fd;
+  extern void STRDBG();
+  extern void ENDDBG();
 
 #define DEBUG_ENABLED 1
 #ifdef DEBUG_ENABLED
@@ -85,6 +88,8 @@ extern "C"
 #define DEBUG(...)
 #define ENDDBG()
 #endif
-}
 
+#ifdef __cplusplus
+}
+#endif
 #endif

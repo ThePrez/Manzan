@@ -4,7 +4,7 @@
 #include <stdio.h>
 #include <stdlib.h>
 #include <stdarg.h>
-extern "C" FILE *debug_fd;
+
 FILE *debug_fd = NULL;
 
 extern "C" void STRDBG()
