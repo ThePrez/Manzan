@@ -38,9 +38,19 @@
         "extensions": [
             "GLOBAL"
         ]
-    }, {
+    }, 
+    {
         "name": "Build current",
         "command": "/QOpenSys/pkgs/bin/gmake all BUILDLIB=&CURLIB ERR=*EVENTF",
+        "deployFirst": true,
+        "environment": "pase",
+        "extensions": [
+            "GLOBAL"
+        ]
+    },
+    {
+        "name": "Build dry run",
+        "command": "/QOpenSys/pkgs/bin/gmake all BUILDLIB=&CURLIB ERR=*EVENTF -n -B",
         "deployFirst": true,
         "environment": "pase",
         "extensions": [
