@@ -17,9 +17,7 @@ BUILDLIB := "MANZAN"
 	system "CRTDTAQ DTAQ(${BUILDLIB}/MANZANDTAQ) MAXLEN(64512) SEQ(*KEYED) KEYLEN(10) SIZE(*MAX2GB) AUTORCL(*YES)"
 
 /qsys.lib/${BUILDLIB}.lib/%.file: install_tasks/%.sql
-	mkdir -p ./.build/install_tasks || echo "Failed to create .build/install_tasks"
-	cat $^ | /QOpenSys/usr/bin/sed -e 's|%%LIB%%|'${BUILDLIB}'|g' > ./.build/$^
-	system -kKv "RUNSQLSTM SRCSTMF('./.build/$^') COMMIT(*NONE)"
+	system -kKv "RUNSQLSTM SRCSTMF('./.build/$^') COMMIT(*NONE) DFTRDBCOL(${BUILDLIB})"
 	echo "Success"
 
 init: /qsys.lib/${BUILDLIB}.lib /qsys.lib/${BUILDLIB}.lib/manzanmsg.file /qsys.lib/${BUILDLIB}.lib/manzanoth.file /qsys.lib/${BUILDLIB}.lib/manzanpal.file /qsys.lib/${BUILDLIB}.lib/manzanvlog.file /qsys.lib/${BUILDLIB}.lib/manzandtaq.dtaq 
