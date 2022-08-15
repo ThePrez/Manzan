@@ -4,7 +4,7 @@ init: /qsys.lib/${BUILDLIB}.lib /qsys.lib/${BUILDLIB}.lib/manzanmsg.file /qsys.l
 
 all: /qsys.lib/${BUILDLIB}.lib/handler.pgm
 
-/qsys.lib/${BUILDLIB}.lib/handler.pgm: /qsys.lib/${BUILDLIB}.lib/handler.module /qsys.lib/${BUILDLIB}.lib/pub_json.module /qsys.lib/${BUILDLIB}.lib/pub_db2.module /qsys.lib/${BUILDLIB}.lib/debug.module /qsys.lib/${BUILDLIB}.lib/pub_db2.module /qsys.lib/${BUILDLIB}.lib/userconf.module
+/qsys.lib/${BUILDLIB}.lib/handler.pgm: /qsys.lib/${BUILDLIB}.lib/handler.module /qsys.lib/${BUILDLIB}.lib/pub_json.module /qsys.lib/${BUILDLIB}.lib/pub_db2.module /qsys.lib/${BUILDLIB}.lib/debug.module /qsys.lib/${BUILDLIB}.lib/pub_db2.module /qsys.lib/${BUILDLIB}.lib/rpgpub_db2.module /qsys.lib/${BUILDLIB}.lib/userconf.module
 	system "CRTPGM PGM(${BUILDLIB}/HANDLER) MODULE(${BUILDLIB}/HANDLER ${BUILDLIB}/PUB_JSON ${BUILDLIB}/PUB_DB2 ${BUILDLIB}/DEBUG ${BUILDLIB}/USERCONF) ACTGRP(*CALLER)""
 
 /qsys.lib/${BUILDLIB}.lib/%.module: src/%.cpp
@@ -12,6 +12,9 @@ all: /qsys.lib/${BUILDLIB}.lib/handler.pgm
 
 /qsys.lib/${BUILDLIB}.lib/%.module: src/%.sqlc
 	system "CRTSQLCI OBJ(${BUILDLIB}/$*) SRCSTMF('$^') COMMIT(*NONE) DATFMT(*ISO) TIMFMT(*ISO) CVTCCSID(*JOB) COMPILEOPT('INCDIR(''src'')') SQLPATH(${BUILDLIB}) DFTRDBCOL(${BUILDLIB}) OPTION(*SQL)"
+
+/qsys.lib/${BUILDLIB}.lib/%.module: src/%.sqlrpgle
+	system "CRTSQLRPGI OBJ(${BUILDLIB}/$*) OBJTYPE(*MODULE) SRCSTMF('$^') COMMIT(*NONE) DATFMT(*ISO) TIMFMT(*ISO) CVTCCSID(*JOB) COMPILEOPT('INCDIR(''src'')') SQLPATH(${BUILDLIB}) DFTRDBCOL(${BUILDLIB}) OPTION(*SQL)"
 
 /qsys.lib/${BUILDLIB.lib}:
 	-system "RUNSQL SQL('create schema ${BUILDLIB}') NAMING(*SYS)"
