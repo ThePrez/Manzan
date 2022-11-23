@@ -34,9 +34,7 @@ all: /qsys.lib/${BUILDLIB}.lib/handler.pgm
 testing: /qsys.lib/${BUILDLIB}.lib/MANZANQ.msgq watch_start watch_testq watch_end
 
 watch_testq:
-	system -kKv "SNDMSG MSG('ABCD') TOMSGQ(${BUILDLIB}/MANZANQ)"
-	system -kKv "SNDMSG MSG('EFGH') TOMSGQ(${BUILDLIB}/MANZANQ)"
-	system -kKv "SNDMSG MSG('IJK') TOMSGQ(${BUILDLIB}/MANZANQ)"
+	-java -cp ./tester:/QIBM/ProdData/OS400/jt400/lib/jt400.jar sndmsg
 
 watch_start:
 	# Listens to chosen message queue for all messages
@@ -46,3 +44,4 @@ watch_start:
 
 watch_end:
 	system -kKv "ENDWCH SSNID(TESTING)"
+	# select rtrim(HANDLED_TIMESTAMP) as TS, rtrim(SESSION_ID) as SESSION, rtrim(MESSAGE_ID) as MSG_ID from jesseg.manzanmsg where SESSION_ID = 'TESTING   '
