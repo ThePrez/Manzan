@@ -22,6 +22,27 @@ all: /qsys.lib/${BUILDLIB}.lib/handler.pgm
 	-system "DLTDTAQ DTAQ(${BUILDLIB}/MANZANDTAQ)"
 	system "CRTDTAQ DTAQ(${BUILDLIB}/MANZANDTAQ) MAXLEN(64512) SEQ(*KEYED) KEYLEN(10) SIZE(*MAX2GB) AUTORCL(*YES)"
 
+/qsys.lib/${BUILDLIB}.lib/%.msgq:
+	-system "DLTMSGQ MSGQ(${BUILDLIB}/$*)"
+	system -kKv "CRTMSGQ MSGQ(${BUILDLIB}/$*) TEXT('Testing queue') CCSID(1208)"
+
 /qsys.lib/${BUILDLIB}.lib/%.file: install_tasks/%.sql
 	system -kKv "RUNSQLSTM SRCSTMF('$<') COMMIT(*NONE) DFTRDBCOL(${BUILDLIB})"
 	echo "Success"
+
+.PHONY: testing
+testing: /qsys.lib/${BUILDLIB}.lib/MANZANQ.msgq watch_start watch_testq watch_end
+
+watch_testq:
+	system -kKv "SNDMSG MSG('ABCD') TOMSGQ(${BUILDLIB}/MANZANQ)"
+	system -kKv "SNDMSG MSG('EFGH') TOMSGQ(${BUILDLIB}/MANZANQ)"
+	system -kKv "SNDMSG MSG('IJK') TOMSGQ(${BUILDLIB}/MANZANQ)"
+
+watch_start:
+	# Listens to chosen message queue for all messages
+	# then calls the handler program
+	# Check /tmp/manzan_debug.txt for logs
+	system -kKv "STRWCH SSNID(TESTING) WCHPGM(${BUILDLIB}/HANDLER) CALLWCHPGM(*STRWCH) WCHMSG((*ALL)) WCHMSGQ((${BUILDLIB}/MANZANQ))"
+
+watch_end:
+	system -kKv "ENDWCH SSNID(TESTING)"
