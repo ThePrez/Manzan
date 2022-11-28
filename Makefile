@@ -33,8 +33,11 @@ all: /qsys.lib/${BUILDLIB}.lib/handler.pgm
 .PHONY: testing
 testing: /qsys.lib/${BUILDLIB}.lib/MANZANQ.msgq watch_start watch_testq watch_end
 
-watch_testq:
-	-java -cp ./tester:/QIBM/ProdData/OS400/jt400/lib/jt400.jar sndmsg
+./tester/sndmsg.class: ./tester/sndmsg.java
+	javac -d tester -cp /QIBM/ProdData/OS400/jt400/lib/jt400.jar tester/sndmsg.java
+
+watch_testq: ./tester/sndmsg.class
+	java -cp ./tester:/QIBM/ProdData/OS400/jt400/lib/jt400.jar sndmsg
 
 watch_start:
 	# Listens to chosen message queue for all messages
