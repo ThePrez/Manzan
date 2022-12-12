@@ -3,11 +3,13 @@ package com.github.theprez.manzan;
 import java.io.File;
 import java.util.LinkedList;
 import java.util.List;
+import java.util.Map;
 import java.util.Map.Entry;
 
 import org.apache.camel.CamelContext;
 import org.apache.camel.impl.DefaultCamelContext;
 
+import com.github.theprez.manzan.configuration.DataConfig;
 import com.github.theprez.manzan.configuration.DestinationConfig;
 import com.github.theprez.manzan.routes.ManzanRoute;
 import com.github.theprez.manzan.routes.event.WatchMsgEvent;
@@ -36,18 +38,15 @@ public class MainApp {
         context.getRegistry().bind("jt400", dataSource);
 
         final DestinationConfig destinations = new DestinationConfig(new File("dests.ini"));
-        for (final Entry<String, ManzanRoute> dest : destinations.getRoutes().entrySet()) {
+        Map<String, ManzanRoute> destinationRoutes = destinations.getRoutes();
+        for (final Entry<String, ManzanRoute> dest : destinationRoutes.entrySet()) {
             context.addRoutes(dest.getValue());
         }
-        // testing only
-        final List<String> testdests = new LinkedList<String>();
-        testdests.add("test_out");
-        testdests.add("mysentry");
-        context.addRoutes(new WatchMsgEvent("JESSE", testdests, "JESSEG", 5, 1000));
 
-        // OLD SECTION
-        // final ManzanConfig config = new ManzanConfig();
-        // final ManzanRouteMaster master = new ManzanRouteMaster(config, context);
+        final DataConfig dataSources = new DataConfig(new File("data.ini"), destinationRoutes.keySet());
+        for (final Entry<String, ManzanRoute> src : dataSources.getRoutes().entrySet()) {
+            context.addRoutes(src.getValue());
+        }
 
         // This actually "starts" the route, so Camel will start monitoring and routing
         // activity here.

@@ -33,6 +33,13 @@ public class DestinationConfig {
         }
         return ret;
     }
+    private String getOptionalString(final String _name, final String _key) {
+        final String ret = m_ini.get(_name, _key);
+        if (StringUtils.isEmpty(ret)) {
+            return null;
+        }
+        return ret;
+    }
 
     public Map<String, ManzanRoute> getRoutes() {
         final Map<String, ManzanRoute> ret = new LinkedHashMap<String, ManzanRoute>();
@@ -49,7 +56,8 @@ public class DestinationConfig {
                 case "slack":
                     final String webhook = getRequiredString(name, "webhook");
                     final String channel = getRequiredString(name, "channel");
-                    ret.put(name, new SlackMsgDestination(name, webhook, channel));
+                    final String format = getOptionalString(name, "format");
+                    ret.put(name, new SlackMsgDestination(name, webhook, channel, format));
                     break;
                 case "sentry":
                     final String dsn = getRequiredString(name, "dsn");

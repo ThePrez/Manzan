@@ -14,13 +14,15 @@ public class WatchMsgEvent extends ManzanRoute {
     private final int m_numToProcess;
     private final List<String> m_destinations;
     private final String m_recipientList;
+    private String m_sessionId;
 
-    public WatchMsgEvent(String _name, List<String> _destinations, String _schema, int _interval, int _numToProcess) throws IOException {
+    public WatchMsgEvent(String _name, String _session_id, List<String> _destinations, String _schema, int _interval, int _numToProcess) throws IOException {
         super(_name);
         m_interval=_interval;
         m_numToProcess=_numToProcess;
         m_schema=_schema;
         m_destinations = _destinations;
+        m_sessionId = _session_id.trim().toUpperCase();
         String destinationsStr="";
         for(String dest : m_destinations) {
             if(StringUtils.isEmpty(dest)) {
@@ -38,7 +40,8 @@ public class WatchMsgEvent extends ManzanRoute {
     public void configure() {        
         from("timer://foo?synchronous=false&period=" + m_interval)
         .routeId("manzan_msg")
-        .setBody(constant("SeLeCt * fRoM " + m_schema + ".mAnZaNmSg wHeRe SESSION_ID = '"+m_name+"' limit " + m_numToProcess ))
+        .setBody(constant("SeLeCt * fRoM " + m_schema + ".mAnZaNmSg wHeRe SESSION_ID = '"+m_sessionId+"' limit " + m_numToProcess ))
+        .to("stream:out")
         .to("jdbc:jt400?outputType=StreamList")
         .split(body()).streaming().parallelProcessing()
             .setHeader("id", simple("${body[ORDINAL_POSITION]}"))
@@ -48,7 +51,7 @@ public class WatchMsgEvent extends ManzanRoute {
             .setBody(simple("${body}\n"))
             .recipientList(constant(m_recipientList)).parallelProcessing().stopOnException().end()
             .setBody(simple("delete fRoM " + m_schema + ".mAnZaNmSg where ORDINAL_POSITION = ${header.id} WITH NC"))
-            .to("jdbc:jt400");
+            .to("jdbc:jt400").to("stream:err");
     }
     
 }
