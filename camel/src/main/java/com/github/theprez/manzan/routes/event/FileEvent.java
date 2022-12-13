@@ -45,7 +45,6 @@ public class FileEvent extends ManzanRoute{
         .convertBodyTo(String.class)
         .process(exchange -> {
                 exchange.getIn().setHeader("abort", m_filter.matches(exchange.getIn().getBody(String.class))?"continue":"abort");
-                System.out.println("abort="+exchange.getIn().getHeader("abort"));
         })
         .choice().when(simple("${header.abort} != 'abort'"))
         .process(exchange -> {

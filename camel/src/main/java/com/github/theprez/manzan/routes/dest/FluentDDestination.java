@@ -33,7 +33,7 @@ public class FluentDDestination extends ManzanRoute {
 
     @Override
     public void configure() {
-        from("direct:msg_fluentd")
+        from(getInUri())
         .routeId(m_name).process(exchange -> {
             m_logger.log(m_tag, getDataMap(exchange));
         });
