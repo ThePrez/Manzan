@@ -2,9 +2,6 @@ package com.github.theprez.manzan.routes.event;
 
 import java.io.IOException;
 import java.util.List;
-import java.util.Map;
-
-import com.github.theprez.jcmdutils.StringUtils;
 import com.github.theprez.manzan.ManzanEventType;
 import com.github.theprez.manzan.routes.ManzanRoute;
 
