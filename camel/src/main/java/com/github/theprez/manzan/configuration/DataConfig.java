@@ -11,12 +11,14 @@ import java.util.Set;
 import org.ini4j.Ini;
 import org.ini4j.InvalidFileFormatException;
 
+import com.fasterxml.jackson.core.sym.Name;
 import com.github.theprez.jcmdutils.StringUtils;
 import com.github.theprez.manzan.routes.ManzanRoute;
-import com.github.theprez.manzan.routes.dest.FluentDMsgDestination;
-import com.github.theprez.manzan.routes.dest.SentryMsgDestination;
-import com.github.theprez.manzan.routes.dest.SlackMsgDestination;
-import com.github.theprez.manzan.routes.dest.StreamMsgDestination;
+import com.github.theprez.manzan.routes.dest.FluentDDestination;
+import com.github.theprez.manzan.routes.dest.SentryDestination;
+import com.github.theprez.manzan.routes.dest.SlackDestination;
+import com.github.theprez.manzan.routes.dest.StreamDestination;
+import com.github.theprez.manzan.routes.event.FileEvent;
 import com.github.theprez.manzan.routes.event.WatchMsgEvent;
 
 public class DataConfig extends Config {
@@ -35,6 +37,9 @@ public class DataConfig extends Config {
             if (StringUtils.isEmpty(type)) {
                 throw new RuntimeException("type not specified for data source [" + section + "]");
             }
+            if("false".equalsIgnoreCase(getIni().get(section, "enabled"))) {
+                continue;
+            }
             final String name = section;
             String schema = "JESSEG"; //TODO: get from configuration
             int interval = 5; //TODO: get from configuration
@@ -52,7 +57,7 @@ public class DataConfig extends Config {
                     ret.put(name, new WatchMsgEvent(name, getRequiredString(name, "id"), destinations, schema, interval, numToProcess));
                     break;
                 case "file":
-                    //TODO
+                    ret.put(name, new FileEvent(name, getRequiredString(name, "file"), destinations, getOptionalString(name,"filter")));
                     break;
                 default:
                     throw new RuntimeException("Unknown destination type: " + type);

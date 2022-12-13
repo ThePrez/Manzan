@@ -5,17 +5,18 @@ import java.util.Map.Entry;
 
 public class ManzanMessageFormatter {
 
-    private final Map<String, Object> m_mappings;
+    private final String m_fmtStr;
 
-    public ManzanMessageFormatter(Map<String, Object> _mappings) {
-m_mappings = _mappings;
+    public ManzanMessageFormatter(String _fmtStr) {
+        m_fmtStr = _fmtStr;
     }
-    public String format(String _fmtStr) {
-        String ret = _fmtStr;
-        for(Entry<String, Object> repl:m_mappings.entrySet()) {
-            ret = ret.replace("$"+repl.getKey()+"$", ""+repl.getValue());
+
+    public String format(Map<String, Object> _mappings) {
+        String ret = m_fmtStr;
+        for (Entry<String, Object> repl : _mappings.entrySet()) {
+            ret = ret.replace("$" + repl.getKey() + "$", "" + repl.getValue());
         }
         return ret;
     }
-    
+
 }

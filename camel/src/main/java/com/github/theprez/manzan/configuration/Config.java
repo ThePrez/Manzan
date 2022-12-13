@@ -28,4 +28,11 @@ public abstract class Config {
         }
         return ret;
     }
+    protected String getOptionalString(final String _name, final String _key) {
+        final String ret = m_ini.get(_name, _key);
+        if (StringUtils.isEmpty(ret)) {
+           return null;
+        }
+        return ret;
+    }
 }

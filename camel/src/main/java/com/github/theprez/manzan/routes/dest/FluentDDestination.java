@@ -7,20 +7,18 @@ import org.fluentd.logger.FluentLogger;
 
 import com.github.theprez.manzan.routes.ManzanRoute;
 
-public class FluentDMsgDestination extends ManzanRoute {
-
-    private final Map<String, FluentLogger> m_fluentLoggers = new HashMap<String, FluentLogger>();
-    private final String m_host;
+public class FluentDDestination extends ManzanRoute {
+ private final String m_host;
     private final FluentLogger m_logger;
     private final int m_port;
     private final String m_tag;
 
-    public FluentDMsgDestination(final String _name, final String _tag, final String _host, final int _port) {
+    public FluentDDestination(final String _name, final String _tag, final String _host, final int _port) {
         super(_name);
         m_tag = _tag;
         m_host = _host;
         m_port = _port;
-        m_logger = FluentLogger.getLogger(_tag, _host, _port);
+        m_logger = FluentLogger.getLogger(m_tag, m_host, m_port);
         Runtime.getRuntime().addShutdownHook(new Thread() {
             @Override
             public void run() {
@@ -35,7 +33,8 @@ public class FluentDMsgDestination extends ManzanRoute {
 
     @Override
     public void configure() {
-        from("direct:msg_fluentd").process(exchange -> {
+        from("direct:msg_fluentd")
+        .routeId(m_name).process(exchange -> {
             m_logger.log(m_tag, getDataMap(exchange));
         });
     }

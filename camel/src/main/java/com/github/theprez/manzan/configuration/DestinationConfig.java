@@ -10,10 +10,10 @@ import org.ini4j.InvalidFileFormatException;
 
 import com.github.theprez.jcmdutils.StringUtils;
 import com.github.theprez.manzan.routes.ManzanRoute;
-import com.github.theprez.manzan.routes.dest.FluentDMsgDestination;
-import com.github.theprez.manzan.routes.dest.SentryMsgDestination;
-import com.github.theprez.manzan.routes.dest.SlackMsgDestination;
-import com.github.theprez.manzan.routes.dest.StreamMsgDestination;
+import com.github.theprez.manzan.routes.dest.FluentDDestination;
+import com.github.theprez.manzan.routes.dest.SentryDestination;
+import com.github.theprez.manzan.routes.dest.SlackDestination;
+import com.github.theprez.manzan.routes.dest.StreamDestination;
 
 public class DestinationConfig {
     private final Ini m_ini;
@@ -51,23 +51,23 @@ public class DestinationConfig {
             final String name = section;
             switch (type) {
                 case "stdout":
-                    ret.put(name, new StreamMsgDestination(name));
+                    ret.put(name, new StreamDestination(name));
                     break;
                 case "slack":
                     final String webhook = getRequiredString(name, "webhook");
                     final String channel = getRequiredString(name, "channel");
                     final String format = getOptionalString(name, "format");
-                    ret.put(name, new SlackMsgDestination(name, webhook, channel, format));
+                    ret.put(name, new SlackDestination(name, webhook, channel, format));
                     break;
                 case "sentry":
                     final String dsn = getRequiredString(name, "dsn");
-                    ret.put(name, new SentryMsgDestination(name, dsn));
+                    ret.put(name, new SentryDestination(name, dsn));
                     break;
                 case "fluentd":
                     final String tag = getRequiredString(name, "tag");
                     final String host = getRequiredString(name, "host");
                     final int port = getRequiredInt(name, "port");
-                    ret.put(name, new FluentDMsgDestination(name, tag, host, port));
+                    ret.put(name, new FluentDDestination(name, tag, host, port));
                     break;
                 default:
                     throw new RuntimeException("Unknown destination type: " + type);

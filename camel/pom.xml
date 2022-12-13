@@ -91,6 +91,13 @@
     <artifactId>ini4j</artifactId>
     <version>0.5.4</version>
 </dependency>
+
+<dependency>
+  <groupId>io.github.theprez</groupId>
+  <artifactId>jfiletail</artifactId>
+  <version>0.0.3</version>
+</dependency>
+
     <!-- logging -->
     <dependency>
       <groupId>org.apache.logging.log4j</groupId>

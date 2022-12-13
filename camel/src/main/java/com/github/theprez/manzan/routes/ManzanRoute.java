@@ -1,11 +1,17 @@
 package com.github.theprez.manzan.routes;
 
+import java.io.IOException;
+import java.util.List;
 import java.util.Map;
 
 import org.apache.camel.Exchange;
 import org.apache.camel.builder.RouteBuilder;
 
+import com.github.theprez.jcmdutils.StringUtils;
+
 public abstract class ManzanRoute extends RouteBuilder {
+
+    protected static final String EVENT_TYPE = "event_type";
 
     protected static String getWatchName(final Exchange exchange) {
         final Object watchNameObject = exchange.getIn().getHeader("session_id");
@@ -16,6 +22,7 @@ public abstract class ManzanRoute extends RouteBuilder {
     }
 
     protected final String m_name;
+    private String m_recipientList="";
 
     public ManzanRoute(final String _name) {
         m_name = _name;
@@ -44,4 +51,23 @@ public abstract class ManzanRoute extends RouteBuilder {
     protected String getString(final Exchange _exchange, final String _attr) {
         return "" + get(_exchange, _attr);
     }
+
+    protected void setRecipientList(List<String> _destinations) throws IOException {
+        String destinationsStr="";
+        for(String dest : _destinations) {
+            if(StringUtils.isEmpty(dest)) {
+                continue;
+            }
+            destinationsStr+= "direct:"+dest.toLowerCase().trim()+",";
+        }
+        m_recipientList = destinationsStr.replaceFirst(",$", "").trim();
+        
+       if(StringUtils.isEmpty(m_recipientList)) {
+        throw new IOException("Message watch for '"+m_name+"' has no valid destinations");
+    }   
+    }
+    protected String getRecipientList() {
+        return m_recipientList;
+    }
+
 }

@@ -4,6 +4,7 @@ import java.util.LinkedList;
 import java.util.List;
 import java.util.UUID;
 
+import com.github.theprez.manzan.ManzanEventType;
 import com.github.theprez.manzan.routes.ManzanRoute;
 
 import io.sentry.Sentry;
@@ -13,8 +14,8 @@ import io.sentry.protocol.Message;
 import io.sentry.protocol.SentryId;
 import io.sentry.protocol.User;
 
-public class SentryMsgDestination extends ManzanRoute {
-    private static SentryMsgDestination m_singleton = null;
+public class SentryDestination extends ManzanRoute {
+    private static SentryDestination m_singleton = null;
     private static final String MSG_MESSAGE = "MESSAGE";
     private static final String MSG_MESSAGE_ID = "MESSAGE_ID";
     private static final String MSG_ORDINAL_POSITION = "ORDINAL_POSITION";
@@ -26,9 +27,9 @@ public class SentryMsgDestination extends ManzanRoute {
 
     private static final String MSG_SEVERITY = "SEVERITY";
 
-    public SentryMsgDestination(final String _name, final String _dsn) {
+    public SentryDestination(final String _name, final String _dsn) {
         super(_name);
-        synchronized (SentryMsgDestination.class) {
+        synchronized (SentryDestination.class) {
             if (null != m_singleton) {
                 throw new RuntimeException("Only one Sentry configuration is allowed");
             }
@@ -42,7 +43,12 @@ public class SentryMsgDestination extends ManzanRoute {
 
     @Override
     public void configure() {
-        from(getInUri()).convertBodyTo(String.class).process(exchange -> {
+        from(getInUri())
+        .routeId(m_name)
+        .convertBodyTo(String.class)
+        .process(exchange -> {
+            ManzanEventType type = (ManzanEventType) exchange.getIn().getHeader(EVENT_TYPE);
+            if(ManzanEventType.WATCH_MSG == type) {
             System.out.println("sentry");
             final SentryEvent event = new SentryEvent();
             final String watch = getWatchName(exchange);
@@ -79,6 +85,9 @@ public class SentryMsgDestination extends ManzanRoute {
             event.setFingerprints(fingerprints);
             event.setMessage(message);
             Sentry.captureEvent(event);
+            } else {
+                throw new RuntimeException("Sentry route doesn't know how to process type "+type);
+            }
         });
     }
 }
