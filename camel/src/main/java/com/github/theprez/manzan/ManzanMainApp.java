@@ -17,7 +17,7 @@ import com.ibm.as400.access.AS400JDBCDataSource;
  * A Camel Application that routes messages from an IBM i message queue to
  * email.
  */
-public class MainApp {
+public class ManzanMainApp {
     private static AS400 getSystemConnection() {
         return new AS400("oss73dev.rch.stglabs.ibm.com", "linux", "linux1");
     }
@@ -34,13 +34,13 @@ public class MainApp {
         dataSource.setTransactionIsolation("none");
         context.getRegistry().bind("jt400", dataSource);
 
-        final DestinationConfig destinations = new DestinationConfig(new File("dests.ini"));
+        final DestinationConfig destinations = new DestinationConfig(getDestinationConfigFile());
         Map<String, ManzanRoute> destinationRoutes = destinations.getRoutes();
         for (final Entry<String, ManzanRoute> dest : destinationRoutes.entrySet()) {
             context.addRoutes(dest.getValue());
         }
 
-        final DataConfig dataSources = new DataConfig(new File("data.ini"), destinationRoutes.keySet());
+        final DataConfig dataSources = new DataConfig(getDataConfigFile(), destinationRoutes.keySet());
         for (final Entry<String, ManzanRoute> src : dataSources.getRoutes().entrySet()) {
             context.addRoutes(src.getValue());
         }
@@ -55,5 +55,13 @@ public class MainApp {
         Thread.sleep(Long.MAX_VALUE);
         context.stop();
         context.close();
+    }
+
+    private static File getDataConfigFile() {
+        return new File("data.ini"); //TODO: the right thing
+    }
+
+    private static File getDestinationConfigFile() {
+        return new File("dests.ini"); //TODO: the right thing
     }
 }

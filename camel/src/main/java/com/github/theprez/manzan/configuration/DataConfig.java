@@ -18,13 +18,17 @@ import com.github.theprez.manzan.routes.event.WatchMsgEvent;
 public class DataConfig extends Config {
 
     private final Set<String> m_destinations;
+    private Map<String, ManzanRoute> m_routes = null;
 
     public DataConfig(final File _f, Set<String> _destinations) throws InvalidFileFormatException, IOException {
         super(_f);
         m_destinations = _destinations;
     }
 
-    public Map<String, ManzanRoute> getRoutes() throws IOException {
+    public synchronized Map<String, ManzanRoute> getRoutes() throws IOException {
+        if(null != m_routes) {
+            return m_routes;
+        }
         final Map<String, ManzanRoute> ret = new LinkedHashMap<String, ManzanRoute>();
         for (final String section : getIni().keySet()) {
             final String type = getIni().get(section, "type");
@@ -57,7 +61,7 @@ public class DataConfig extends Config {
                     throw new RuntimeException("Unknown destination type: " + type);
             }
         }
-        return ret;
+        return m_routes = ret;
     }
 
 }

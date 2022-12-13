@@ -15,10 +15,14 @@ import com.github.theprez.manzan.routes.dest.SlackDestination;
 import com.github.theprez.manzan.routes.dest.StreamDestination;
 
 public class DestinationConfig extends Config{
+    private Map<String, ManzanRoute> m_routes=null;
     public DestinationConfig(final File _f) throws InvalidFileFormatException, IOException {
         super(_f);
     }
-    public Map<String, ManzanRoute> getRoutes() {
+    public synchronized Map<String, ManzanRoute> getRoutes() {
+        if(null != m_routes) {
+            return m_routes;
+        }
         final Map<String, ManzanRoute> ret = new LinkedHashMap<String, ManzanRoute>();
         for (final String section : getIni().keySet()) {
             final String type = getIni().get(section, "type");
@@ -53,7 +57,7 @@ public class DestinationConfig extends Config{
                     throw new RuntimeException("Unknown destination type: " + type);
             }
         }
-        return ret;
+        return m_routes = ret;
     }
 
 }
