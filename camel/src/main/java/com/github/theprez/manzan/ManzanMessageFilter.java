@@ -1,7 +1,5 @@
 package com.github.theprez.manzan;
 
-import java.util.Map;
-import java.util.Map.Entry;
 import java.util.regex.Pattern;
 
 import com.github.theprez.jcmdutils.StringUtils;

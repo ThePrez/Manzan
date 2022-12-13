@@ -1,8 +1,5 @@
 package com.github.theprez.manzan.routes.dest;
 
-import java.util.HashMap;
-import java.util.Map;
-
 import org.fluentd.logger.FluentLogger;
 
 import com.github.theprez.manzan.routes.ManzanRoute;

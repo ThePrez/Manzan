@@ -1,8 +1,6 @@
 package com.github.theprez.manzan;
 
 import java.io.File;
-import java.util.LinkedList;
-import java.util.List;
 import java.util.Map;
 import java.util.Map.Entry;
 
@@ -12,7 +10,6 @@ import org.apache.camel.impl.DefaultCamelContext;
 import com.github.theprez.manzan.configuration.DataConfig;
 import com.github.theprez.manzan.configuration.DestinationConfig;
 import com.github.theprez.manzan.routes.ManzanRoute;
-import com.github.theprez.manzan.routes.event.WatchMsgEvent;
 import com.ibm.as400.access.AS400;
 import com.ibm.as400.access.AS400JDBCDataSource;
 

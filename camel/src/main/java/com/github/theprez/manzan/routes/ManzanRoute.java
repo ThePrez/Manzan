@@ -40,6 +40,7 @@ public abstract class ManzanRoute extends RouteBuilder {
         return val;
     }
 
+    @SuppressWarnings("unchecked")
     protected Map<String, Object> getDataMap(final Exchange _exchange) {
         return (Map<String, Object>) _exchange.getIn().getHeader("data_map");
     }
