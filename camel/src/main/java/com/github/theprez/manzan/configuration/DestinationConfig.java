@@ -5,7 +5,6 @@ import java.io.IOException;
 import java.util.LinkedHashMap;
 import java.util.Map;
 
-import org.ini4j.Ini;
 import org.ini4j.InvalidFileFormatException;
 
 import com.github.theprez.jcmdutils.StringUtils;
@@ -15,38 +14,19 @@ import com.github.theprez.manzan.routes.dest.SentryDestination;
 import com.github.theprez.manzan.routes.dest.SlackDestination;
 import com.github.theprez.manzan.routes.dest.StreamDestination;
 
-public class DestinationConfig {
-    private final Ini m_ini;
-
+public class DestinationConfig extends Config{
     public DestinationConfig(final File _f) throws InvalidFileFormatException, IOException {
-        m_ini = new Ini(_f);
+        super(_f);
     }
-
-    private int getRequiredInt(final String _name, final String _key) {
-        return Integer.valueOf(getRequiredString(_name, _key));
-    }
-
-    private String getRequiredString(final String _name, final String _key) {
-        final String ret = m_ini.get(_name, _key);
-        if (StringUtils.isEmpty(ret)) {
-            throw new RuntimeException("Required value for '" + _key + "' in [" + _name + "] not found");
-        }
-        return ret;
-    }
-    private String getOptionalString(final String _name, final String _key) {
-        final String ret = m_ini.get(_name, _key);
-        if (StringUtils.isEmpty(ret)) {
-            return null;
-        }
-        return ret;
-    }
-
     public Map<String, ManzanRoute> getRoutes() {
         final Map<String, ManzanRoute> ret = new LinkedHashMap<String, ManzanRoute>();
-        for (final String section : m_ini.keySet()) {
-            final String type = m_ini.get(section, "type");
+        for (final String section : getIni().keySet()) {
+            final String type = getIni().get(section, "type");
             if (StringUtils.isEmpty(type)) {
                 throw new RuntimeException("type not specified for destination [" + section + "]");
+            }
+            if("false".equalsIgnoreCase(getIni().get(section, "enabled"))) {
+                continue;
             }
             final String name = section;
             switch (type) {
