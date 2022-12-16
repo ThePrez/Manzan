@@ -52,7 +52,7 @@ public class FileEvent extends ManzanRoute {
             final Map<String,Object> data_map = new LinkedHashMap<String,Object>();
             data_map.put(FILE_NAME, m_file.getName());
             data_map.put(FILE_PATH, m_file.getAbsolutePath());
-            data_map.put(FILE_DATA, exchange.getIn().getBody(String.class));
+            data_map.put(FILE_DATA, exchange.getIn().getBody(String.class).replace("\r",""));
             exchange.getIn().setHeader("data_map", data_map);
             exchange.getIn().setBody(data_map);
         })

@@ -28,7 +28,8 @@ public class ManzanMessageFormatter {
         for (final Entry<String, Object> repl : _mappings.entrySet()) {
             ret = ret.replace("$" + repl.getKey() + "$", "" + repl.getValue());
         }
-        ret = ret.replace("\\r\\n", "\\n");
+        ret = ret.replace("\r\n", "\n");
+        ret = ret.replace("\r", "");
         ret = ret.replace("\\n", "\n").replace("\\t", "\t");
 
         return ret;
