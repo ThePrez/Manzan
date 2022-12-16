@@ -7,10 +7,12 @@ public class StreamDestination extends ManzanRoute {
         super(_name);
     }
 
+//@formatter:off
     @Override
     public void configure() {
         from(getInUri())
         .routeId(m_name).to("stream:out");
     }
+    //@formatter:on
 
 }

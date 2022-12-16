@@ -18,6 +18,14 @@ import com.ibm.as400.access.AS400JDBCDataSource;
  * email.
  */
 public class ManzanMainApp {
+    private static File getDataConfigFile() {
+        return new File("data.ini"); // TODO: the right thing
+    }
+
+    private static File getDestinationConfigFile() {
+        return new File("dests.ini"); // TODO: the right thing
+    }
+
     private static AS400 getSystemConnection() {
         return new AS400("oss73dev.rch.stglabs.ibm.com", "linux", "linux1");
     }
@@ -35,7 +43,7 @@ public class ManzanMainApp {
         context.getRegistry().bind("jt400", dataSource);
 
         final DestinationConfig destinations = new DestinationConfig(getDestinationConfigFile());
-        Map<String, ManzanRoute> destinationRoutes = destinations.getRoutes();
+        final Map<String, ManzanRoute> destinationRoutes = destinations.getRoutes();
         for (final Entry<String, ManzanRoute> dest : destinationRoutes.entrySet()) {
             context.addRoutes(dest.getValue());
         }
@@ -55,13 +63,5 @@ public class ManzanMainApp {
         Thread.sleep(Long.MAX_VALUE);
         context.stop();
         context.close();
-    }
-
-    private static File getDataConfigFile() {
-        return new File("data.ini"); //TODO: the right thing
-    }
-
-    private static File getDestinationConfigFile() {
-        return new File("dests.ini"); //TODO: the right thing
     }
 }

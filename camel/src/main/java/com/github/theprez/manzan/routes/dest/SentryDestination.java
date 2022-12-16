@@ -41,13 +41,14 @@ public class SentryDestination extends ManzanRoute {
         });
     }
 
+//@formatter:off
     @Override
     public void configure() {
         from(getInUri())
         .routeId(m_name)
         .convertBodyTo(String.class)
         .process(exchange -> {
-            ManzanEventType type = (ManzanEventType) exchange.getIn().getHeader(EVENT_TYPE);
+            final ManzanEventType type = (ManzanEventType) exchange.getIn().getHeader(EVENT_TYPE);
             if(ManzanEventType.WATCH_MSG == type) {
             System.out.println("sentry");
             final SentryEvent event = new SentryEvent();
@@ -90,4 +91,5 @@ public class SentryDestination extends ManzanRoute {
             }
         });
     }
+    //@formatter:on
 }

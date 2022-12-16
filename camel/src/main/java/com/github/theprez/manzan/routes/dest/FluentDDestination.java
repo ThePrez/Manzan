@@ -5,7 +5,7 @@ import org.fluentd.logger.FluentLogger;
 import com.github.theprez.manzan.routes.ManzanRoute;
 
 public class FluentDDestination extends ManzanRoute {
- private final String m_host;
+    private final String m_host;
     private final FluentLogger m_logger;
     private final int m_port;
     private final String m_tag;
@@ -28,6 +28,7 @@ public class FluentDDestination extends ManzanRoute {
         });
     }
 
+//@formatter:off
     @Override
     public void configure() {
         from(getInUri())
@@ -35,5 +36,7 @@ public class FluentDDestination extends ManzanRoute {
             m_logger.log(m_tag, getDataMap(exchange));
         });
     }
+
+//@formatter:on
 
 }

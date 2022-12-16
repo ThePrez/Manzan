@@ -22,7 +22,7 @@ public abstract class ManzanRoute extends RouteBuilder {
     }
 
     protected final String m_name;
-    private String m_recipientList="";
+    private String m_recipientList = "";
 
     public ManzanRoute(final String _name) {
         m_name = _name;
@@ -49,26 +49,27 @@ public abstract class ManzanRoute extends RouteBuilder {
         return "direct:" + m_name;
     }
 
+    protected String getRecipientList() {
+        return m_recipientList;
+    }
+
     protected String getString(final Exchange _exchange, final String _attr) {
         return "" + get(_exchange, _attr);
     }
 
-    protected void setRecipientList(List<String> _destinations) throws IOException {
-        String destinationsStr="";
-        for(String dest : _destinations) {
-            if(StringUtils.isEmpty(dest)) {
+    protected void setRecipientList(final List<String> _destinations) throws IOException {
+        String destinationsStr = "";
+        for (final String dest : _destinations) {
+            if (StringUtils.isEmpty(dest)) {
                 continue;
             }
-            destinationsStr+= "direct:"+dest.toLowerCase().trim()+",";
+            destinationsStr += "direct:" + dest.toLowerCase().trim() + ",";
         }
         m_recipientList = destinationsStr.replaceFirst(",$", "").trim();
-        
-       if(StringUtils.isEmpty(m_recipientList)) {
-        throw new IOException("Message watch for '"+m_name+"' has no valid destinations");
-    }   
-    }
-    protected String getRecipientList() {
-        return m_recipientList;
+
+        if (StringUtils.isEmpty(m_recipientList)) {
+            throw new IOException("Message watch for '" + m_name + "' has no valid destinations");
+        }
     }
 
 }

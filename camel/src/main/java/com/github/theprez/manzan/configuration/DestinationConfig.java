@@ -18,13 +18,15 @@ import com.github.theprez.manzan.routes.dest.SentryDestination;
 import com.github.theprez.manzan.routes.dest.SlackDestination;
 import com.github.theprez.manzan.routes.dest.StreamDestination;
 
-public class DestinationConfig extends Config{
-    private Map<String, ManzanRoute> m_routes=null;
+public class DestinationConfig extends Config {
+    private Map<String, ManzanRoute> m_routes = null;
+
     public DestinationConfig(final File _f) throws InvalidFileFormatException, IOException {
         super(_f);
     }
+
     public synchronized Map<String, ManzanRoute> getRoutes() {
-        if(null != m_routes) {
+        if (null != m_routes) {
             return m_routes;
         }
         final Map<String, ManzanRoute> ret = new LinkedHashMap<String, ManzanRoute>();
@@ -33,7 +35,7 @@ public class DestinationConfig extends Config{
             if (StringUtils.isEmpty(type)) {
                 throw new RuntimeException("type not specified for destination [" + section + "]");
             }
-            if("false".equalsIgnoreCase(getIni().get(section, "enabled"))) {
+            if ("false".equalsIgnoreCase(getIni().get(section, "enabled"))) {
                 continue;
             }
             final String name = section;
@@ -41,11 +43,12 @@ public class DestinationConfig extends Config{
                 case "stdout":
                     ret.put(name, new StreamDestination(name));
                     break;
-                case "slack":{
+                case "slack": {
                     final String webhook = getRequiredString(name, "webhook");
                     final String channel = getRequiredString(name, "channel");
                     final String format = getOptionalString(name, "format");
-                    ret.put(name, new SlackDestination(name, webhook, channel, format));}
+                    ret.put(name, new SlackDestination(name, webhook, channel, format));
+                }
                     break;
                 case "sentry":
                     final String dsn = getRequiredString(name, "dsn");
@@ -57,18 +60,19 @@ public class DestinationConfig extends Config{
                     final int port = getRequiredInt(name, "port");
                     ret.put(name, new FluentDDestination(name, tag, host, port));
                     break;
-                case "smtp": 
+                case "smtp":
                     final String server = getRequiredString(name, "server");
                     final String emailFormat = getOptionalString(name, "format");
-                    Section sectionObj = getIni().get(name);
-                    Map<String,String> pathParameters = new LinkedHashMap<String,String>();
-                    for(String sectionKey:sectionObj.keySet() )
-                    {
-                        List<String> exclusions = Arrays.asList("server", "type", "filter", "format");
-                        if(exclusions.contains(sectionKey) ){continue;}
+                    final Section sectionObj = getIni().get(name);
+                    final Map<String, String> pathParameters = new LinkedHashMap<String, String>();
+                    for (final String sectionKey : sectionObj.keySet()) {
+                        final List<String> exclusions = Arrays.asList("server", "type", "filter", "format");
+                        if (exclusions.contains(sectionKey)) {
+                            continue;
+                        }
                         pathParameters.put(sectionKey, getRequiredString(name, sectionKey));
                     }
-                    EmailDestination d = new EmailDestination(name, server,emailFormat, pathParameters, null);
+                    final EmailDestination d = new EmailDestination(name, server, emailFormat, pathParameters, null);
                     ret.put(name, d);
                     break;
                 default:
