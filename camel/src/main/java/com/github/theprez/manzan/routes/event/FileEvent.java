@@ -53,7 +53,11 @@ public class FileEvent extends ManzanRoute{
             data_map.put(FILE_PATH, m_file.getAbsolutePath());
             data_map.put(FILE_DATA, exchange.getIn().getBody(String.class));
             exchange.getIn().setHeader("data_map", data_map);
-        })
+            exchange.getIn().setBody(data_map);
+        })       
+        .marshal().json(true)
+        .setBody(simple("${body}\n"))
+        .convertBodyTo(String.class,"UTF-8")
         .recipientList(constant(getRecipientList())).stopOnException()
         ;
     }

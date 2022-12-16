@@ -2,13 +2,17 @@ package com.github.theprez.manzan.configuration;
 
 import java.io.File;
 import java.io.IOException;
+import java.util.Arrays;
 import java.util.LinkedHashMap;
+import java.util.List;
 import java.util.Map;
 
 import org.ini4j.InvalidFileFormatException;
+import org.ini4j.Profile.Section;
 
 import com.github.theprez.jcmdutils.StringUtils;
 import com.github.theprez.manzan.routes.ManzanRoute;
+import com.github.theprez.manzan.routes.dest.EmailDestination;
 import com.github.theprez.manzan.routes.dest.FluentDDestination;
 import com.github.theprez.manzan.routes.dest.SentryDestination;
 import com.github.theprez.manzan.routes.dest.SlackDestination;
@@ -37,11 +41,11 @@ public class DestinationConfig extends Config{
                 case "stdout":
                     ret.put(name, new StreamDestination(name));
                     break;
-                case "slack":
+                case "slack":{
                     final String webhook = getRequiredString(name, "webhook");
                     final String channel = getRequiredString(name, "channel");
                     final String format = getOptionalString(name, "format");
-                    ret.put(name, new SlackDestination(name, webhook, channel, format));
+                    ret.put(name, new SlackDestination(name, webhook, channel, format));}
                     break;
                 case "sentry":
                     final String dsn = getRequiredString(name, "dsn");
@@ -52,6 +56,20 @@ public class DestinationConfig extends Config{
                     final String host = getRequiredString(name, "host");
                     final int port = getRequiredInt(name, "port");
                     ret.put(name, new FluentDDestination(name, tag, host, port));
+                    break;
+                case "smtp": 
+                    final String server = getRequiredString(name, "server");
+                    final String emailFormat = getOptionalString(name, "format");
+                    Section sectionObj = getIni().get(name);
+                    Map<String,String> pathParameters = new LinkedHashMap<String,String>();
+                    for(String sectionKey:sectionObj.keySet() )
+                    {
+                        List<String> exclusions = Arrays.asList("server", "type", "filter", "format");
+                        if(exclusions.contains(sectionKey) ){continue;}
+                        pathParameters.put(sectionKey, getRequiredString(name, sectionKey));
+                    }
+                    EmailDestination d = new EmailDestination(name, server,emailFormat, pathParameters, null);
+                    ret.put(name, d);
                     break;
                 default:
                     throw new RuntimeException("Unknown destination type: " + type);
