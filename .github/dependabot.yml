@@ -9,3 +9,5 @@ updates:
     directory: "/camel" # Location of package manifests
     schedule:
       interval: "weekly"
+    ignore:
+      - update-types: ["version-update:semver-major","version-update:semver-minor"]
