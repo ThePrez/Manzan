@@ -44,7 +44,7 @@ public class DataConfig extends Config {
                 continue;
             }
             final String name = section;
-            final String schema = "JESSEG"; // TODO: get from configuration
+            final String schema = ApplicationConfig.get().getLibrary();
             final int interval = 5; // TODO: get from configuration
             final int numToProcess = 1000; // TODO: get from configuration
             final List<String> destinations = new LinkedList<String>();

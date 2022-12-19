@@ -54,4 +54,12 @@ public class ApplicationConfig extends Config {
         return ret;
     }
 
+    public String getLibrary() {
+        String configuredLib = getOptionalString("install", "library");
+        if(StringUtils.isNonEmpty(configuredLib)) {
+            return configuredLib;
+        }
+        return "manzan";
+    }
+
 }
