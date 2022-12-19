@@ -1,1 +1,7 @@
-.vscode/settings.json
+.vscode/
+camel/.vscode
+camel/.settings
+camel/.classpath
+camel/.project
+camel/target
+camel/src/main/resources/real.properties
