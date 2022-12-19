@@ -17,10 +17,15 @@ import com.github.theprez.manzan.routes.event.WatchMsgEvent;
 
 public class DataConfig extends Config {
 
+    public static DataConfig get(final Set<String> _destinations) throws InvalidFileFormatException, IOException {
+        return new DataConfig(getConfigFile("data.ini"), _destinations);
+    }
+
     private final Set<String> m_destinations;
+
     private Map<String, ManzanRoute> m_routes = null;
 
-    public DataConfig(final File _f, final Set<String> _destinations) throws InvalidFileFormatException, IOException {
+    private DataConfig(final File _f, final Set<String> _destinations) throws InvalidFileFormatException, IOException {
         super(_f);
         m_destinations = _destinations;
     }

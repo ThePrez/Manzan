@@ -19,9 +19,13 @@ import com.github.theprez.manzan.routes.dest.SlackDestination;
 import com.github.theprez.manzan.routes.dest.StreamDestination;
 
 public class DestinationConfig extends Config {
+    public static DestinationConfig get() throws InvalidFileFormatException, IOException {
+        return new DestinationConfig(getConfigFile("dests.ini"));
+    }
+
     private Map<String, ManzanRoute> m_routes = null;
 
-    public DestinationConfig(final File _f) throws InvalidFileFormatException, IOException {
+    private DestinationConfig(final File _f) throws InvalidFileFormatException, IOException {
         super(_f);
     }
 
