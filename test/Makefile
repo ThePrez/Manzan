@@ -20,6 +20,6 @@ watch_start:
 
 watch_end:
 	system -kKv "ENDWCH SSNID(TESTING)"
-	# select rtrim(HANDLED_TIMESTAMP) as TS, rtrim(SESSION_ID) as SESSION, rtrim(MESSAGE_ID) as MSG_ID from jesseg.manzanmsg where SESSION_ID = 'TESTING   '
+	# select rtrim(HANDLED_TIMESTAMP) as TS, rtrim(SESSION_ID) as SESSION, rtrim(MESSAGE_ID) as MSG_ID from ${BUILDLIB}.manzanmsg where SESSION_ID = 'TESTING   '
 
 all: ile testing
