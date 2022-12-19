@@ -1,6 +1,5 @@
 package com.github.theprez.manzan;
 
-import java.io.File;
 import java.util.Map;
 import java.util.Map.Entry;
 
@@ -18,37 +17,26 @@ import com.ibm.as400.access.AS400JDBCDataSource;
  * email.
  */
 public class ManzanMainApp {
-    private static File getDataConfigFile() {
-        return new File("data.ini"); // TODO: the right thing
-    }
-
-    private static File getDestinationConfigFile() {
-        return new File("dests.ini"); // TODO: the right thing
-    }
-
-    private static AS400 getSystemConnection() {
-        return new AS400("localhost", "*CURRENT", "*CURRENT");
-    }
 
     public static void main(final String... args) throws Exception {
         // Standard for a Camel deployment. Start by getting a CamelContext object.
         final CamelContext context = new DefaultCamelContext();
         System.out.println("Apache Camel version " + context.getVersion());
 
-        final AS400 as400 = getSystemConnection();
+        final AS400 as400 = IBMiConnectionSupplier.getSystemConnection();
         as400.setGuiAvailable(false);
         as400.validateSignon();
         final AS400JDBCDataSource dataSource = new AS400JDBCDataSource(as400);
         dataSource.setTransactionIsolation("none");
         context.getRegistry().bind("jt400", dataSource);
 
-        final DestinationConfig destinations = new DestinationConfig(getDestinationConfigFile());
+        final DestinationConfig destinations = DestinationConfig.get();
         final Map<String, ManzanRoute> destinationRoutes = destinations.getRoutes();
         for (final Entry<String, ManzanRoute> dest : destinationRoutes.entrySet()) {
             context.addRoutes(dest.getValue());
         }
 
-        final DataConfig dataSources = new DataConfig(getDataConfigFile(), destinationRoutes.keySet());
+        final DataConfig dataSources = DataConfig.get(destinationRoutes.keySet());
         for (final Entry<String, ManzanRoute> src : dataSources.getRoutes().entrySet()) {
             context.addRoutes(src.getValue());
         }
