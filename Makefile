@@ -14,7 +14,7 @@ all: ile camel
 
 install:
 	gmake -C config install
-	gmake -C ile install
+	gmake -C ile
 	gmake -C camel install
 
 uninstall:

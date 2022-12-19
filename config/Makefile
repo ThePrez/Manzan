@@ -13,7 +13,7 @@ app.ini: app.ini.tpl
 copyfiles: app.ini data.ini dests.ini
 	install -m 555 -o qsys $^ ${INSTALL_ROOT}/QOpenSys/etc/manzan
 
-install: copyfiles
+install: mkdirs copyfiles
 	/QOpenSys/usr/bin/find  ${INSTALL_ROOT}/QOpenSys/etc/manzan/ -type f -print -exec chmod 644 {} \;
 	/QOpenSys/usr/bin/find  ${INSTALL_ROOT}/QOpenSys/etc/manzan/ -type l -print -exec chmod 644 {} \;
 	chown -R qsys ${INSTALL_ROOT}/QOpenSys/etc/manzan
