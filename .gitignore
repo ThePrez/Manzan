@@ -5,3 +5,6 @@ camel/.classpath
 camel/.project
 camel/target
 camel/src/main/resources/real.properties
+camel/data.ini
+camel/dests.ini
+camel/app.ini
