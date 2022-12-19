@@ -8,3 +8,4 @@ camel/src/main/resources/real.properties
 camel/data.ini
 camel/dests.ini
 camel/app.ini
+camel/test.txt
