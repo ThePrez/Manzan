@@ -6,8 +6,10 @@ import java.util.LinkedHashMap;
 import java.util.List;
 import java.util.Map;
 
+import com.github.theprez.jcmdutils.StringUtils;
 import com.github.theprez.manzan.ManzanEventType;
 import com.github.theprez.manzan.ManzanMessageFilter;
+import com.github.theprez.manzan.ManzanMessageFormatter;
 import com.github.theprez.manzan.routes.ManzanRoute;
 
 import io.github.theprez.jfiletail.FileNewContentsReader;
@@ -19,16 +21,18 @@ public class FileEvent extends ManzanRoute {
     private static final String FILE_PATH = "FILE_PATH";
     private final File m_file;
     private final ManzanMessageFilter m_filter;
+    private final ManzanMessageFormatter m_formatter;
 
-    public FileEvent(final String _name, final File _f, final List<String> _destinations, final String _filter) throws IOException {
+    public FileEvent(final String _name, final File _f, final String _format, final List<String> _destinations, final String _filter) throws IOException {
         super(_name);
         m_file = _f;
         super.setRecipientList(_destinations);
+        m_formatter = StringUtils.isEmpty(_format) ? null: new ManzanMessageFormatter(_format);
         m_filter = new ManzanMessageFilter(_filter);
     }
 
-    public FileEvent(final String _name, final String _f, final List<String> _destinations, final String _filter) throws IOException {
-        this(_name, new File(_f), _destinations, _filter);
+    public FileEvent(final String _name, final String _f, final String _format, final List<String> _destinations, final String _filter) throws IOException {
+        this(_name, new File(_f), _format, _destinations, _filter);
     }
 
 //@formatter:off
@@ -56,8 +60,13 @@ public class FileEvent extends ManzanRoute {
             exchange.getIn().setHeader("data_map", data_map);
             exchange.getIn().setBody(data_map);
         })
-        .marshal().json(true)
+        .marshal().json(true)  //TODO: skip this if we are applying a format
         .setBody(simple("${body}\n"))
+        .process(exchange -> {
+            if (null != m_formatter) {
+                exchange.getIn().setBody(m_formatter.format(getDataMap(exchange)));
+            }
+        })
         .convertBodyTo(String.class,"UTF-8")
         .recipientList(constant(getRecipientList())).stopOnException()
         ;

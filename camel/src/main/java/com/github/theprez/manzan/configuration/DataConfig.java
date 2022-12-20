@@ -45,6 +45,7 @@ public class DataConfig extends Config {
             }
             final String name = section;
             final String schema = ApplicationConfig.get().getLibrary();
+            final String format = getOptionalString(name, "format");
             final int interval = 5; // TODO: get from configuration
             final int numToProcess = 1000; // TODO: get from configuration
             final List<String> destinations = new LinkedList<String>();
@@ -59,10 +60,10 @@ public class DataConfig extends Config {
             }
             switch (type) {
                 case "watch":
-                    ret.put(name, new WatchMsgEvent(name, getRequiredString(name, "id"), destinations, schema, interval, numToProcess));
+                    ret.put(name, new WatchMsgEvent(name, getRequiredString(name, "id"), format, destinations, schema, interval, numToProcess));
                     break;
                 case "file":
-                    ret.put(name, new FileEvent(name, getRequiredString(name, "file"), destinations, getOptionalString(name, "filter")));
+                    ret.put(name, new FileEvent(name, getRequiredString(name, "file"), format, destinations, getOptionalString(name, "filter")));
                     break;
                 default:
                     throw new RuntimeException("Unknown destination type: " + type);

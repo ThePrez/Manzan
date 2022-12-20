@@ -45,7 +45,7 @@ public class DestinationConfig extends Config {
             final String name = section;
             switch (type) {
                 case "stdout":
-                    ret.put(name, new StreamDestination(name));
+                    ret.put(name, new StreamDestination(name,getOptionalString(name, "format")));
                     break;
                 case "slack": {
                     final String webhook = getRequiredString(name, "webhook");
