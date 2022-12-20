@@ -15,7 +15,7 @@ import com.github.theprez.manzan.ManzanMessageFormatter;
 public abstract class ManzanGenericCamelRoute extends ManzanRoute {
 
     private final String m_camelComponent;
-    private final String m_format;
+    private final ManzanMessageFormatter m_formatter;
     private final Map<String, Object> m_headerParams;
     private final String m_path;
     private final Map<String, String> m_uriParams;
@@ -27,7 +27,8 @@ public abstract class ManzanGenericCamelRoute extends ManzanRoute {
         m_headerParams = null == _headerParams ? new HashMap<String, Object>(1) : _headerParams;
         m_camelComponent = _camelComponent;
         m_path = _path;
-        m_format = _format;
+        m_formatter = StringUtils.isEmpty(_format) ? null: new ManzanMessageFormatter(_format);
+      
     }
 
     protected abstract void customPostProcess(Exchange exchange);
@@ -36,10 +37,8 @@ public abstract class ManzanGenericCamelRoute extends ManzanRoute {
     public void configure() {
         from(getInUri())
                 .process(exchange -> {
-                    if (StringUtils.isNonEmpty(m_format)) {
-                        final ManzanMessageFormatter formatter = new ManzanMessageFormatter(m_format);
-                        final String formatted = formatter.format(getDataMap(exchange));
-                        exchange.getIn().setBody(formatted);
+                    if (null != m_formatter) {
+                        exchange.getIn().setBody(m_formatter.format(getDataMap(exchange)));
                     }
                     for (final Entry<String, Object> headerEntry : m_headerParams.entrySet()) {
                         exchange.getIn().setHeader(headerEntry.getKey(), headerEntry.getValue());

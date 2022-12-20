@@ -1,18 +1,15 @@
 package com.github.theprez.manzan.routes.dest;
 
-import com.github.theprez.manzan.routes.ManzanRoute;
+import org.apache.camel.Exchange;
 
-public class StreamDestination extends ManzanRoute {
-    public StreamDestination(final String _name) {
-        super(_name);
+import com.github.theprez.manzan.routes.ManzanGenericCamelRoute;
+
+public class StreamDestination extends ManzanGenericCamelRoute {
+    public StreamDestination(final String _name, final String _format) {
+        super(_name, "stream", "out", _format, null, null);
     }
 
-//@formatter:off
     @Override
-    public void configure() {
-        from(getInUri())
-        .routeId(m_name).to("stream:out");
+    protected void customPostProcess(Exchange exchange) {
     }
-    //@formatter:on
-
 }
