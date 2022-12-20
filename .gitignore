@@ -9,3 +9,4 @@ camel/data.ini
 camel/dests.ini
 camel/app.ini
 camel/test.txt
+config/app.ini

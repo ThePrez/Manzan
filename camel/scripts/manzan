@@ -1,0 +1,20 @@
+#!/QOpenSys/usr/bin/sh
+
+if [[ "$LC_ALL" != *UTF-8* ]]; then
+    # LC_ALL is not set. Set it to EN_US.UTF-8 if present
+    if [ -e /usr/lib/nls/loc/EN_US.UTF-8 ]; then
+        LC_ALL=EN_US.UTF-8
+        export LC_ALL
+    else
+        # EN_US.UTF-8 is not present. Look for installed UTF-8 locale
+        INSTALLEDUTF8LOCALE=$(ls -b /usr/lib/nls/loc | grep -E '.UTF-8$' | tail -n 1)
+        if [[ "" = "$INSTALLEDUTF8LOCALE" ]]; then
+            >&2 echo "WARNING: Cannot find a UTF-8 locale installed on this system."
+        else
+            LC_ALL=$INSTALLEDUTF8LOCALE
+            export LC_ALL
+        fi
+    fi
+fi
+
+exec /QOpenSys/QIBM/ProdData/JavaVM/jdk80/64bit/bin/java -jar /opt/manzan/lib/manzan.jar $*
