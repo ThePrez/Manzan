@@ -104,7 +104,7 @@ int json_publish(const char *_session_id, std::string &_json)
   memcpy(dtaq_key, _session_id, MIN(11, strlen(_session_id)));
 
   QSNDDTAQ("MANZANDTAQ",
-           "JESSEG    ", // TODO: How to properly resolve the library here?
+           "*CURLIB   ", // TODO: How to properly resolve the library here?
            strlen(utf8),
            utf8,
            (_Decimal(3,0))10,
