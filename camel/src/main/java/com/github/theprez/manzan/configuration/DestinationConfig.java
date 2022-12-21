@@ -4,6 +4,7 @@ import java.io.File;
 import java.io.IOException;
 import java.util.Arrays;
 import java.util.LinkedHashMap;
+import java.util.LinkedList;
 import java.util.List;
 import java.util.Map;
 
@@ -14,6 +15,7 @@ import com.github.theprez.jcmdutils.StringUtils;
 import com.github.theprez.manzan.routes.ManzanRoute;
 import com.github.theprez.manzan.routes.dest.EmailDestination;
 import com.github.theprez.manzan.routes.dest.FluentDDestination;
+import com.github.theprez.manzan.routes.dest.KafkaDestination;
 import com.github.theprez.manzan.routes.dest.SentryDestination;
 import com.github.theprez.manzan.routes.dest.SlackDestination;
 import com.github.theprez.manzan.routes.dest.StreamDestination;
@@ -43,16 +45,21 @@ public class DestinationConfig extends Config {
                 continue;
             }
             final String name = section;
+            final Section sectionObj = getIni().get(name);
+            final String format = getOptionalString(name, "format");
             switch (type) {
                 case "stdout":
-                    ret.put(name, new StreamDestination(name,getOptionalString(name, "format")));
+                    ret.put(name, new StreamDestination(name, getOptionalString(name, "format")));
                     break;
                 case "slack": {
                     final String webhook = getRequiredString(name, "webhook");
                     final String channel = getRequiredString(name, "channel");
-                    final String format = getOptionalString(name, "format");
                     ret.put(name, new SlackDestination(name, webhook, channel, format));
                 }
+                    break;
+                case "kafka":
+                    final String topic = getRequiredString(name, "topic");
+                    ret.put(name, new KafkaDestination(name, topic, format, getUriParameters(name, sectionObj, "topic")));
                     break;
                 case "sentry":
                     final String dsn = getRequiredString(name, "dsn");
@@ -66,17 +73,7 @@ public class DestinationConfig extends Config {
                     break;
                 case "smtp":
                     final String server = getRequiredString(name, "server");
-                    final String emailFormat = getOptionalString(name, "format");
-                    final Section sectionObj = getIni().get(name);
-                    final Map<String, String> pathParameters = new LinkedHashMap<String, String>();
-                    for (final String sectionKey : sectionObj.keySet()) {
-                        final List<String> exclusions = Arrays.asList("server", "type", "filter", "format");
-                        if (exclusions.contains(sectionKey)) {
-                            continue;
-                        }
-                        pathParameters.put(sectionKey, getRequiredString(name, sectionKey));
-                    }
-                    final EmailDestination d = new EmailDestination(name, server, emailFormat, pathParameters, null);
+                    final EmailDestination d = new EmailDestination(name, server, format, getUriParameters(name, sectionObj, "server"), null);
                     ret.put(name, d);
                     break;
                 default:
@@ -84,6 +81,19 @@ public class DestinationConfig extends Config {
             }
         }
         return m_routes = ret;
+    }
+
+    private Map<String, String> getUriParameters(final String _name, Section sectionObj, String... _exclusions) {
+        final Map<String, String> pathParameters = new LinkedHashMap<String, String>();
+        List<String> exclusions = new LinkedList<>(Arrays.asList(_exclusions));
+        exclusions.addAll(Arrays.asList("type", "filter", "format"));
+        for (final String sectionKey : sectionObj.keySet()) {
+            if (exclusions.contains(sectionKey)) {
+                continue;
+            }
+            pathParameters.put(sectionKey, getRequiredString(_name, sectionKey));
+        }
+        return pathParameters;
     }
 
 }
