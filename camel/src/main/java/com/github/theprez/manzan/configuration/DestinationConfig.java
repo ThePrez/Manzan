@@ -79,7 +79,10 @@ public class DestinationConfig extends Config {
                     ret.put(name, d);
                     break;
                 case "twilio":
-                    ret.put(name, new TwilioDestination(context, name, format, getUriParameters(name, sectionObj)));
+                    final String sid = getRequiredString(name, "sid");
+                    final String token = getRequiredString(name, "token");
+                    ret.put(name, new TwilioDestination(context, name, format, sid, token, 
+                    getUriParameters(name, sectionObj, "sid", "token")));
                     break;
                 default:
                     throw new RuntimeException("Unknown destination type: " + type);
