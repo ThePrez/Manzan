@@ -39,7 +39,7 @@ public class FileEvent extends ManzanRoute {
     @Override
     public void configure() {
         from("timer://foo?period=5000&synchronous=true")
-        .routeId("file://"+m_file.getAbsolutePath())
+        .routeId(m_name)
         .setHeader(EVENT_TYPE, constant(ManzanEventType.FILE))
         .setBody(constant(m_file.getAbsolutePath()))
         .process((exchange) -> {

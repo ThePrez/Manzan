@@ -11,9 +11,12 @@ import java.util.Set;
 import org.ini4j.InvalidFileFormatException;
 
 import com.github.theprez.jcmdutils.StringUtils;
+import com.github.theprez.manzan.WatchStarter;
 import com.github.theprez.manzan.routes.ManzanRoute;
 import com.github.theprez.manzan.routes.event.FileEvent;
 import com.github.theprez.manzan.routes.event.WatchMsgEvent;
+import com.ibm.as400.access.AS400SecurityException;
+import com.ibm.as400.access.ErrorCompletingRequestException;
 
 public class DataConfig extends Config {
 
@@ -30,7 +33,7 @@ public class DataConfig extends Config {
         m_destinations = _destinations;
     }
 
-    public synchronized Map<String, ManzanRoute> getRoutes() throws IOException {
+    public synchronized Map<String, ManzanRoute> getRoutes() throws IOException, AS400SecurityException, ErrorCompletingRequestException, InterruptedException {
         if (null != m_routes) {
             return m_routes;
         }
@@ -60,7 +63,13 @@ public class DataConfig extends Config {
             }
             switch (type) {
                 case "watch":
-                    ret.put(name, new WatchMsgEvent(name, getRequiredString(name, "id"), format, destinations, schema, interval, numToProcess));
+                    String id = getRequiredString(name, "id");
+                    ret.put(name, new WatchMsgEvent(name, id, format, destinations, schema, interval, numToProcess));
+                    String strwch = getOptionalString(name, "strwch");
+                    if(StringUtils.isNonEmpty(strwch)) {
+                        WatchStarter ws = new WatchStarter(id, strwch);
+                        ws.strwch();
+                    }
                     break;
                 case "file":
                     ret.put(name, new FileEvent(name, getRequiredString(name, "file"), format, destinations, getOptionalString(name, "filter")));
