@@ -18,7 +18,7 @@ public abstract class ManzanGenericCamelRoute extends ManzanRoute {
     private final ManzanMessageFormatter m_formatter;
     private final Map<String, Object> m_headerParams;
     private final String m_path;
-    private final Map<String, String> m_uriParams;
+    protected final Map<String, String> m_uriParams;
 
     public ManzanGenericCamelRoute(final String _name, final String _camelComponent, final String _path,
             final String _format, final Map<String, String> _uriParams, final Map<String, Object> _headerParams) {
