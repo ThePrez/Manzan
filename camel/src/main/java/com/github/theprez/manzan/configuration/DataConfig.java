@@ -1,5 +1,6 @@
 package com.github.theprez.manzan.configuration;
 
+import java.beans.PropertyVetoException;
 import java.io.File;
 import java.io.IOException;
 import java.util.LinkedHashMap;
@@ -17,6 +18,7 @@ import com.github.theprez.manzan.routes.event.FileEvent;
 import com.github.theprez.manzan.routes.event.WatchMsgEvent;
 import com.ibm.as400.access.AS400SecurityException;
 import com.ibm.as400.access.ErrorCompletingRequestException;
+import com.ibm.as400.access.ObjectDoesNotExistException;
 
 public class DataConfig extends Config {
 
@@ -33,7 +35,7 @@ public class DataConfig extends Config {
         m_destinations = _destinations;
     }
 
-    public synchronized Map<String, ManzanRoute> getRoutes() throws IOException, AS400SecurityException, ErrorCompletingRequestException, InterruptedException {
+    public synchronized Map<String, ManzanRoute> getRoutes() throws IOException, AS400SecurityException, ErrorCompletingRequestException, InterruptedException, PropertyVetoException, ObjectDoesNotExistException {
         if (null != m_routes) {
             return m_routes;
         }
