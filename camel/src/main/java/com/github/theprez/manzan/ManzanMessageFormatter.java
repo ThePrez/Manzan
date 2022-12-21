@@ -2,6 +2,9 @@ package com.github.theprez.manzan;
 
 import java.util.Map;
 import java.util.Map.Entry;
+
+import com.google.gson.Gson;
+
 import java.util.WeakHashMap;
 
 public class ManzanMessageFormatter {
@@ -25,13 +28,23 @@ public class ManzanMessageFormatter {
 
     public String format(final Map<String, Object> _mappings) {
         String ret = m_fmtStr;
-        for (final Entry<String, Object> repl : _mappings.entrySet()) {
-            ret = ret.replace("$" + repl.getKey() + "$", "" + repl.getValue());
-        }
         ret = ret.replace("\r\n", "\n");
         ret = ret.replace("\r", "");
         ret = ret.replace("\\n", "\n").replace("\\t", "\t");
 
+        for (final Entry<String, Object> repl : _mappings.entrySet()) {
+            ret = ret.replace("$" + repl.getKey() + "$", "" + repl.getValue());
+            String jsonIndicator ="$json:" + repl.getKey() + "$"; 
+            if(ret.contains(jsonIndicator)) {
+                ret = ret.replace(jsonIndicator, jsonEncode("" + repl.getValue()));
+            }
+        }
         return ret;
+    }
+
+    private CharSequence jsonEncode(String _s) {
+        Gson gson = new Gson();
+        String json = gson.toJson(_s);
+        return json;
     }
 }

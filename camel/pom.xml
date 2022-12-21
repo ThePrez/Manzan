@@ -40,7 +40,7 @@
       <groupId>org.apache.camel</groupId>
       <artifactId>camel-twilio</artifactId>
       <version>3.14.0</version>
-  </dependency>
+    </dependency>
     <dependency>
       <groupId>org.apache.camel</groupId>
       <artifactId>camel-main</artifactId>
@@ -80,6 +80,11 @@
       <artifactId>camel-kafka</artifactId>
       <version>3.14.0</version>
     </dependency>
+    <dependency>
+      <groupId>org.apache.camel</groupId>
+      <artifactId>camel-http</artifactId>
+      <version>3.14.0</version>
+    </dependency>
 
 
     <dependency>
@@ -103,11 +108,15 @@
       <artifactId>sentry</artifactId>
       <version>6.10.0</version>
     </dependency>
-
     <dependency>
       <groupId>org.ini4j</groupId>
       <artifactId>ini4j</artifactId>
       <version>0.5.4</version>
+    </dependency>
+    <dependency>
+      <groupId>com.google.code.gson</groupId>
+      <artifactId>gson</artifactId>
+      <version>2.10</version>
     </dependency>
 
     <dependency>

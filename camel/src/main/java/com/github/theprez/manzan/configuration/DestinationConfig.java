@@ -16,6 +16,7 @@ import com.github.theprez.jcmdutils.StringUtils;
 import com.github.theprez.manzan.routes.ManzanRoute;
 import com.github.theprez.manzan.routes.dest.EmailDestination;
 import com.github.theprez.manzan.routes.dest.FluentDDestination;
+import com.github.theprez.manzan.routes.dest.HttpDestination;
 import com.github.theprez.manzan.routes.dest.KafkaDestination;
 import com.github.theprez.manzan.routes.dest.SentryDestination;
 import com.github.theprez.manzan.routes.dest.SlackDestination;
@@ -61,7 +62,7 @@ public class DestinationConfig extends Config {
                     break;
                 case "kafka":
                     final String topic = getRequiredString(name, "topic");
-                    ret.put(name, new KafkaDestination(name, topic, format, getUriParameters(name, sectionObj, "topic")));
+                    ret.put(name, new KafkaDestination(name, topic, format, getUriAndHeaderParameters(name, sectionObj, "topic")));
                     break;
                 case "sentry":
                     final String dsn = getRequiredString(name, "dsn");
@@ -75,14 +76,18 @@ public class DestinationConfig extends Config {
                     break;
                 case "smtp":
                     final String server = getRequiredString(name, "server");
-                    final EmailDestination d = new EmailDestination(name, server, format, getUriParameters(name, sectionObj, "server"), null);
+                    final EmailDestination d = new EmailDestination(name, server, format, getUriAndHeaderParameters(name, sectionObj, "server"), null);
                     ret.put(name, d);
                     break;
                 case "twilio":
                     final String sid = getRequiredString(name, "sid");
                     final String token = getRequiredString(name, "token");
                     ret.put(name, new TwilioDestination(context, name, format, sid, token, 
-                    getUriParameters(name, sectionObj, "sid", "token")));
+                    getUriAndHeaderParameters(name, sectionObj, "sid", "token")));
+                    break;
+                case "http":
+                    final String url = getRequiredString(name, "url");
+                    ret.put(name, HttpDestination.get(name, url, format, getUriAndHeaderParameters(name, sectionObj, "url")));
                     break;
                 default:
                     throw new RuntimeException("Unknown destination type: " + type);
@@ -91,7 +96,7 @@ public class DestinationConfig extends Config {
         return m_routes = ret;
     }
 
-    private Map<String, String> getUriParameters(final String _name, Section sectionObj, String... _exclusions) {
+    private Map<String, String> getUriAndHeaderParameters(final String _name, Section sectionObj, String... _exclusions) {
         final Map<String, String> pathParameters = new LinkedHashMap<String, String>();
         List<String> exclusions = new LinkedList<>(Arrays.asList(_exclusions));
         exclusions.addAll(Arrays.asList("type", "filter", "format"));
