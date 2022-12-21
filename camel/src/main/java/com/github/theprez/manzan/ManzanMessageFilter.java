@@ -12,7 +12,7 @@ public class ManzanMessageFilter {
 
     public ManzanMessageFilter(final String _filterStr) {
         m_filterStr = StringUtils.isEmpty(_filterStr) ? null : _filterStr.trim();
-        m_isRegex = m_filterStr.startsWith("re:");
+        m_isRegex = null == m_filterStr? false:m_filterStr.startsWith("re:");
         if (m_isRegex) {
             final String regex = m_filterStr.substring(3);
             m_pattern = Pattern.compile(regex, Pattern.CASE_INSENSITIVE);// TODO: handle invalid regex
