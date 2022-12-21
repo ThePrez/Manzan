@@ -8,6 +8,7 @@ import java.util.LinkedList;
 import java.util.List;
 import java.util.Map;
 
+import org.apache.camel.CamelContext;
 import org.ini4j.InvalidFileFormatException;
 import org.ini4j.Profile.Section;
 
@@ -19,6 +20,7 @@ import com.github.theprez.manzan.routes.dest.KafkaDestination;
 import com.github.theprez.manzan.routes.dest.SentryDestination;
 import com.github.theprez.manzan.routes.dest.SlackDestination;
 import com.github.theprez.manzan.routes.dest.StreamDestination;
+import com.github.theprez.manzan.routes.dest.TwilioDestination;
 
 public class DestinationConfig extends Config {
     public static DestinationConfig get() throws InvalidFileFormatException, IOException {
@@ -31,7 +33,7 @@ public class DestinationConfig extends Config {
         super(_f);
     }
 
-    public synchronized Map<String, ManzanRoute> getRoutes() {
+    public synchronized Map<String, ManzanRoute> getRoutes(CamelContext context) {
         if (null != m_routes) {
             return m_routes;
         }
@@ -75,6 +77,9 @@ public class DestinationConfig extends Config {
                     final String server = getRequiredString(name, "server");
                     final EmailDestination d = new EmailDestination(name, server, format, getUriParameters(name, sectionObj, "server"), null);
                     ret.put(name, d);
+                    break;
+                case "twilio":
+                    ret.put(name, new TwilioDestination(context, name, format, getUriParameters(name, sectionObj)));
                     break;
                 default:
                     throw new RuntimeException("Unknown destination type: " + type);

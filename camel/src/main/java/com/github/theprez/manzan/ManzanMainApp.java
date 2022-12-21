@@ -31,7 +31,7 @@ public class ManzanMainApp {
         context.getRegistry().bind("jt400", dataSource);
 
         final DestinationConfig destinations = DestinationConfig.get();
-        final Map<String, ManzanRoute> destinationRoutes = destinations.getRoutes();
+        final Map<String, ManzanRoute> destinationRoutes = destinations.getRoutes(context);
         for (final Entry<String, ManzanRoute> dest : destinationRoutes.entrySet()) {
             context.addRoutes(dest.getValue());
         }
