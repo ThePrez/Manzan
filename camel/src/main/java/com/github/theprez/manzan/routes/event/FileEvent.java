@@ -49,7 +49,8 @@ public class FileEvent extends ManzanRoute {
         .split(body().tokenize("\n")).streaming().parallelProcessing(false).stopOnException()
         .convertBodyTo(String.class)
         .process(exchange -> {
-                exchange.getIn().setHeader("abort", m_filter.matches(exchange.getIn().getBody(String.class))?"continue":"abort");
+                String bodyStr = exchange.getIn().getBody(String.class);
+                exchange.getIn().setHeader("abort", m_filter.matches(bodyStr) && StringUtils.isNonEmpty(bodyStr)?"continue":"abort");
         })
         .choice().when(simple("${header.abort} != 'abort'"))
         .process(exchange -> {
