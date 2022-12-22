@@ -5,11 +5,13 @@
 #include <fcntl.h>
 #include <qp0ztrc.h>
 #include <qmhrtvm.h>
+#include <qp0ztrc.h>
 #include <except.h>
 #include <QWCCVTDT.h>
 #include "manzan.h"
 #include "event_data.h"
 #include "userconf.h"
+#include "mzversion.h"
 
 static FILE *fd = NULL;
 
@@ -80,6 +82,13 @@ int main(int _argc, char **argv)
     return 0;
   }
   STRDBG();
+  if ((2 <= _argc) && (0 == strcmp("*VERSION", argv[1]) || 0 == strcmp("*VERSION  ", argv[1]) || 0 == strcmp("--version", argv[1]) || 0 == strcmp("-v", argv[1])))
+  {
+    Qp0zLprintf("Version: %s\n", MANZAN_VERSION);
+    Qp0zLprintf("Build date (UTC): %s\n", MANZAN_BUILDDATE);
+    printf("Version: %s\nBuild date (UTC): %s\n", MANZAN_VERSION, MANZAN_BUILDDATE);
+    return 0;
+  }
 
   BUFSTRN(watch_option, argv[1], 10);
   BUFSTRN(session_id, argv[2], 10);
@@ -259,7 +268,8 @@ int main(int _argc, char **argv)
   return 0;
 oh_crap:
   printf("Well, shit\n");
-  strncpy(argv[3], "*ERROR    ", 10);
+  if (4 <= _argc)
+    strncpy(argv[3], "*ERROR    ", 10);
   DEBUG("MCH exception happened!\n");
   ENDDBG();
   return 1;

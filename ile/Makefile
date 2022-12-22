@@ -1,8 +1,20 @@
 BUILDLIB:=MANZAN
+BUILDVERSION:="Development build \(built with Make\)"
 
 all: init /qsys.lib/${BUILDLIB}.lib/handler.pgm
 
 init: /qsys.lib/${BUILDLIB}.lib /qsys.lib/${BUILDLIB}.lib/manzanmsg.file /qsys.lib/${BUILDLIB}.lib/manzanoth.file /qsys.lib/${BUILDLIB}.lib/manzanpal.file /qsys.lib/${BUILDLIB}.lib/manzanvlog.file /qsys.lib/${BUILDLIB}.lib/manzandtaq.dtaq 
+
+.PHONY: src/mzversion.h
+
+src/mzversion.h:
+	rm -f $@
+	echo "#ifndef __MZVERSION_H" > $@
+	echo "#define __MZVERSION_H" >> $@
+	echo "#define MANZAN_VERSION \"${BUILDVERSION}\"" >> $@
+	echo "#define MANZAN_BUILDDATE \"$(shell date --universal)\"" >> $@
+	echo "#endif" >> $@
+	grep MANZAN_ $@
 
 /qsys.lib/${BUILDLIB}.lib:
 	system "RUNSQL SQL('create schema ${BUILDLIB}')  COMMIT(*NONE) NAMING(*SQL) "
@@ -12,8 +24,8 @@ init: /qsys.lib/${BUILDLIB}.lib /qsys.lib/${BUILDLIB}.lib/manzanmsg.file /qsys.l
 /qsys.lib/${BUILDLIB}.lib/%.pgm:
 	system "CRTPGM PGM(${BUILDLIB}/$*) MODULE($(patsubst %.module,$(BUILDLIB)/%,$(notdir $^))) ACTGRP(*CALLER)"
 
-/qsys.lib/${BUILDLIB}.lib/%.module: src/%.cpp
-	system "CRTCPPMOD MODULE(${BUILDLIB}/$*) SRCSTMF('$^') OPTION(*EVENTF) SYSIFCOPT(*IFS64IO) DBGVIEW(*SOURCE) TERASPACE(*YES *TSIFC) STGMDL(*SNGLVL) DTAMDL(*p128) DEFINE(DEBUG_ENABLED)"
+/qsys.lib/${BUILDLIB}.lib/%.module: src/%.cpp src/mzversion.h
+	system "CRTCPPMOD MODULE(${BUILDLIB}/$*) SRCSTMF('$<') OPTION(*EVENTF) SYSIFCOPT(*IFS64IO) DBGVIEW(*SOURCE) TERASPACE(*YES *TSIFC) STGMDL(*SNGLVL) DTAMDL(*p128) DEFINE(DEBUG_ENABLED)"
 
 /qsys.lib/${BUILDLIB}.lib/%.module: src/%.sqlc
 	system "CRTSQLCI OBJ(${BUILDLIB}/$*) SRCSTMF('$^') COMMIT(*NONE) DATFMT(*ISO) TIMFMT(*ISO) CVTCCSID(*JOB) COMPILEOPT('INCDIR(''src'')') SQLPATH(${BUILDLIB}) DFTRDBCOL(${BUILDLIB}) OPTION(*SQL)"
