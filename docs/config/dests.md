@@ -26,6 +26,7 @@ Some types have additional properties that they required.
 | `fluentd`  | Sent data to FluentD            | * `tag` <br> * `host` <br> * `port` <br>                   |
 | `smtp`     | Sent data via email             | * `server` <br> * `subject` <br> * `to` <br> * `from` <br> |
 | `sentry` | Send data into Sentry           | `dsn`                                                      |
+| `twilio` | Send via SMS | * `sid` <br> * `token` <br> * `to` <br> * `from` |
 
 ### Example
 
@@ -38,11 +39,17 @@ format=Hey, check out this information!! \n\n$FILE_DATA$
   from=me@mycompany.com
   to=me@mycompany.com
 
-
 [test_out]
 type=stdout
 
 [sentry_out]
 type=sentry
 dsn=<slackdsn>
+
+[twilio_spam]
+type=twilio
+sid=x
+token=x
+to=+x
+from=+x
 ```
