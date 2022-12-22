@@ -23,10 +23,10 @@ destinations=<destinations>
 
 Some types have additional properties that they required.
 
-| id    | Description                                 | Required properties                                                                     |
-|-------|---------------------------------------------|-----------------------------------------------------------------------------------------|
-| `file`  | Triggered when a file changes               | * `file` path of file to watch <br>* `filter` only listen for lines that include this value |
-| `watch` | Triggered when the Manzan handler is called | `id` of the watch (session ID)                                                          |
+| id      | Description                                 | Required properties            | Optional props                                                                                                        |
+|---------|---------------------------------------------|--------------------------------|-----------------------------------------------------------------------------------------------------------------------|
+| `file`  | Triggered when a file changes               | `file` path of file to watch   | `filter` only listen for lines that include this value                                                                |
+| `watch` | Triggered when the Manzan handler is called | `id` of the watch (session ID) | `strwch` is part of the `STRWCH` CL command that can be used to describe how to start the watch when Manzan starts up |
 
 ### Example
 
@@ -43,6 +43,13 @@ file=test.txt
 destinations=email_it, test_out
 filter=error
 format=$FILE_DATA$
+
+[watchout]
+type=watch
+id=jesse
+destinations=test_out, slackme
+format=$MESSAGE_ID$ (severity $SEVERITY$): $MESSAGE$ 
+strwch=WCHMSG((*ALL)) WCHMSGQ((*HSTLOG))
 ```
 
 ## Optional properties
@@ -51,4 +58,3 @@ These are optional properties available on all types:
 
 * `format` can be used to define a nicer messages to be sent to the destination
 * `enabled` is a boolean (`true` or `false`) so a data source can be defined but disabled
-* `filter` is a string that can be used to filter through which events are sent to the destination
