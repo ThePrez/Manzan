@@ -1,16 +1,23 @@
 package com.github.theprez.manzan;
 
+import java.io.IOException;
+import java.util.Arrays;
 import java.util.Map;
 import java.util.Map.Entry;
 
 import org.apache.camel.CamelContext;
 import org.apache.camel.impl.DefaultCamelContext;
 
+import com.github.theprez.jcmdutils.StringUtils;
+import com.github.theprez.manzan.configuration.ApplicationConfig;
 import com.github.theprez.manzan.configuration.DataConfig;
 import com.github.theprez.manzan.configuration.DestinationConfig;
 import com.github.theprez.manzan.routes.ManzanRoute;
 import com.ibm.as400.access.AS400;
 import com.ibm.as400.access.AS400JDBCDataSource;
+import com.ibm.as400.access.AS400Message;
+import com.ibm.as400.access.CommandCall;
+import com.ibm.as400.access.Job;
 
 /**
  * A Camel Application that routes messages from an IBM i message queue to
@@ -18,7 +25,12 @@ import com.ibm.as400.access.AS400JDBCDataSource;
  */
 public class ManzanMainApp {
 
-    public static void main(final String... args) throws Exception {
+    public static void main(final String... _args) throws Exception {
+
+        if (Arrays.asList(_args).contains("--version")) {
+            printVersionInfo();
+            return;
+        }
         // Standard for a Camel deployment. Start by getting a CamelContext object.
         final CamelContext context = new DefaultCamelContext();
         System.out.println("Apache Camel version " + context.getVersion());
@@ -51,5 +63,52 @@ public class ManzanMainApp {
         Thread.sleep(Long.MAX_VALUE);
         context.stop();
         context.close();
+    }
+
+    private static void printVersionInfo() {
+        System.out.println("");
+        System.out.println("Distributor version information:");
+        System.out.println("-------------------------------------------");
+        System.out.println("    Version: " + Version.version);
+        System.out.println("    Build date (UTC): " + Version.compileDateTime);
+        System.out.println("");
+        String library = null;
+        try {
+            library = ApplicationConfig.get().getLibrary();
+        } catch (IOException e) {
+            System.err.println("ERROR: Cannot locate handler component!!");
+            e.printStackTrace();
+            System.exit(-1);
+        }
+        if (StringUtils.isEmpty(library)) {
+            System.err.println("ERROR: Cannot locate handler component!!");
+            System.exit(-1);
+        }
+        try {
+            AS400 as400 = IBMiConnectionSupplier.getSystemConnection();
+            CommandCall cmd = new CommandCall(as400,
+                    "CALL PGM(" + library.trim() + "/handler) PARM('*VERSION' '*VERSION')");
+
+            cmd.setMessageOption(AS400Message.MESSAGE_OPTION_ALL);;
+            boolean isSuccess = cmd.run();
+            if (isSuccess) {
+                AS400Message[] msgs = cmd.getMessageList();
+                System.out.println("ILE Handler version information:");
+                System.out.println("-------------------------------------------");
+                for (AS400Message msg : msgs) {
+                    if (StringUtils.isEmpty(msg.getID())) {
+                        System.out.println("    " + msg.getText());
+                    }
+                }
+                System.out.println("");
+            } else {
+                System.err.println("Unable to get handler component version info");
+            }
+            as400.disconnectAllServices();
+        } catch (Exception e) {
+            System.err.println("ERROR: Cannot get handler version information!!");
+            e.printStackTrace();
+            System.exit(-1);
+        }
     }
 }
