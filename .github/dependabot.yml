@@ -8,6 +8,8 @@ updates:
   - package-ecosystem: "maven" # See documentation for possible values
     directory: "/camel" # Location of package manifests
     schedule:
-      interval: "weekly"
+      interval: "daily"
     ignore:
-      - update-types: ["version-update:semver-major","version-update:semver-minor"]
+      - dependency-name: "camel-*"
+        versions:
+        - ">=3.15.0"
