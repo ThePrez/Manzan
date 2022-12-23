@@ -5,11 +5,11 @@
 Here are the requirements for each section.
 
 * `<id>` is the unique ID that identifies this destination
-* `<type>` can be the ID many of the available different destnations
+* `type` can be the ID many of the available different destnations
 
 ```ini
 [<id>]
-# where the data is going to
+# the type of destination the data is going to
 type=<type>
 
 # other properties for <id> here..

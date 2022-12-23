@@ -6,7 +6,11 @@ Building Manzan is easy for IBM i and we provide makefiles to simplify the entir
 
 To build Manzan, GNU Make (`gmake`), Java and Maven must be setup and on the path so the shell can access them.
 
-## Build
+## Install from GitHub release
+
+(coming at a later date)
+
+## Build from source (for Development)
 
 1. `cd Manzan`
    * ensure that the working directory is the root of Manzan
