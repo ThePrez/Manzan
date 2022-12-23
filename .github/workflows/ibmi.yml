@@ -19,8 +19,21 @@ jobs:
     runs-on: ubuntu-latest
 
     steps:
+    - name: Get changed files in the ile folder
+      id: changed-files-specific
+      uses: tj-actions/changed-files@v35
+      with:
+        files: |
+          docs/ile
+
+    - name: Run step if any file(s) in the docs folder change
+      if: steps.changed-files-specific.outputs.any_changed == 'true'
+      run: |
+        echo "One or more files in the ile folder has changed. Running ILE CI build"
+
     - uses: actions/checkout@v2
     - name: Install private key
+      if: steps.changed-files-specific.outputs.any_changed == 'true'
       run: |
         mkdir -p ~/.ssh
         chmod 0755 ~
@@ -28,24 +41,30 @@ jobs:
         echo  "${{ secrets.IBMI_BUILD_PVTKEY }}" > ~/.ssh/id_rsa
         chmod 0600 ~/.ssh/id_rsa
     - name: Disable strict host key checking
+      if: steps.changed-files-specific.outputs.any_changed == 'true'
       run: |
         echo "Host *" > ~/.ssh/config
         echo "  StrictHostKeyChecking no" >> ~/.ssh/config
     - name: Create build sandbox
+      if: steps.changed-files-specific.outputs.any_changed == 'true'
       run: $ssh_command "mkdir -p $remote_build_dir"
     - name: Clean up unnecessary files
+      if: steps.changed-files-specific.outputs.any_changed == 'true'
       run: rm -fr ./.git ./docs
     - name: Populate build sandbox
+      if: steps.changed-files-specific.outputs.any_changed == 'true'
       run: $rsync_command
     - name: Get short SHA ID
+      if: steps.changed-files-specific.outputs.any_changed == 'true'
       run: |
         echo "short_sha=$(echo ${{ github.sha }} | head -c 5)" >> $GITHUB_ENV
         cat $GITHUB_ENV
     - name: Perform remote build
+      if: steps.changed-files-specific.outputs.any_changed == 'true'
       run: $ssh_command "cd $remote_build_dir && /QOpenSys/pkgs/bin/gmake -C ile BUILDLIB=MZNCI$short_sha uninstall all"
     - name: Cleanup remote dist lib
-      if: always()
+      if: steps.changed-files-specific.outputs.any_changed == 'true'
       run: $ssh_command "system 'dltlib MZNCI$short_sha'"
     - name: Cleanup remote build dir
-      if: always()
+      if: steps.changed-files-specific.outputs.any_changed == 'true'
       run: $ssh_command "rm -fr $remote_build_dir"
