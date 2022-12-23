@@ -31,14 +31,23 @@ Events can be consumed by your own custom ILE code (documentation forthcoming) b
 
 Many other destinations will be available. Examples include:
 
-- [Slack](http://slack.com) ✅
-- Email ✅
-- SMS ⏳
-- [Sentry](http://sentry.io) ✅
-- [Splunk](http://splunk.com) ⏳
-- [FluentD](http://fluentd.org) ✅
-- [Kafka](http://kafka.apache.org) ⏳
 - [ActiveMQ](http://activemq.apache.org/) ⏳
-- [Grafana Loki](https://grafana.com/oss/loki/) ⏳
-- [Mezmo](http://mezmo.com) ⏳
+- [AWS Simple Email Service (SES)](https://aws.amazon.com/ses/) ⏳
+- [AWS Simple Notification System (SNS)](https://aws.amazon.com/sns/) ⏳
 - [ElasticSearch](http://elastic.co) ⏳
+- Email (SMTP) ✅
+- [FluentD](http://fluentd.org) ✅
+- [Google Drive](http://drive.google.com) ⏳
+- [Google Mail (gmail)](http://gmail.com) ⏳
+- [Google Pub/Sub](http://cloud.google.com/pubsub) ⏳
+- [Grafana Loki](https://grafana.com/oss/loki/) ⏳
+- HTTP endpoints (REST, etc) ✅
+- HTTPS endpoints (REST, etc) ⏳
+- [Internet of Things (mqtt)](https://www.eclipse.org/paho/) ⏳
+- [Kafka](http://kafka.apache.org) ✅
+- [Mezmo](http://mezmo.com) ⏳
+- [Sentry](http://sentry.io) 🌗
+- [Slack](http://slack.com) ✅
+- SMS (via [Twilio](http://www.twilio.com)) ✅
+- [Splunk](http://splunk.com) ⏳
+
