@@ -1,5 +1,9 @@
 # Manzan (WIP!! DO NOT USE!!)
 
+# Documentation
+
+Full documentation is available [here](http://theprez.github.io/Manzan/)
+
 # Objective
 
 Provide a gateway for publishing IBM i events to a variety of endpoints, which may include user applications, external resources, and/or open source technologies. Example use cases include:
