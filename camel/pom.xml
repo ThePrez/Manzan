@@ -22,7 +22,7 @@
       <dependency>
         <groupId>org.apache.camel</groupId>
         <artifactId>camel-parent</artifactId>
-        <version>3.14.0</version>
+        <version>3.14.6</version>
         <scope>import</scope>
         <type>pom</type>
       </dependency>
@@ -34,63 +34,63 @@
     <dependency>
       <groupId>org.apache.camel</groupId>
       <artifactId>camel-core</artifactId>
-      <version>3.14.0</version>
+      <version>3.14.6</version>
     </dependency>
     <dependency>
       <groupId>org.apache.camel</groupId>
       <artifactId>camel-twilio</artifactId>
-      <version>3.14.0</version>
+      <version>3.14.6</version>
     </dependency>
     <dependency>
       <groupId>org.apache.camel</groupId>
       <artifactId>camel-main</artifactId>
-      <version>3.14.0</version>
+      <version>3.14.6</version>
     </dependency>
 
 
     <dependency>
       <groupId>org.apache.camel</groupId>
       <artifactId>camel-exec</artifactId>
-      <version>3.14.0</version>
+      <version>3.14.6</version>
     </dependency>
     <dependency>
       <groupId>org.apache.camel</groupId>
       <artifactId>camel-stream</artifactId>
-      <version>3.14.0</version>
+      <version>3.14.6</version>
     </dependency>
     <dependency>
       <groupId>org.apache.camel</groupId>
       <artifactId>camel-jdbc</artifactId>
-      <version>3.14.0</version>
+      <version>3.14.6</version>
     </dependency>
     <dependency>
       <groupId>org.apache.camel</groupId>
       <artifactId>camel-slack</artifactId>
-      <version>3.14.0</version>
+      <version>3.14.6</version>
     </dependency>
     <dependency>
       <groupId>org.apache.camel</groupId>
       <artifactId>camel-mail</artifactId>
-      <version>3.14.0</version>
+      <version>3.14.6</version>
     </dependency>
 
 
     <dependency>
       <groupId>org.apache.camel</groupId>
       <artifactId>camel-kafka</artifactId>
-      <version>3.14.0</version>
+      <version>3.14.6</version>
     </dependency>
     <dependency>
       <groupId>org.apache.camel</groupId>
       <artifactId>camel-http</artifactId>
-      <version>3.14.0</version>
+      <version>3.14.6</version>
     </dependency>
 
 
     <dependency>
       <groupId>org.apache.camel</groupId>
       <artifactId>camel-jt400</artifactId>
-      <version>3.14.0</version>
+      <version>3.14.6</version>
     </dependency>
     <dependency>
       <groupId>com.ibm.watson</groupId>
@@ -100,7 +100,7 @@
     <dependency>
       <groupId>org.apache.camel</groupId>
       <artifactId>camel-jackson</artifactId>
-      <version>3.14.0</version>
+      <version>3.14.6</version>
     </dependency>
 
     <dependency>
