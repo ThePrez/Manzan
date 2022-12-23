@@ -32,7 +32,7 @@ jobs:
     - name: Create build sandbox
       run: $ssh_command "mkdir -p $remote_build_dir"
     - name: Clean up unnecessary files
-      run: rm -fr ./.* ./docs
+      run: rm -fr ./.git ./docs
     - name: Populate build sandbox
       run: $rsync_command
     - name: Get short SHA ID
@@ -40,12 +40,12 @@ jobs:
         echo "short_sha=$(echo ${{ github.sha }} | head -c 7)" >> $GITHUB_ENV
         cat $GITHUB_ENV
     - name: Perform remote build
-      run: $ssh_command "cd $remote_build_dir && gmake manzan-${{ github.ref_name }}.zip"
+      run: $ssh_command "cd $remote_build_dir && /QOpenSys/pkgs/bin/gmake/gmake manzan-${{ github.ref_name }}.zip"
     - name: Retrieve artifact
       run: $scp_dist_command
     - name: Cleanup remote build lib
       if: always()
-      run: $ssh_command "system 'dltlib MANZANBLD'"
+      run: $ssh_command "system 'dltlib MANZANBLD' || echo 'could not delete build lib'"
     - name: Cleanup remote dist lib
       if: always()
       run: $ssh_command "system 'dltlib manzan'"

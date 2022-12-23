@@ -34,20 +34,19 @@ jobs:
     - name: Create build sandbox
       run: $ssh_command "mkdir -p $remote_build_dir"
     - name: Clean up unnecessary files
-      run: rm -fr ./.* ./docs
+      run: rm -fr ./.git ./docs
     - name: Populate build sandbox
       run: $rsync_command
     - name: Get short SHA ID
       run: |
-        echo "short_sha=$(echo ${{ github.sha }} | head -c 7)" >> $GITHUB_ENV
+        echo "short_sha=$(echo ${{ github.sha }} | head -c 5)" >> $GITHUB_ENV
         cat $GITHUB_ENV
     - name: Perform remote build
-      run: $ssh_command "cd $remote_build_dir && gmake -C ile uninstall all"
-      if: always()
-      run: $ssh_command "system 'dltlib MANZANBLD'"
+      run: $ssh_command "cd $remote_build_dir && /QOpenSys/pkgs/bin/gmake -C ile BUILDLIB=MZNCI$short_sha uninstall all"
     - name: Cleanup remote dist lib
       if: always()
-      run: $ssh_command "system 'dltlib manzan'"
+      run: $ssh_command "system 'dltlib MZNCI$short_sha'"
     - name: Cleanup remote build dir
       if: always()
       run: $ssh_command "rm -fr $remote_build_dir"
+      
