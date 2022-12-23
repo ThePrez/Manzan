@@ -6,7 +6,7 @@
 #include <stdarg.h>
 
 FILE *debug_fd = NULL;
-
+//CI test
 extern "C" void STRDBG()
 {
 #ifdef DEBUG_ENABLED
