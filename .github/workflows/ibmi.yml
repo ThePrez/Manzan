@@ -4,8 +4,12 @@ name: IBM i build CI
 on:
   push:
     branches: [ "main" ]
+    paths:
+      - 'ile/**'
   pull_request:
     branches: [ "main" ]
+    paths:
+      - 'ile/**'
 
 env:
   ssh_command: ssh ${{ secrets.IBMI_BUILD_USRPRF }}@${{ secrets.IBMI_BUILD_SYS }}
