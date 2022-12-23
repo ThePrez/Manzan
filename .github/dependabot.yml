@@ -10,6 +10,6 @@ updates:
     schedule:
       interval: "daily"
     ignore:
-      - dependency-name: "camel-*"
+      - dependency-name: "org.apache.camel-camel-*"
         versions:
         - ">=3.15.0"
