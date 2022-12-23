@@ -5,9 +5,17 @@
 Here are the requirements for each section.
 
 * `<id>` is the unique ID that identifies this data source
-* `<type>` can be the ID many of the available different data sources
-* `<destinations>` are the places where the data should be pushed to, as defined in `dests.ini`
+* `type` can be the ID many of the available different data sources
+* `destinations` are the places where the data should be pushed to, as defined in `dests.ini`
    * Destination IDs can be comma delimited. This will send the same data to multiple destinations.
+
+
+### Optional properties for all types
+
+These are optional properties available on all types:
+
+* `format` can be used to define a nicer messages to be sent to the destination
+* `enabled` is a boolean (`true` or `false`) so a data source can be defined but disabled
 
 ```ini
 [<id>]
@@ -19,7 +27,7 @@ destinations=<destinations>
 # other properties for <id> here..
 ```
 
-## Available types
+### Available types
 
 Some types have additional properties that they required.
 
@@ -28,15 +36,18 @@ Some types have additional properties that they required.
 | `file`  | Triggered when a file changes               | `file` path of file to watch   | `filter` only listen for lines that include this value                                                                |
 | `watch` | Triggered when the Manzan handler is called | `id` of the watch (session ID) | `strwch` is part of the `STRWCH` CL command that can be used to describe how to start the watch when Manzan starts up |
 
+
 ### Example
 
 ```ini
+# This will manage information from the watch session with id "jesse". It is disabled.
 [watcher1]
 type=watch
 id=jesse
 destinations=test_out, slackme
 enabled=false
 ​
+# This will trigger an event whenever anything is appended to "test.txt"
 [logfile1]
 type=file
 file=test.txt
@@ -44,6 +55,9 @@ destinations=email_it, test_out
 filter=error
 format=$FILE_DATA$
 
+# This will manage information from the watch session with id "jesse".
+# The event will be formatted as specified in the format value, and
+# the system watch will automatically be started when the Manzan Distributor is run
 [watchout]
 type=watch
 id=jesse
@@ -51,10 +65,3 @@ destinations=test_out, slackme
 format=$MESSAGE_ID$ (severity $SEVERITY$): $MESSAGE$ 
 strwch=WCHMSG((*ALL)) WCHMSGQ((*HSTLOG))
 ```
-
-## Optional properties
-
-These are optional properties available on all types:
-
-* `format` can be used to define a nicer messages to be sent to the destination
-* `enabled` is a boolean (`true` or `false`) so a data source can be defined but disabled
