@@ -24,6 +24,9 @@ uninstall:
 	gmake -C ile uninstall
 	gmake -C config uninstall
 
+/QOpenSys/pkgs/bin/zip:
+	/QOpenSys/pkgs/bin/yum install zip
+
 manzan-v%.zip: /QOpenSys/pkgs/bin/zip
 	echo "Building version $*"
 	system "clrlib ${MANZAN_TEMPLIB}" || system "crtlib ${MANZAN_TEMPLIB}"
