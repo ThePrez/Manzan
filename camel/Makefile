@@ -1,10 +1,12 @@
 
 
+BUILDVERSION:="Development build \(built with Make\)"
+
 .PHONY: mkdirs
 
 JAVA_SRCS := $(shell find src -type f)
 target/manzan.jar: ${JAVA_SRCS} /QOpenSys/pkgs/bin/mvn
-	JAVA_HOME=/QOpenSys/QIBM/ProdData/JavaVM/jdk80/64bit /QOpenSys/pkgs/bin/mvn -Djava.net.preferIPv4Stack=true package
+	JAVA_HOME=/QOpenSys/QIBM/ProdData/JavaVM/jdk80/64bit /QOpenSys/pkgs/bin/mvn -Djava.net.preferIPv4Stack=true "-Dmanzan.version=${BUILDVERSION}" package
 	cp target/manzan-*-with-dependencies.jar target/manzan.jar
 
 mkdirs:
