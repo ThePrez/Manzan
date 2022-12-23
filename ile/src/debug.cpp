@@ -4,7 +4,7 @@
 #include <stdio.h>
 #include <stdlib.h>
 #include <stdarg.h>
-hi
+//hi
 FILE *debug_fd = NULL;
 //CI test
 extern "C" void STRDBG()
