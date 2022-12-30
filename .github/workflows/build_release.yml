@@ -40,7 +40,7 @@ jobs:
         echo "short_sha=$(echo ${{ github.sha }} | head -c 7)" >> $GITHUB_ENV
         cat $GITHUB_ENV
     - name: Perform remote build
-      run: $ssh_command "cd $remote_build_dir && /QOpenSys/pkgs/bin/gmake/gmake manzan-${{ github.ref_name }}.zip"
+      run: $ssh_command "cd $remote_build_dir && /QOpenSys/pkgs/bin/gmake/gmake manzan-installer-${{ github.ref_name }}.jar"
     - name: Retrieve artifact
       run: $scp_dist_command
     - name: Cleanup remote build lib
@@ -72,6 +72,6 @@ jobs:
         GITHUB_TOKEN: ${{ secrets.GITHUB_TOKEN }}
       with:
         upload_url: ${{ steps.create_release.outputs.upload_url }} # This pulls from the CREATE RELEASE step above, referencing it's ID to get its outputs object, which include a `upload_url`. See this blog post for more info: https://jasonet.co/posts/new-features-of-github-actions/#passing-data-to-future-steps 
-        asset_path: ./manzan-${{ github.ref_name }}.zip
-        asset_name: manzan-${{ github.ref_name }}.zip
+        asset_path: ./manzan-installer-${{ github.ref_name }}.jar
+        asset_name: manzan-installer-${{ github.ref_name }}.jar
         asset_content_type: application/zip
