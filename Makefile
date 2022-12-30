@@ -27,7 +27,13 @@ uninstall:
 /QOpenSys/pkgs/bin/zip:
 	/QOpenSys/pkgs/bin/yum install zip
 
-manzan-v%.zip: /QOpenSys/pkgs/bin/zip
+/QOpenSys/pkgs/bin/wget:
+	/QOpenSys/pkgs/bin/yum install wget
+
+appinstall.jar: /QOpenSys/pkgs/bin/wget
+	/QOpenSys/pkgs/bin/wget -O appinstall.jar https://github.com/ThePrez/AppInstall-IBMi/releases/download/v0.0.3/appinstall-v0.0.3.jar
+
+manzan-installer-v%.jar: /QOpenSys/pkgs/bin/zip appinstall.jar
 	echo "Building version $*"
 	system "clrlib ${MANZAN_TEMPLIB}" || system "crtlib ${MANZAN_TEMPLIB}"
 	system "dltlib ${BUILDLIB}" || echo "could not delete"
@@ -37,13 +43,4 @@ manzan-v%.zip: /QOpenSys/pkgs/bin/zip
 	gmake -C config BUILDVERSION="$*" install
 	gmake -C ile BUILDVERSION="$*"
 	gmake -C camel BUILDVERSION="$*" clean install
-	system "crtsavf ${MANZAN_TEMPLIB}/distqsys"
-	system "crtsavf ${MANZAN_TEMPLIB}/diststmf"
-	rm -f /qsys.lib/${MANZAN_TEMPLIB}.lib/*.MODULE
-	system "SAV DEV('/qsys.lib/${MANZAN_TEMPLIB}.lib/distqsys.file') OBJ(('/qsys.lib/manzan.lib')) SAVACT(*YES)"
-	cp /qsys.lib/${MANZAN_TEMPLIB}.lib/distqsys.file .
-	system "SAV DEV('/qsys.lib/${MANZAN_TEMPLIB}.lib/diststmf.file') OBJ(('/opt/manzan') ('/QOpenSys/etc/manzan')) SAVACT(*YES)"
-	cp /qsys.lib/${MANZAN_TEMPLIB}.lib/diststmf.file .
-	/QOpenSys/pkgs/bin/zip -v -0 $@ diststmf.file distqsys.file
-	rm diststmf.file distqsys.file
-	system "dltlib ${MANZAN_TEMPLIB}"
+	/QOpenSys/QIBM/ProdData/JavaVM/jdk80/64bit/bin/java -jar appinstall.jar --qsys manzan --dir /QOpenSys/etc/manzan --file /opt/manzan -o $@
