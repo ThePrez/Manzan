@@ -31,7 +31,7 @@ Some types have additional properties that they required.
 ### Example
 
 ```ini
-[email_bollocks]
+[email_b]
 type=smtp
 format=Hey, check out this information!! \n\n$FILE_DATA$
   server = my.smtpserver.com
@@ -46,10 +46,15 @@ type=stdout
 type=sentry
 dsn=<slackdsn>
 
-[twilio_spam]
+[twilio_sms]
 type=twilio
 sid=x
 token=x
 to=+x
 from=+x
+
+[slackme]
+type=slack
+channel=open-source-system-status
+webhook=https://hooks.slack.com/services/TA3EF58G4...
 ```
