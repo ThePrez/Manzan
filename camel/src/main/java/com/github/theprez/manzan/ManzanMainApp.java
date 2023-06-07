@@ -10,6 +10,7 @@ import org.apache.camel.impl.DefaultCamelContext;
 
 import com.github.theprez.jcmdutils.StringUtils;
 import com.github.theprez.manzan.configuration.ApplicationConfig;
+import com.github.theprez.manzan.configuration.Config;
 import com.github.theprez.manzan.configuration.DataConfig;
 import com.github.theprez.manzan.configuration.DestinationConfig;
 import com.github.theprez.manzan.routes.ManzanRoute;
@@ -33,6 +34,13 @@ public class ManzanMainApp {
             printVersionInfo();
             return;
         }
+
+        for(final String arg:_args) {
+            if(arg.startsWith("--configdir=")) {
+                System.setProperty(Config.DIRECTORY_OVERRIDE_PROPERTY, arg.replaceFirst("^[^=]+=", ""));
+            }
+        }
+
         // Standard for a Camel deployment. Start by getting a CamelContext object.
         final CamelContext context = new DefaultCamelContext();
         System.out.println("Apache Camel version " + context.getVersion());

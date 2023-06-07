@@ -10,13 +10,22 @@ import com.github.theprez.jcmdutils.StringUtils;
 
 public abstract class Config {
 
+    public static final String DIRECTORY_OVERRIDE_PROPERTY = "manzan.configdir";
+
     protected static boolean isIBMi() {
         final String osName = System.getProperty("os.name", "Misty");
         return "os400".equalsIgnoreCase(osName) || "os/400".equalsIgnoreCase(osName);
     }
     protected static File getConfigFile(final String _name) throws IOException {
 
-        final File configDir = isIBMi() ? new File("/QOpenSys/etc/manzan") : new File(".").getAbsoluteFile();
+        final File configDir;
+        final String configDirOverride = System.getProperty(DIRECTORY_OVERRIDE_PROPERTY);
+        if(StringUtils.isNonEmpty(configDirOverride)) {
+            configDir = new File(configDirOverride).getAbsoluteFile();
+        } else {
+            configDir = isIBMi() ? new File("/QOpenSys/etc/manzan") : new File(".").getAbsoluteFile();
+        }
+
         if (!configDir.isDirectory()) {
             if (!configDir.mkdirs()) {
                 throw new IOException("Cound not create configuration directory " + configDir.getAbsolutePath());
