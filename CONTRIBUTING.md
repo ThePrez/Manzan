@@ -36,6 +36,17 @@ After you install Manzan with the makefiles:
 * The configuration files (`.ini` extension) get created in `/QOpenSys/etc/manzan/`
 * Manzan can be started with `/opt/manzan/bin/manzan`
 
+
+## Building the Distributor component only via Maven
+
+1. `cd Manzan/camel`
+2. `mvn compile`
+   * builds camel into the `camel/target` directory
+3. `mvn exec:java`
+   * this starts the Distributor up on the system.
+   * If it is run for the first time, it will create empty configuration files (`.ini` extension) into the working directory
+
+
 ### Build Distributor (camel) only
 
 To build only the camel component, you can use `camel` as the target:
