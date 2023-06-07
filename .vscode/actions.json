@@ -12,7 +12,7 @@
         "deployFirst": true,
         "environment": "ile",
         "extensions": [
-            "C"
+            "C","c"
         ]
     }, {
         "name": "CPP compile",
