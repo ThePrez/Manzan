@@ -21,3 +21,33 @@ We welcome everyone to work on this cool project. We use a typical PR system:
    * You only have to do this once.
 6. Actions are available to compile source from your local machine
    * Control / Command + E
+
+
+## Build from source (for development/contribution)
+
+1. `cd Manzan`
+   * ensure that the working directory is the root of Manzan
+2. `gmake install` - installs the Handler (ILE component) into the `MANZAN` library
+    * change installation library with `BUILDLIB=MANZAN2 gmake install`
+
+After you install Manzan with the makefiles:
+
+* Both the Handler and Distributor are built
+* The configuration files (`.ini` extension) get created in `/QOpenSys/etc/manzan/`
+* Manzan can be started with `/opt/manzan/bin/manzan`
+
+### Build Distributor (camel) only
+
+To build only the camel component, you can use `camel` as the target:
+
+```sh
+gmake camel
+```
+
+### Build Handler (ILE) only
+
+To build only the ILE component, you can use `ile` as the target:
+
+```sh
+gmake ile
+```
