@@ -15,6 +15,7 @@ import org.ini4j.Profile.Section;
 import com.github.theprez.jcmdutils.StringUtils;
 import com.github.theprez.manzan.routes.ManzanRoute;
 import com.github.theprez.manzan.routes.dest.EmailDestination;
+import com.github.theprez.manzan.routes.dest.FileDestination;
 import com.github.theprez.manzan.routes.dest.FluentDDestination;
 import com.github.theprez.manzan.routes.dest.HttpDestination;
 import com.github.theprez.manzan.routes.dest.KafkaDestination;
@@ -63,6 +64,10 @@ public class DestinationConfig extends Config {
                 case "kafka":
                     final String topic = getRequiredString(name, "topic");
                     ret.put(name, new KafkaDestination(name, topic, format, getUriAndHeaderParameters(name, sectionObj, "topic")));
+                    break;
+                case "file":
+                    final String file = getRequiredString(name, "file");
+                    ret.put(name, new FileDestination(name, file, format, getUriAndHeaderParameters(name, sectionObj, "file")));
                     break;
                 case "sentry":
                     final String dsn = getRequiredString(name, "dsn");
