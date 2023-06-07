@@ -46,8 +46,15 @@ Many other destinations will be available. Examples include:
 - [Internet of Things (mqtt)](https://www.eclipse.org/paho/) ⏳
 - [Kafka](http://kafka.apache.org) ✅
 - [Mezmo](http://mezmo.com) ⏳
+- [Microsoft Teams](http://teams.microsoft.com) ⏳
+- [PagerDuty](http://pagerduty.com) ⏳
 - [Sentry](http://sentry.io) 🌗
 - [Slack](http://slack.com) ✅
 - SMS (via [Twilio](http://www.twilio.com)) ✅
 - [Splunk](http://splunk.com) ⏳
 
+✅ = implemented
+🌗 = partially implemented
+⏳ = future
+
+Desired target not on the list? Please open an issue to the repository and let us know!
