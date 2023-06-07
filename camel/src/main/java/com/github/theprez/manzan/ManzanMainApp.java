@@ -19,6 +19,8 @@ import com.ibm.as400.access.AS400Message;
 import com.ibm.as400.access.CommandCall;
 import com.ibm.as400.access.Job;
 
+import io.github.theprez.dotenv_ibmi.IBMiDotEnv;
+
 /**
  * A Camel Application that routes messages from an IBM i message queue to
  * email.
@@ -35,7 +37,7 @@ public class ManzanMainApp {
         final CamelContext context = new DefaultCamelContext();
         System.out.println("Apache Camel version " + context.getVersion());
 
-        final AS400 as400 = IBMiConnectionSupplier.getSystemConnection();
+        final AS400 as400 = IBMiDotEnv.getCachedSystemConnection(true);
         as400.setGuiAvailable(false);
         as400.validateSignon();
         final AS400JDBCDataSource dataSource = new AS400JDBCDataSource(as400);
@@ -85,7 +87,7 @@ public class ManzanMainApp {
             System.exit(-1);
         }
         try {
-            AS400 as400 = IBMiConnectionSupplier.getSystemConnection();
+            AS400 as400 = IBMiDotEnv.getCachedSystemConnection(true);
             CommandCall cmd = new CommandCall(as400,
                     "CALL PGM(" + library.trim() + "/handler) PARM('*VERSION' '*VERSION')");
 

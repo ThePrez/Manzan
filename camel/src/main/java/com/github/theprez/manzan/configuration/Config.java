@@ -7,12 +7,16 @@ import org.ini4j.Ini;
 import org.ini4j.InvalidFileFormatException;
 
 import com.github.theprez.jcmdutils.StringUtils;
-import com.github.theprez.manzan.IBMiConnectionSupplier;
 
 public abstract class Config {
+
+    protected static boolean isIBMi() {
+        final String osName = System.getProperty("os.name", "Misty");
+        return "os400".equalsIgnoreCase(osName) || "os/400".equalsIgnoreCase(osName);
+    }
     protected static File getConfigFile(final String _name) throws IOException {
 
-        final File configDir = IBMiConnectionSupplier.isIBMi() ? new File("/QOpenSys/etc/manzan") : new File(".").getAbsoluteFile();
+        final File configDir = isIBMi() ? new File("/QOpenSys/etc/manzan") : new File(".").getAbsoluteFile();
         if (!configDir.isDirectory()) {
             if (!configDir.mkdirs()) {
                 throw new IOException("Cound not create configuration directory " + configDir.getAbsolutePath());
