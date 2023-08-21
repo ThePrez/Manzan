@@ -7,7 +7,7 @@ ile:
 testing: /qsys.lib/${BUILDLIB}.lib/MANZANQ.msgq  watch_start watch_testq watch_end
 
 sndmsg.class: sndmsg.java
-	javac -cp /QIBM/ProdData/OS400/jt400/lib/jt400.jar ndmsg.java
+	javac -cp /QIBM/ProdData/OS400/jt400/lib/jt400.jar sndmsg.java
 
 watch_testq: ./tester/sndmsg.class
 	java -cp ./tester:/QIBM/ProdData/OS400/jt400/lib/jt400.jar sndmsg
