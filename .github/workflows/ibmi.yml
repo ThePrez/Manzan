@@ -12,44 +12,44 @@ on:
       - 'ile/**'
 
 env:
-  ssh_command: ssh ${{ secrets.IBMI_BUILD_USRPRF }}@${{ secrets.IBMI_BUILD_SYS }}
-  scp_dist_command: scp ${{ secrets.IBMI_BUILD_USRPRF }}@${{ secrets.IBMI_BUILD_SYS }}:/home/${{ secrets.IBMI_BUILD_USRPRF }}/build/${{ github.sha }}/manzan-${{ github.ref_name }}.zip .
-  remote_build_dir: /home/${{ secrets.IBMI_BUILD_USRPRF }}/build/${{ github.sha }}
-  rsync_command: rsync -a --exclude='./.*' --exclude='./runners' --exclude='./.git' --exclude='./docs' --rsync-path=/QOpenSys/pkgs/bin/rsync ./ ${{ secrets.IBMI_BUILD_USRPRF }}@${{ secrets.IBMI_BUILD_SYS }}:/home/${{ secrets.IBMI_BUILD_USRPRF }}/build/${{ github.sha }}/
+  remote_build_dir: /home/${{ secrets.IBMI_USER }}/build/${{ github.sha }}
 
 jobs:
   build:
 
     runs-on: ubuntu-latest
+    environment: OSSBUILD
+    permissions:
+      packages: read
+      contents: read
 
     steps:
     - uses: actions/checkout@v2
-    - name: Install private key
-      run: |
-        mkdir -p ~/.ssh
-        chmod 0755 ~
-        chmod 0700 ~/.ssh
-        echo  "${{ secrets.IBMI_BUILD_PVTKEY }}" > ~/.ssh/id_rsa
-        chmod 0600 ~/.ssh/id_rsa
-    - name: Disable strict host key checking
-      run: |
-        echo "Host *" > ~/.ssh/config
-        echo "  StrictHostKeyChecking no" >> ~/.ssh/config
-    - name: Create build sandbox
-      run: $ssh_command "mkdir -p $remote_build_dir"
-    - name: Clean up unnecessary files
-      run: rm -fr ./.git ./docs
-    - name: Populate build sandbox
-      run: $rsync_command
+    - uses: actions/setup-node@v3
+      with:
+        node-version: 18
+        registry-url: https://npm.pkg.github.com/
+
+    - run: npm i -g @ibm/ibmi-ci
+      env:
+        NODE_AUTH_TOKEN: ${{secrets.GITHUB_TOKEN}}
+
     - name: Get short SHA ID
       run: |
         echo "short_sha=$(echo ${{ github.sha }} | head -c 5)" >> $GITHUB_ENV
         cat $GITHUB_ENV
-    - name: Perform remote build
-      run: $ssh_command "cd $remote_build_dir && /QOpenSys/pkgs/bin/gmake -C ile BUILDLIB=MZNCI$short_sha uninstall all"
-    - name: Cleanup remote dist lib
-      if: always()
-      run: $ssh_command "system 'dltlib MZNCI$short_sha'"
-    - name: Cleanup remote build dir
-      if: always()
-      run: $ssh_command "rm -fr $remote_build_dir"
+
+    - name: Deploy to IBM i
+      run: | 
+        ici \
+          --cmd "mkdir -p '$remote_build_dir'" \
+          --rcwd "$remote_build_dir" \
+          --push "." \
+          --cmd "/QOpenSys/pkgs/bin/gmake -C ile BUILDLIB=MZNCI$short_sha uninstall all" \
+          --ignore --cl "dltlib MZNCI$short_sha" \
+          --ignore --cmd "rm -fr $remote_build_dir"
+      env:
+        IBMI_HOST: ${{ secrets.IBMI_HOST }}
+        IBMI_USER: ${{ secrets.IBMI_USER }}
+        IBMI_PASSWORD: ${{ secrets.IBMI_PASSWORD }}
+        IBMI_SSH_PORT: ${{ secrets.IBMI_SSH_PORT }}
