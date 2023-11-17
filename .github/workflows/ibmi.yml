@@ -30,9 +30,7 @@ jobs:
         always-auth: true
         node-version: 18
 
-    - run: npm i -g @ibm/ibmi-ci --registry=https://npm.pkg.github.com/
-      env:
-        NPM_TOKEN: ${{secrets.PACKAGE_TOKEN}}
+    - run: npm i -g @ibm/ibmi-ci
 
     - name: Get short SHA ID
       run: |
