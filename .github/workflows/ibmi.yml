@@ -27,6 +27,7 @@ jobs:
 
     - uses: actions/setup-node@v4
       with:
+        always-auth: true
         node-version: 18
 
     - run: npm i -g @ibm/ibmi-ci --registry=https://npm.pkg.github.com/
