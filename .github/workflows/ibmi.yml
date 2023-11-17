@@ -29,7 +29,7 @@ jobs:
 
     - run: npm i -g @ibm/ibmi-ci --registry=https://npm.pkg.github.com/
       env:
-        NODE_AUTH_TOKEN: ${{secrets.PACKAGE_TOKEN}}
+        NPM_TOKEN: ${{secrets.PACKAGE_TOKEN}}
 
     - name: Get short SHA ID
       run: |
