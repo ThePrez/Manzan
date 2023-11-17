@@ -29,9 +29,8 @@ jobs:
     - uses: actions/setup-node@v4
       with:
         node-version: 18
-        registry-url: https://npm.pkg.github.com/
 
-    - run: npm i -g @ibm/ibmi-ci
+    - run: npm i -g @ibm/ibmi-ci --registry=https://npm.pkg.github.com/
       env:
         NODE_AUTH_TOKEN: ${{secrets.GITHUB_TOKEN}}
 
