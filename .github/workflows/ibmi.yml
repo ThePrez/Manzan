@@ -19,6 +19,8 @@ jobs:
 
     runs-on: ubuntu-latest
     environment: OSSBUILD
+    permissions:
+      packages: read
 
     steps:
     - uses: actions/checkout@v2
