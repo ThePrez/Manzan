@@ -16,11 +16,8 @@ env:
 
 jobs:
   build:
-
     runs-on: ubuntu-latest
     environment: OSSBUILD
-    permissions:
-      packages: read
 
     steps:
     - uses: actions/checkout@v2
@@ -40,11 +37,11 @@ jobs:
     - name: Deploy to IBM i
       run: | 
         ici \
-          --cmd "mkdir -p '$remote_build_dir'" \
           --rcwd "$remote_build_dir" \
           --push "." \
           --cmd "/QOpenSys/pkgs/bin/gmake -C ile BUILDLIB=MZNCI$short_sha uninstall all" \
           --ignore --cl "dltlib MZNCI$short_sha" \
+          --rcwd ".." \
           --ignore --cmd "rm -fr $remote_build_dir"
       env:
         IBMI_HOST: ${{ secrets.IBMI_HOST }}
