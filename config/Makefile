@@ -10,7 +10,7 @@ app.ini: app.ini.tpl
 	cat $< | /QOpenSys/usr/bin/sed  's|library=.*|library=${BUILDLIB}|g' > $@
 
 
-copyfiles: app.ini data.ini dests.ini
+copyfiles: app.ini $(CURDIR)/data.ini dests.ini
 	install -m 555 -o qsys $^ ${INSTALL_ROOT}/QOpenSys/etc/manzan
 
 install: mkdirs copyfiles
