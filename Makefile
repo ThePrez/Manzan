@@ -10,8 +10,11 @@ ile:
 camel:
 	gmake -C camel
 
-test:
+test: install
 	gmake -C test
+
+testonly:
+	gmake -C test runtests
 
 all: ile camel
 
