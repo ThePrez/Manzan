@@ -14,6 +14,7 @@ import org.ini4j.Profile.Section;
 
 import com.github.theprez.jcmdutils.StringUtils;
 import com.github.theprez.manzan.routes.ManzanRoute;
+import com.github.theprez.manzan.routes.dest.DirDestination;
 import com.github.theprez.manzan.routes.dest.EmailDestination;
 import com.github.theprez.manzan.routes.dest.FileDestination;
 import com.github.theprez.manzan.routes.dest.FluentDDestination;
@@ -68,6 +69,10 @@ public class DestinationConfig extends Config {
                 case "file":
                     final String file = getRequiredString(name, "file");
                     ret.put(name, new FileDestination(name, file, format, getUriAndHeaderParameters(name, sectionObj, "file")));
+                    break;
+                case "dir":
+                    final String dir = getRequiredString(name, "dir");
+                    ret.put(name, new DirDestination(name, dir, format, getUriAndHeaderParameters(name, sectionObj, "dir")));
                     break;
                 case "sentry":
                     final String dsn = getRequiredString(name, "dsn");
