@@ -29,7 +29,7 @@ public class WatchMsgEvent extends ManzanRoute {
 //@formatter:off
     @Override
     public void configure() {
-        from("timer://foo?synchronous=false&period=" + m_interval)
+        from("timer://foo?synchronous=true&period=" + m_interval)
         .routeId("manzan_msg:"+m_name)
         .setHeader(EVENT_TYPE, constant(ManzanEventType.WATCH_MSG))
         .setBody(constant("SeLeCt * fRoM " + m_schema + ".mAnZaNmSg wHeRe SESSION_ID = '"+m_sessionId+"' limit " + m_numToProcess ))
