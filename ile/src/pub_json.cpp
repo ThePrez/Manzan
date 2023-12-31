@@ -9,6 +9,7 @@
 #include <qp0ztrc.h>
 #include <qsnddtaq.h>
 #include <qtqiconv.h>
+#include <bcd.h>
 
 int to_utf8(char *out, size_t out_len, const char *in)
 {
@@ -99,17 +100,24 @@ int json_publish(const char *_session_id, std::string &_json)
   DEBUG("Publishing JSON\n");
   DEBUG("%s\n", _json.c_str());
 
-  char dtaq_key[11];
+  __attribute__((aligned(16))) char  dtaq_key[11];
   memset(dtaq_key, ' ', 11);
   memcpy(dtaq_key, _session_id, MIN(11, strlen(_session_id)));
 
+  _DecimalT<5,0> len2 = __D("0"); 
+  len2 += strlen(utf8);
+  _DecimalT<3,0> keyLen = __D("10.0");
+
+  DEBUG("About to call QSNDDTAQ\n");
   QSNDDTAQ("MANZANDTAQ",
-           "*CURLIB   ", // TODO: How to properly resolve the library here?
-           strlen(utf8),
+           "MANZAN    ", // TODO: How to properly resolve the library here?
+           len2,
            utf8,
-           (_Decimal(3,0))10,
-           dtaq_key);
+           keyLen,
+           &dtaq_key);
+  DEBUG("About to free up stuff\n");
   free(utf8);
+  DEBUG("Done publishing JSON\n");
   return 0;
 }
 
