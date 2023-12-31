@@ -45,6 +45,7 @@ public abstract class ManzanGenericCamelRoute extends ManzanRoute {
                     }
                 })
                 .setBody(simple("${body}\n"))
+                .wireTap("stream:out")
                 .process(exchange -> {customPostProcess(exchange);})
                 .to(getTargetUri());
     }
@@ -61,14 +62,17 @@ public abstract class ManzanGenericCamelRoute extends ManzanRoute {
         for (final Entry<String, String> entry : m_uriParams.entrySet()) {
             ret += entry.getKey();
             ret += "=";
-            try {
-                ret += URLEncoder.encode(entry.getValue(), "UTF-8");
-            } catch (final UnsupportedEncodingException e) {
-                ret += URLEncoder.encode(entry.getValue());
-            }
+            ret += entry.getValue();
+            //TODO: what's right here? with "file://" targets Camel wants real paths
+            // try {
+            //     ret += URLEncoder.encode(entry.getValue(), "UTF-8");
+            // } catch (final UnsupportedEncodingException e) {
+            //     ret += URLEncoder.encode(entry.getValue());
+            // }
             ret += "&";
         }
         ret = ret.replaceFirst("&$", "");
+        System.out.println("target URI: "+ret);
         return ret;
     }
 }
