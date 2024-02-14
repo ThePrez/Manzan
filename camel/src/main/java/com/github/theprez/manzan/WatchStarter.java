@@ -71,7 +71,7 @@ public class WatchStarter {
     public boolean isRunning()
             throws AS400SecurityException, ErrorCompletingRequestException, IOException, InterruptedException,
             PropertyVetoException, ObjectDoesNotExistException {
-        AS400 as400 = new AS400("localhost","*CURRENT","*CURRENT");//IBMiDotEnv.getNewSystemConnection(true);
+        AS400 as400 = ApplicationConfig.get().getRemoteConnection();
         ProgramCall pc = new ProgramCall(as400);
 
         final ProgramCall program = new ProgramCall(as400);
@@ -107,7 +107,7 @@ public class WatchStarter {
 
     private static void runCmd(final String _command)
             throws AS400SecurityException, ErrorCompletingRequestException, IOException, InterruptedException {
-        AS400 as400 = new AS400("localhost","*CURRENT","*CURRENT");// IBMiDotEnv.getNewSystemConnection(true);
+        AS400 as400 = ApplicationConfig.get().getRemoteConnection();
         CommandCall cmd = new CommandCall(as400, _command);
         boolean isSuccess = cmd.run();
 
