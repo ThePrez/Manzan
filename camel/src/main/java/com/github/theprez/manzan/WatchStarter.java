@@ -37,6 +37,7 @@ public class WatchStarter {
 
         command = command.replaceFirst("^(?i)([a-z0-9]+\\/)?strwch\\s+", " ");
         command = "QSYS/STRWCH" + ssnid + wchpgm + command;
+        System.out.println("STRWCH Command:\n"+command);
         m_command = command;
         m_stopCommand = "QSYS/ENDWCH SSNID(" + _session_id.trim() + ")";
         m_session_id = _session_id;
