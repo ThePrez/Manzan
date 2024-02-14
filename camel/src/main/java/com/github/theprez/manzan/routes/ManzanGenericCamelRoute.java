@@ -45,7 +45,7 @@ public abstract class ManzanGenericCamelRoute extends ManzanRoute {
                     }
                 })
                 .setBody(simple("${body}\n"))
-                .wireTap("stream:out")
+                //.wireTap("stream:out")
                 .process(exchange -> {customPostProcess(exchange);})
                 .to(getTargetUri());
     }
