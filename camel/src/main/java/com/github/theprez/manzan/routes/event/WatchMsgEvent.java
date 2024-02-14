@@ -33,7 +33,7 @@ public class WatchMsgEvent extends ManzanRoute {
         .routeId("manzan_msg:"+m_name)
         .setHeader(EVENT_TYPE, constant(ManzanEventType.WATCH_MSG))
         .setBody(constant("SeLeCt * fRoM " + m_schema + ".mAnZaNmSg wHeRe SESSION_ID = '"+m_sessionId+"' limit " + m_numToProcess ))
-        .to("stream:out")
+       // .to("stream:out")
         .to("jdbc:jt400?outputType=StreamList")
         .split(body()).streaming().parallelProcessing()
             .setHeader("id", simple("${body[ORDINAL_POSITION]}"))
