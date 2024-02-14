@@ -124,38 +124,56 @@ int main(int _argc, char **argv)
     int replacement_data_len = msg_event->length_replacement_data;
     DEBUG("Replacement data offset is '%d'\n", replacement_data_offset);
     DEBUG("REPLACEMENT DATA LENGTH IS '%d'\n", replacement_data_len);
+    char message_watched[8];
+    message_watched[7] = 0x00;
+    memcpy(message_watched, msg_event->message_watched, 7);
+    DEBUG("MESSAGE WATCHED IS '%s'\n",message_watched);
+    char qualified_msg_file[21];
+    qualified_msg_file[20] = 0x00;
+    memcpy(qualified_msg_file, msg_event->message_file_name, 10);
+    memcpy(qualified_msg_file+10, msg_event->message_file_library, 10);
+    DEBUG("MESSAGE FILE AND NAME IS '%s'\n", qualified_msg_file);
     char *replacement_data = (0 == replacement_data_len) ? "" : (((char *)msg_event) + replacement_data_offset);
-    char *replacement_data_aligned = (char *)malloc(replacement_data_len);
-    memcpy(replacement_data_aligned, replacement_data, replacement_data_len);
+    char *replacement_data_aligned = (char *)malloc(1+replacement_data_len);
+    memset(replacement_data_aligned, 0x00, 1+replacement_data_len);
+    memcpy(replacement_data_aligned, replacement_data, (size_t)replacement_data_len);
 
-    RTVM0100 msg_info_buf;
-    memset(&msg_info_buf, 0x00, sizeof(msg_info_buf));
-    char err_plc[64];
-    memset(err_plc, 0x00, sizeof(err_plc));
-    QMHRTVM(
-        // 1 	Message information 	Output 	Char(*)
-        &msg_info_buf,
-        // 2 	Length of message information 	Input 	Binary(4)
-        -1 + sizeof(msg_info_buf),
-        // 3 	Format name 	Input 	Char(8)
-        "RTVM0100",
-        // 4 	Message identifier 	Input 	Char(7)
-        msg_event->message_watched,
-        // 5 	Qualified message file name 	Input 	Char(20)
-        "QCPFMSG   QSYS      ",
-        // 6 	Replacement data 	Input 	Char(*)
-        replacement_data_aligned,
-        // 7 	Length of replacement data 	Input 	Binary(4)
-        replacement_data_len,
-        // 8 	Replace substitution values 	Input 	Char(10)
-        "*YES      ",
-        // 9 	Return format control characters 	Input 	Char(10)
-        "*NO       ",
-        // 10 	Error code 	I/O 	Char(*)
-        err_plc);
+    size_t msg_info_buf_size = 128+sizeof(RTVM0100) + replacement_data_len;
+    RTVM0100 *msg_info_buf = (RTVM0100*)malloc(msg_info_buf_size);
+    memset(msg_info_buf, 0x00, msg_info_buf_size);
+    if('0' == qualified_msg_file[0]) { 
+      DEBUG("Message not from message file\n");
+      strncpy(msg_info_buf->message, replacement_data_aligned, replacement_data_len);
+    } else {
+      char err_plc[64];
+      memset(err_plc, 0x00, sizeof(err_plc));
+      DEBUG("about to format\n");
+
+      QMHRTVM(
+          // 1 	Message information 	Output 	Char(*)
+          msg_info_buf,
+          // 2 	Length of message information 	Input 	Binary(4)
+          sizeof(msg_info_buf),
+          // 3 	Format name 	Input 	Char(8)
+          "RTVM0100",
+          // 4 	Message identifier 	Input 	Char(7)
+          message_watched,
+          // 5 	Qualified message file name 	Input 	Char(20)
+          qualified_msg_file,
+          // 6 	Replacement data 	Input 	Char(*)
+          replacement_data_aligned,
+          // 7 	Length of replacement data 	Input 	Binary(4)
+          replacement_data_len,
+          // 8 	Replace substitution values 	Input 	Char(10)
+          "*YES      ",
+          // 9 	Return format control characters 	Input 	Char(10)
+          "*NO       ",
+          // 10 	Error code 	I/O 	Char(*)
+          err_plc);
+      DEBUG("Done formatting \n");
+      DEBUG("The full message is '%s'\n", msg_info_buf->message);
+    }
     free(replacement_data_aligned);
-    DEBUG("The full message is '%s'\n", msg_info_buf.message);
-
     DEBUG("About to publish...\n");
     for (int i = 0; i < num_publishers; i++)
     {
@@ -168,12 +186,13 @@ int main(int _argc, char **argv)
           message_timestamp.c_str(),
           job.c_str(),
           sending_usrprf.c_str(),
-          msg_info_buf.message,
+          msg_info_buf->message,
           sending_program_name.c_str(),
           sending_module_name.c_str(),
           sending_procedure_name.c_str());
       DEBUG("Published\n");
     }
+    free(msg_info_buf);
     memset(argv[3], ' ', 10);
     DEBUG("DONE\n");
   }
