@@ -141,7 +141,7 @@ int main(int _argc, char **argv)
     size_t msg_info_buf_size = 128+sizeof(RTVM0100) + replacement_data_len;
     RTVM0100 *msg_info_buf = (RTVM0100*)malloc(msg_info_buf_size);
     memset(msg_info_buf, 0x00, msg_info_buf_size);
-    if('0' == qualified_msg_file[0]) { 
+    if(' ' == qualified_msg_file[0]) { 
       DEBUG("Message not from message file\n");
       strncpy(msg_info_buf->message, replacement_data_aligned, replacement_data_len);
     } else {
