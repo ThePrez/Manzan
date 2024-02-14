@@ -153,7 +153,7 @@ int main(int _argc, char **argv)
           // 1 	Message information 	Output 	Char(*)
           msg_info_buf,
           // 2 	Length of message information 	Input 	Binary(4)
-          sizeof(msg_info_buf),
+          msg_info_buf_size-1,
           // 3 	Format name 	Input 	Char(8)
           "RTVM0100",
           // 4 	Message identifier 	Input 	Char(7)
