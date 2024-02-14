@@ -28,6 +28,9 @@ public class ApplicationConfig extends Config {
 
     public AS400 getRemoteConnection() throws AS400SecurityException, IOException {
 
+        if(isIBMi()) {
+            return new AS400("localhost", "*CURRENT", "*CURRENT");
+        }
         if (null != m_cachedPw) {
             final AS400 cacheHit = new AS400(m_cached);
             cacheHit.setPassword(m_cachedPw);

@@ -45,7 +45,7 @@ public class ManzanMainApp {
         final CamelContext context = new DefaultCamelContext();
         System.out.println("Apache Camel version " + context.getVersion());
 
-        final AS400 as400 = IBMiDotEnv.getCachedSystemConnection(true);
+        final AS400 as400 = ApplicationConfig.get().getRemoteConnection();
         as400.setGuiAvailable(false);
         as400.validateSignon();
         final AS400JDBCDataSource dataSource = new AS400JDBCDataSource(as400);
