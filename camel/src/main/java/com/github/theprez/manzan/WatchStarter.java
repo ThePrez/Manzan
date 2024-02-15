@@ -19,8 +19,6 @@ import com.ibm.as400.access.ObjectDoesNotExistException;
 import com.ibm.as400.access.ProgramCall;
 import com.ibm.as400.access.ProgramParameter;
 
-import io.github.theprez.dotenv_ibmi.IBMiDotEnv;
-
 public class WatchStarter {
     private final String m_command;
     private final String m_stopCommand;

@@ -18,9 +18,6 @@ import com.ibm.as400.access.AS400;
 import com.ibm.as400.access.AS400JDBCDataSource;
 import com.ibm.as400.access.AS400Message;
 import com.ibm.as400.access.CommandCall;
-import com.ibm.as400.access.Job;
-
-import io.github.theprez.dotenv_ibmi.IBMiDotEnv;
 
 /**
  * A Camel Application that routes messages from an IBM i message queue to
@@ -95,7 +92,7 @@ public class ManzanMainApp {
             System.exit(-1);
         }
         try {
-            AS400 as400 = IBMiDotEnv.getCachedSystemConnection(true);
+            AS400 as400 = ApplicationConfig.get().getRemoteConnection();
             CommandCall cmd = new CommandCall(as400,
                     "CALL PGM(" + library.trim() + "/handler) PARM('*VERSION' '*VERSION')");
 
