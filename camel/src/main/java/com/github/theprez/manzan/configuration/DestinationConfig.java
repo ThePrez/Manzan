@@ -84,7 +84,7 @@ public class DestinationConfig extends Config {
                     final int port = getRequiredInt(name, "port");
                     ret.put(name, new FluentDDestination(name, tag, host, port));
                     break;
-                case "smtp":
+                case "smtps":
                     final String server = getRequiredString(name, "server");
                     final EmailDestination d = new EmailDestination(name, server, format, getUriAndHeaderParameters(name, sectionObj, "server"), null);
                     ret.put(name, d);
