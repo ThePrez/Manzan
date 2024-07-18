@@ -48,14 +48,14 @@ jobs:
       - name: Deploy to IBM i
         run: | 
           ici \
-            --rcwd "$remote_build_dir" \
+            --rcwd "${{ env.remote_build_dir }}" \
             --push "." \
-            --cmd "/QOpenSys/pkgs/bin/gmake --jobs=1 $jar_file" \
+            --cmd "/QOpenSys/pkgs/bin/gmake --jobs=1 ${{ env.jar_file }}" \
             --pull "." \ 
-            --ignore --cl "dltlib $build_lib" \
-            --ignore --cl "dltlib $dist_lib" \
+            --ignore --cl "dltlib ${{ env.build_lib }}" \
+            --ignore --cl "dltlib ${{ env.dist_lib }}" \
             --rcwd ".." \
-            --ignore --cmd "rm -fr $remote_build_dir /QOpenSys/etc/manzan /opt/manzan"
+            --ignore --cmd "rm -fr ${{ env.remote_build_dir }} /QOpenSys/etc/manzan /opt/manzan"
         env:
           IBMI_HOST: ${{ secrets.IBMI_HOST }}
           IBMI_USER: ${{ secrets.IBMI_USER }}
@@ -75,6 +75,6 @@ jobs:
           GITHUB_TOKEN: ${{ secrets.GITHUB_TOKEN }}
         with:
           upload_url: ${{ steps.get_release.outputs.upload_url }}
-          asset_path: ./manzan-installer-${{ github.ref_name }}.jar
-          asset_name: manzan-installer-${{ github.ref_name }}.jar
+          asset_path: ./${{ env.jar_file }}
+          asset_name: ${{ env.jar_file }}
           asset_content_type: application/zip
