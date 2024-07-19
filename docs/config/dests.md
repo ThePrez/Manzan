@@ -24,7 +24,7 @@ Some types have additional properties that they required.
 | `stdout`   | Write all data to standard out. | None.                                                      |
 | `slack`    | Send data to a Slack channel    | * `webhook` <br> * `channel` <br>                          |
 | `fluentd`  | Sent data to FluentD            | * `tag` <br> * `host` <br> * `port` <br>                   |
-| `smtp`     | Sent data via email             | * `server` <br> * `subject` <br> * `to` <br> * `from` <br> |
+| `smtps`     | Sent data via email             | * `server` <br> * `subject` <br> * `to` <br> * `from` <br> |
 | `sentry` | Send data into Sentry           | `dsn`                                                      |
 | `twilio` | Send via SMS | * `sid` <br> * `token` <br> * `to` <br> * `from` |
 
@@ -32,7 +32,7 @@ Some types have additional properties that they required.
 
 ```ini
 [email_b]
-type=smtp
+type=smtps
 format=Hey, check out this information!! \n\n$FILE_DATA$
   server = my.smtpserver.com
   subject = Testemail

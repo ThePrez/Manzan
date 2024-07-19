@@ -35,7 +35,7 @@ Many other destinations will be available. Examples include:
 - [AWS Simple Email Service (SES)](https://aws.amazon.com/ses/) ⏳
 - [AWS Simple Notification System (SNS)](https://aws.amazon.com/sns/) ⏳
 - [ElasticSearch](http://elastic.co) ⏳
-- Email (SMTP) ✅
+- Email (SMTPS) ✅
 - [FluentD](http://fluentd.org) ✅
 - [Google Drive](http://drive.google.com) ⏳
 - [Google Mail (gmail)](http://gmail.com) ⏳
