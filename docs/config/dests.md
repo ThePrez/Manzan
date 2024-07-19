@@ -19,14 +19,14 @@ type=<type>
 
 Some types have additional properties that they required.
 
-| id       | Description                     | Required properties                                        |
-|----------|---------------------------------|------------------------------------------------------------|
-| `stdout`   | Write all data to standard out. | None.                                                      |
-| `slack`    | Send data to a Slack channel    | * `webhook` <br> * `channel` <br>                          |
-| `fluentd`  | Sent data to FluentD            | * `tag` <br> * `host` <br> * `port` <br>                   |
-| `smtps`     | Sent data via email             | * `server` <br> * `subject` <br> * `to` <br> * `from` <br> |
-| `sentry` | Send data into Sentry           | `dsn`                                                      |
-| `twilio` | Send via SMS | * `sid` <br> * `token` <br> * `to` <br> * `from` |
+| id               | Description                     | Required properties                                        | Optional properties   |
+|------------------|---------------------------------|------------------------------------------------------------|                       |
+| `stdout`         | Write all data to standard out. | None.                                                      |                       |
+| `slack`          | Send data to a Slack channel    | * `webhook` <br> * `channel` <br>                          |                       |
+| `fluentd`        | Sent data to FluentD            | * `tag` <br> * `host` <br> * `port` <br>                   |                       |
+| `smtp`/`smtps`   | Sent data via email             | * `server` <br> * `subject` <br> * `to` <br> * `from` <br> | * `port`              |
+| `sentry`         | Send data into Sentry           | * `dsn`                                                    |                       |
+| `twilio`         | Send via SMS                    | * `sid` <br> * `token` <br> * `to` <br> * `from`           |                       |
 
 ### Example
 

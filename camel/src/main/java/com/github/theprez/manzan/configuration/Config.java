@@ -69,4 +69,12 @@ public abstract class Config {
         }
         return ret;
     }
+
+    protected int getOptionalInt(final String _name, final String _key) {
+        final String ret = m_ini.get(_name, _key);
+        if (StringUtils.isEmpty(ret)) {
+            return -1;
+        }
+        return Integer.valueOf(ret);
+    }
 }

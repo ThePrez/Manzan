@@ -31,7 +31,7 @@ destinations=<destinations>
 
 Some types have additional properties that they required.
 
-| id      | Description                                 | Required properties            | Optional props                                                                                                        |
+| id      | Description                                 | Required properties            | Optional properties                                                                                                        |
 |---------|---------------------------------------------|--------------------------------|-----------------------------------------------------------------------------------------------------------------------|
 | `file`  | Triggered when a file changes               | `file` path of file to watch   | `filter` only listen for lines that include this value                                                                |
 | `watch` | Triggered when the Manzan handler is called | `id` of the watch (session ID) | `strwch` is part of the `STRWCH` CL command that can be used to describe how to start the watch when Manzan starts up |
