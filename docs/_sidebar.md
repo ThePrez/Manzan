@@ -6,6 +6,6 @@
    * [Data Sources](config/data.md)
    * [Destinations](config/dests.md)
    * Examples
-      * [File](examples/file.md)
-      * [Twilio](examples/twilio.md)
-      * [Sentry watch](examples/sentry.md)
+      * [File](config/examples/file.md)
+      * [Twilio](config/examples/twilio.md)
+      * [Sentry watch](config/examples/sentry.md)
