@@ -78,15 +78,18 @@ public class DestinationConfig extends Config {
                     final String dsn = getRequiredString(name, "dsn");
                     ret.put(name, new SentryDestination(name, dsn));
                     break;
-                case "fluentd":
+                case "fluentd": {
                     final String tag = getRequiredString(name, "tag");
                     final String host = getRequiredString(name, "host");
                     final int port = getRequiredInt(name, "port");
                     ret.put(name, new FluentDDestination(name, tag, host, port));
+                }
                     break;
+                case "smtp":
                 case "smtps":
                     final String server = getRequiredString(name, "server");
-                    final EmailDestination d = new EmailDestination(name, server, format, getUriAndHeaderParameters(name, sectionObj, "server"), null);
+                    final int port = getOptionalInt(name, "port");
+                    final EmailDestination d = new EmailDestination(name, type, server, format, port, getUriAndHeaderParameters(name, sectionObj, "server", "port"), null);
                     ret.put(name, d);
                     break;
                 case "twilio":
