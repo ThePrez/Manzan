@@ -32,8 +32,9 @@ do
 	echo "checking result...."
 	echo "=================================="
 	gmake -C $test checkresult
-    echo "result is $?"
-    if [[ "0" == "$?" ]]
+	  result="$?"
+    echo "Test $test result is $result"
+    if [[ "0" == "$result" ]]
     then 
         ((num_pass+=1))
     else
