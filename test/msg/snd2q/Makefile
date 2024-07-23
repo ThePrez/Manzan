@@ -27,6 +27,6 @@ run:
 	sleep 5
 
 checkresult:
-    echo "contents of file"
-    cat $(CURDIR)/test.out
+	echo "contents of file"
+	cat $(CURDIR)/test.out
 	grep -i CAE0023 $(CURDIR)/test.out
