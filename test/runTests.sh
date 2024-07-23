@@ -56,3 +56,11 @@ do
     echo "  $num_fail failed"
     echo "  $num_error errored"
 done
+
+if [ $num_fail -ne 0 ] || [ $num_error -ne 0 ]; then
+  echo "Tests failed."
+  exit 1
+else
+  echo "All tests passed."
+  exit 0
+fi
