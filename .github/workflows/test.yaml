@@ -24,8 +24,7 @@ jobs:
           cache: maven
 
       - name: Build Manzan-installer
-        working-directory: camel
-        run: gmake manzan-installer-v0.0.0.jar
+        run: pwd; gmake manzan-installer-v0.0.0.jar
 
       - name: Run Manzan-installer
         working-directory: camel
