@@ -57,6 +57,9 @@ do
     echo "  $num_error errored"
 done
 
+echo "Killing Manzan processes"
+ps -ef | grep manzan | awk '{ print $2 }' | xargs kill -9
+
 if [ $num_fail -ne 0 ] || [ $num_error -ne 0 ]; then
   echo "Tests failed."
   exit 1
