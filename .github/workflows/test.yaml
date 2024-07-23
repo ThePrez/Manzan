@@ -40,7 +40,6 @@ jobs:
         run: npm i -g @ibm/ibmi-ci
 
       - name: Install Manzan
-        working-directory: test
         run: | 
           ici \
             --rcwd "${{ env.remote_build_dir }}" \
