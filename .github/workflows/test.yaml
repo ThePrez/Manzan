@@ -46,7 +46,6 @@ jobs:
             --push "." \
             --cmd "/QOpenSys/pkgs/bin/gmake --jobs=1 install" \
             --ignore --cl "dltlib ${{ env.build_lib }}" \
-            --ignore --cmd "rm -rf /QOpenSys/etc/manzan /opt/manzan"
         env:
           IBMI_HOST: ${{ secrets.IBMI_HOST }}
           IBMI_USER: ${{ secrets.IBMI_USER }}
@@ -60,6 +59,18 @@ jobs:
           ici \
             --rcwd "${{ env.remote_build_dir }}/test" \
             --cmd "/QOpenSys/pkgs/bin/gmake --jobs=1 all" \
+        env:
+          IBMI_HOST: ${{ secrets.IBMI_HOST }}
+          IBMI_USER: ${{ secrets.IBMI_USER }}
+          IBMI_PASSWORD: ${{ secrets.IBMI_PASSWORD }}
+          IBMI_SSH_PORT: ${{ secrets.IBMI_SSH_PORT }}
+
+      - name: Cleanup
+        run: | 
+          ici \
+            --rcwd "." \
+            --ignore --cmd "rm -rf /QOpenSys/etc/manzan /opt/manzan"
+
         env:
           IBMI_HOST: ${{ secrets.IBMI_HOST }}
           IBMI_USER: ${{ secrets.IBMI_USER }}
