@@ -57,8 +57,8 @@ jobs:
         working-directory: test
         run: | 
           ici \
-            --rcwd "${{ env.remote_build_dir }}/test" \
-            --cmd "/QOpenSys/pkgs/bin/gmake --jobs=1 all; exit $?" \
+            --rcwd "${{ env.remote_build_dir }}" \
+            --cmd "/QOpenSys/pkgs/bin/gmake --jobs=1 testonly; exit $?" \
         env:
           IBMI_HOST: ${{ secrets.IBMI_HOST }}
           IBMI_USER: ${{ secrets.IBMI_USER }}
