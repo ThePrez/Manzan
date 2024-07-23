@@ -22,6 +22,7 @@ posttest:
 runtests:
 	echo "Running tests"
 	./runTests.sh
+	ps -ef | grep manzan | awk '{ print $2 }' | xargs kill -9
 
 testing: /qsys.lib/${BUILDLIB}.lib/MANZANQ.msgq  watch_start watch_testq watch_end
 
