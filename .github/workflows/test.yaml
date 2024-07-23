@@ -58,13 +58,7 @@ jobs:
         run: | 
           ici \
             --rcwd "${{ env.remote_build_dir }}" \
-            --cmd " |
-                set -e  # Exit on any error
-                /QOpenSys/pkgs/bin/gmake testonly || { 
-                  echo "Tests failed, killing background process"
-                  ps -ef | grep manzan | awk '{ print $2 }' | xargs kill -9
-                  exit 1; 
-                }" \
+            --cmd "/QOpenSys/pkgs/bin/gmake --jobs=1 testonly; echo exiting; exit $?" \
         env:
           IBMI_HOST: ${{ secrets.IBMI_HOST }}
           IBMI_USER: ${{ secrets.IBMI_USER }}
