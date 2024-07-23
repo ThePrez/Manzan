@@ -12,15 +12,12 @@ env:
   remote_build_dir: /home/${{ secrets.IBMI_USER }}/testbuild/
   build_lib: MANZANTESTBLD
   dist_lib: MANZANTEST
-  IBMI_HOST: ${{ secrets.IBMI_HOST }}
-  IBMI_USER: ${{ secrets.IBMI_USER }}
-  IBMI_PASSWORD: ${{ secrets.IBMI_PASSWORD }}
-  IBMI_SSH_PORT: ${{ secrets.IBMI_SSH_PORT }}
 
 jobs:
   build:
     runs-on: ubuntu-latest
 
+    environment: OSSBUILD
     steps:
       - name: Checkout
         uses: actions/checkout@v4
@@ -51,6 +48,11 @@ jobs:
             --cmd "/QOpenSys/pkgs/bin/gmake --jobs=1 install" \
             --ignore --cl "dltlib ${{ env.build_lib }}" \
             --ignore --cmd "rm -rf /QOpenSys/etc/manzan /opt/manzan"
+        env:
+          IBMI_HOST: ${{ secrets.IBMI_HOST }}
+          IBMI_USER: ${{ secrets.IBMI_USER }}
+          IBMI_PASSWORD: ${{ secrets.IBMI_PASSWORD }}
+          IBMI_SSH_PORT: ${{ secrets.IBMI_SSH_PORT }}
 
 
       - name: Test Manzan
@@ -58,4 +60,9 @@ jobs:
         run: | 
           ici \
             --rcwd "${{ env.remote_build_dir }}/test" \
-            --cmd "/QOpenSys/pkgs/bin/gmake --jobs=1 all" \          
+            --cmd "/QOpenSys/pkgs/bin/gmake --jobs=1 all" \
+        env:
+          IBMI_HOST: ${{ secrets.IBMI_HOST }}
+          IBMI_USER: ${{ secrets.IBMI_USER }}
+          IBMI_PASSWORD: ${{ secrets.IBMI_PASSWORD }}
+          IBMI_SSH_PORT: ${{ secrets.IBMI_SSH_PORT }}
