@@ -8,6 +8,11 @@ on:
   pull_request:
     branches: [ "*" ]
 
+env:
+  remote_build_dir: /home/${{ secrets.IBMI_USER }}/testbuild/
+  build_lib: MANZANTESTBLD
+  dist_lib: MANZANTEST
+
 jobs:
   build:
     runs-on: ubuntu-latest
@@ -22,14 +27,31 @@ jobs:
           java-version: '8'
           distribution: 'temurin'
           cache: maven
+        
+      - name: Use Node.js ${{ matrix.node-version }}
+        uses: actions/setup-node@v4
+        with:
+          node-version: ${{ matrix.node-version }}
+          registry-url: 'https://registry.npmjs.org'
+          always-auth: true
 
-      - name: Build Manzan-installer
-        run: pwd; gmake manzan-installer-v0.0.0.jar
+      - name: Install NPM Dependencies
+        run: npm i -g @ibm/ibmi-ci
 
-      - name: Run Manzan-installer
-        working-directory: camel
-        run: java -jar manzan-installer-v0.0.0.jar
+      - name: Install Manzan
+        working-directory: test
+        run: | 
+          ici \
+            --rcwd "${{ env.remote_build_dir }}" \
+            --push "." \
+            --cmd "/QOpenSys/pkgs/bin/gmake --jobs=1 install" \
+            --ignore --cl "dltlib ${{ env.build_lib }}" \
+            --ignore --cmd "rm -rf /QOpenSys/etc/manzan /opt/manzan"
+
 
       - name: Test Manzan
         working-directory: test
-        run: ./runTests.sh
+        run: | 
+          ici \
+            --rcwd "${{ env.remote_build_dir }}/test" \
+            --cmd "/QOpenSys/pkgs/bin/gmake --jobs=1 all" \
