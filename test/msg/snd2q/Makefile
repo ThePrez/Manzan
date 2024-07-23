@@ -20,10 +20,12 @@ cleanup:
 	rm -f $(CURDIR)/test.out
 
 run:
-	/opt/manzan/bin/manzan --configdir=$(CURDIR) &
+	# /opt/manzan/bin/manzan --configdir=$(CURDIR) &
 	sleep 12
 	/QOpenSys/QIBM/ProdData/JavaVM/jdk80/64bit/bin/java -cp $(CURDIR):/QIBM/ProdData/OS400/jt400/lib/jt400.jar sndmsg ${TESTLIB} msgs
 	sleep 5
 
 checkresult:
+    echo "contents of file"
+    cat $(CURDIR)/test.out
 	grep -i CAE0023 $(CURDIR)/test.out
