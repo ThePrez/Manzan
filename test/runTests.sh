@@ -23,7 +23,7 @@ do
 
     echo "Killing jobs..."
     echo "Printing processes"
-    ps -ef | grep jre
+    ps -ef | grep jre | grep "${USER:0:8}"
     for pid in $(ps -ef | grep jre | grep "${USER:0:8}" | awk '{print $2}')
     do
         echo killing pid $pid
@@ -58,19 +58,6 @@ do
     echo "  $num_fail failed"
     echo "  $num_error errored"
 done
-
-echo "Printing processes"
-ps -ef
-
-echo "Killing Manzan processes"
-ps -ef | grep manzan | awk '{ print $$2 }' | xargs kill -9
-
-echo "Printing processes"
-ps -ef
-
-echo "Getting zombie processes"
-zombie_ppid=$(ps -ef | grep "<defunct>" | awk '{ print $3 }')
-echo "kill -s SIGCHLD $zombie_ppid"
 
 
 if [ $num_fail -ne 0 ] || [ $num_error -ne 0 ]; then
