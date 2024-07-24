@@ -1,4 +1,4 @@
-BUILDLIB:=MANZAN
+BUILDLIB?=MANZAN
 BUILDVERSION:="Development build \(built with Make\)"
 
 .PHONY: ile camel test
@@ -18,8 +18,8 @@ testonly:
 all: ile camel
 
 install:
-	gmake -C config install
-	gmake -C ile
+	gmake -C config install BUILDLIB=${BUILDLIB}
+	gmake -C ile BUILDLIB=${BUILDLIB}
 	gmake -C camel install
 
 uninstall:
