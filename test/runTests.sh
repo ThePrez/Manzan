@@ -24,7 +24,7 @@ do
     echo "Killing jobs..."
     echo "Printing processes"
     ps -ef | grep jre
-    for pid in $(ps -ef | grep jre | awk '{print $$2}' | xargs kill -9)
+    for pid in $(ps -ef | grep jre | grep "${USER:0:8}" | awk '{print $2}')
     do
         echo killing pid $pid
         kill -INT $pid
