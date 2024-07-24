@@ -67,10 +67,12 @@ jobs:
         run: | 
           ici \
             --rcwd "." \
-            --ignore --cmd "rm -rf /QOpenSys/etc/manzan /opt/manzan"
-
+            --cmd "rm -rf /QOpenSys/etc/manzan /opt/manzan" \
+            --cl "dltlib ${{ env.BUILDLIB }}" 
         env:
           IBMI_HOST: ${{ secrets.IBMI_HOST }}
           IBMI_USER: ${{ secrets.IBMI_USER }}
           IBMI_PASSWORD: ${{ secrets.IBMI_PASSWORD }}
           IBMI_SSH_PORT: ${{ secrets.IBMI_SSH_PORT }}
+          BUILDLIB: MZNTEST
+
