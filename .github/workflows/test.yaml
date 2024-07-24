@@ -10,8 +10,6 @@ on:
 
 env:
   remote_build_dir: /home/${{ secrets.IBMI_USER }}/testbuild/
-  build_lib: MANZANTESTBLD
-  dist_lib: MANZANTEST
 
 jobs:
   test:
@@ -44,21 +42,20 @@ jobs:
           ici \
             --rcwd "${{ env.remote_build_dir }}" \
             --push "." \
-            --cmd "/QOpenSys/pkgs/bin/gmake --jobs=1 install" \
-            --ignore --cl "dltlib ${{ env.build_lib }}" \
+            --cmd "/QOpenSys/pkgs/bin/gmake BUILDLIB=${{ env.BUILDLIB }} install" \
         env:
           IBMI_HOST: ${{ secrets.IBMI_HOST }}
           IBMI_USER: ${{ secrets.IBMI_USER }}
           IBMI_PASSWORD: ${{ secrets.IBMI_PASSWORD }}
           IBMI_SSH_PORT: ${{ secrets.IBMI_SSH_PORT }}
-
+          BUILDLIB: MZNTEST
 
       - name: Test Manzan
         working-directory: test
         run: | 
           ici \
             --rcwd "${{ env.remote_build_dir }}" \
-            --cmd "/QOpenSys/pkgs/bin/gmake --jobs=1 testonly;" \
+            --cmd "/QOpenSys/pkgs/bin/gmake testonly;" \
         env:
           IBMI_HOST: ${{ secrets.IBMI_HOST }}
           IBMI_USER: ${{ secrets.IBMI_USER }}
