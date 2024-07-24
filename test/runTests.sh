@@ -22,7 +22,7 @@ do
     echo "Done running test $test. Exit code was $?"
 
     echo "Killing jobs..."
-    for pid in $(ps | grep jre| awk '{print $1}')
+    for pid in $(ps -ef | grep jre | awk '{print $$2}' | xargs kill -9)
     do
         echo killing pid $pid
         kill -INT $pid
@@ -57,12 +57,23 @@ do
     echo "  $num_error errored"
 done
 
+echo "Printing processes"
+ps -ef
+
 echo "Killing Manzan processes"
-ps -ef | grep manzan | awk '{ print $2 }' | xargs kill -9
+ps -ef | grep manzan | awk '{ print $$2 }' | xargs kill -9
+
+echo "Printing processes"
+ps -ef
+
+echo "Getting zombie processes"
+zombie_ppid=$(ps -ef | grep "<defunct>" | awk '{ print $3 }')
+echo "kill -s SIGCHLD $zombie_ppid"
+
 
 if [ $num_fail -ne 0 ] || [ $num_error -ne 0 ]; then
   echo "Tests failed."
-  exit 0
+  exit 1
 else
   echo "All tests passed."
   exit 0
