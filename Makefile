@@ -1,5 +1,4 @@
 BUILDLIB:=MANZAN
-MANZAN_TEMPLIB:=MANZANBLD
 BUILDVERSION:="Development build \(built with Make\)"
 
 .PHONY: ile camel test
@@ -38,7 +37,6 @@ appinstall.jar: /QOpenSys/pkgs/bin/wget
 
 manzan-installer-v%.jar: /QOpenSys/pkgs/bin/zip appinstall.jar
 	echo "Building version $*"
-	system "clrlib ${MANZAN_TEMPLIB}" || system "crtlib ${MANZAN_TEMPLIB}"
 	system "dltlib ${BUILDLIB}" || echo "could not delete"
 	system "crtlib ${BUILDLIB}"
 	system "dltlib ${BUILDLIB}"
