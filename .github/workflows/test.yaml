@@ -14,7 +14,7 @@ env:
   dist_lib: MANZANTEST
 
 jobs:
-  build:
+  test:
     runs-on: ubuntu-latest
 
     environment: OSSBUILD
