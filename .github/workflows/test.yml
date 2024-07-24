@@ -1,0 +1,77 @@
+# This workflow will test Manzan
+
+name: Test Manzan
+
+on:
+  push:
+    branches: [ "*" ]
+  pull_request:
+    branches: [ "*" ]
+
+env:
+  remote_build_dir: /home/${{ secrets.IBMI_USER }}/testbuild/
+
+jobs:
+  test:
+    runs-on: ubuntu-latest
+
+    environment: OSSBUILD
+    steps:
+      - name: Checkout
+        uses: actions/checkout@v4
+
+      - name: Set up JDK 8
+        uses: actions/setup-java@v4
+        with:
+          java-version: '8'
+          distribution: 'temurin'
+          cache: maven
+
+      - name: Use Node.js ${{ matrix.node-version }}
+        uses: actions/setup-node@v4
+        with:
+          node-version: ${{ matrix.node-version }}
+          registry-url: 'https://registry.npmjs.org'
+          always-auth: true
+
+      - name: Install NPM Dependencies
+        run: npm i -g @ibm/ibmi-ci
+
+      - name: Install Manzan
+        run: | 
+          ici \
+            --rcwd "${{ env.remote_build_dir }}" \
+            --push "." \
+            --cmd "/QOpenSys/pkgs/bin/gmake BUILDLIB=${{ env.BUILDLIB }} install" \
+        env:
+          IBMI_HOST: ${{ secrets.IBMI_HOST }}
+          IBMI_USER: ${{ secrets.IBMI_USER }}
+          IBMI_PASSWORD: ${{ secrets.IBMI_PASSWORD }}
+          IBMI_SSH_PORT: ${{ secrets.IBMI_SSH_PORT }}
+          BUILDLIB: MZNTEST
+
+      - name: Test Manzan
+        working-directory: test
+        run: | 
+          ici \
+            --rcwd "${{ env.remote_build_dir }}" \
+            --cmd "/QOpenSys/pkgs/bin/gmake testonly;" \
+        env:
+          IBMI_HOST: ${{ secrets.IBMI_HOST }}
+          IBMI_USER: ${{ secrets.IBMI_USER }}
+          IBMI_PASSWORD: ${{ secrets.IBMI_PASSWORD }}
+          IBMI_SSH_PORT: ${{ secrets.IBMI_SSH_PORT }}
+
+      - name: Cleanup
+        if: always()
+        run: | 
+          ici \
+            --rcwd "." \
+            --cmd "/QOpenSys/pkgs/bin/gmake BUILDLIB=${{ env.BUILDLIB }} uninstall" \
+            
+        env:
+          IBMI_HOST: ${{ secrets.IBMI_HOST }}
+          IBMI_USER: ${{ secrets.IBMI_USER }}
+          IBMI_PASSWORD: ${{ secrets.IBMI_PASSWORD }}
+          IBMI_SSH_PORT: ${{ secrets.IBMI_SSH_PORT }}
+          BUILDLIB: MZNTEST

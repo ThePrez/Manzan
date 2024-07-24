@@ -10,8 +10,7 @@ on:
 env:
   remote_build_dir: /home/${{ secrets.IBMI_USER }}/build/${{ github.sha }}/
   jar_file: manzan-installer-${{ github.ref_name }}.jar
-  build_lib: MANZANBLD
-  dist_lib: MANZAN
+  BUILDLIB: MANZAN
 
 jobs:
   build:
@@ -63,9 +62,8 @@ jobs:
         run: | 
           ici \
             --rcwd "${{ env.remote_build_dir }}" \
-            --ignore --cl "dltlib ${{ env.build_lib }}" \
-            --ignore --cl "dltlib ${{ env.dist_lib }}" \
-            --ignore --cmd "rm -fr ${{ env.remote_build_dir }} /QOpenSys/etc/manzan /opt/manzan"
+            --cmd "/QOpenSys/pkgs/bin/gmake BUILDLIB=${{ env.BUILDLIB }} uninstall"
+            --ignore --cmd "rm -fr ${{ env.remote_build_dir }}"
         env:
           IBMI_HOST: ${{ secrets.IBMI_HOST }}
           IBMI_USER: ${{ secrets.IBMI_USER }}
