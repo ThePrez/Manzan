@@ -22,6 +22,8 @@ do
     echo "Done running test $test. Exit code was $?"
 
     echo "Killing jobs..."
+    echo "Printing processes"
+    ps -ef | grep jre
     for pid in $(ps -ef | grep jre | awk '{print $$2}' | xargs kill -9)
     do
         echo killing pid $pid
