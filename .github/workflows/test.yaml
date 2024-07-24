@@ -66,6 +66,7 @@ jobs:
           IBMI_SSH_PORT: ${{ secrets.IBMI_SSH_PORT }}
 
       - name: Cleanup
+        if: always()
         run: | 
           ici \
             --rcwd "." \
