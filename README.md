@@ -40,7 +40,12 @@ Many other destinations will be available. Examples include:
 - [Mezmo](http://mezmo.com)
 - [ElasticSearch](http://elastic.co)
 
-
+# Running tests
+- First copy the .env.sample file to .env and fill out the values
+- Run tests by executing one of the following tasks 
+    - deployAndTest: Sync the files to your IBM i, and run the tests
+    - deployBuildAllAndTest: Sync the files to your IBM i, build manzan including the ile component and run the tests
+    - deployBuildCamelAndTest: Sync the files to your IBM i, only build the java code and then  run the tests
 
 # Why the name "Manzan"?
 
