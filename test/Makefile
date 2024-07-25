@@ -1,5 +1,5 @@
 
-.PHONY: ile testing
+.PHONY: ile testing runtests
 
 ile:
 	gmake -C ../ile
@@ -20,7 +20,7 @@ posttest:
 
 runtests:
 	echo "Running tests"
-	exec runTests.sh $(TESTS)
+	./runTests.sh $(TESTS)
 
 testing: /qsys.lib/${BUILDLIB}.lib/MANZANQ.msgq  watch_start watch_testq watch_end
 
