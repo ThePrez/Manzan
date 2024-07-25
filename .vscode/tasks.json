@@ -8,12 +8,14 @@
         {
             "label": "deployAndTest",
             "type": "shell",
-            "command": "./deployAndTest.sh"
+            "command": "./deployAndTest.sh",
+            "problemMatcher": []
         },
         {
             "label": "deployBuildAllAndTest",
             "type": "shell",
-            "command": "./deployBuildAllAndTest.sh"
+            "command": "./deployBuildAllAndTest.sh",
+            "problemMatcher": []
         },
         {
             "label": "deployBuildCamelAndTest",
