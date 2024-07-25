@@ -39,12 +39,7 @@ do
         ((num_pass+=1))
     else
         ((num_fail+=1))
-    fi 
-	echo "=================================="
-	echo "output"
-	echo "=================================="
-	cat $test/test.out
-	echo "=================================="
+    fi
 
     echo "Performing test-specific cleanup for test $test..."
     gmake -C $test cleanup || echo "no setup needed"
