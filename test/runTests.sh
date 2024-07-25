@@ -1,6 +1,12 @@
 #!/QOpenSys/pkgs/bin/bash
 
 TESTS=$(/QOpenSys/pkgs/bin/find * -mindepth 1 -type d)
+ARGS=("$@")
+
+if [[ ${#ARGS[@]} -ne 0 ]]; then
+  TESTS=("${ARGS[@]}")
+fi
+echo "tests ${TESTS[@]}"
 
 num_fail=0
 num_pass=0

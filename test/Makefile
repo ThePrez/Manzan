@@ -20,7 +20,7 @@ posttest:
 
 runtests:
 	echo "Running tests"
-	exec runTests.sh
+	exec runTests.sh $(TESTS)
 
 testing: /qsys.lib/${BUILDLIB}.lib/MANZANQ.msgq  watch_start watch_testq watch_end
 
