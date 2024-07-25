@@ -16,7 +16,6 @@ pretest:
 # Run after every test case
 posttest:
 	echo "Doing post-test cleanup"
-	system -kKv "ENDWCH SSNID(TESTING)" || echo "watch not ended"
 	system "clrlib ${TESTLIB}"
 
 runtests:

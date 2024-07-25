@@ -17,6 +17,7 @@ setup: /qsys.lib/${TESTLIB}.lib/msgs.msgq sndmsg.class
 
 cleanup:
 	rm sndmsg.class
+	system -kKv "ENDWCH SSNID(TESTING)" || echo "watch not ended"
 	rm -f $(CURDIR)/test.out
 
 run:
