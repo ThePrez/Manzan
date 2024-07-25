@@ -1,25 +1,21 @@
 TESTLIB:=MZNTEST
+INPUT_FILE:=/tmp/mzntestinput
+OUTPUT_FILE:=/tmp/mzntestoutput
+TEXT:=ayooooooo
 
-/qsys.lib/${TESTLIB}.lib/msgs.msgq:
-	system "CRTMSGQ ${TESTLIB}/MSGS"
-
-
-sndmsg.class: sndmsg.java
-	/QOpenSys/QIBM/ProdData/JavaVM/jdk80/64bit/bin/javac -cp /QIBM/ProdData/OS400/jt400/lib/jt400.jar sndmsg.java
 
 setup:
-	rm -f $(CURDIR)/test_input.txt
-	touch $(CURDIR)/test_input.txt
+	rm -f ${INPUT_FILE} ${OUTPUT_FILE}
+	touch ${INPUT_FILE}
 
 cleanup:
-	rm sndmsg.class
-	rm -f $(CURDIR)/test.out
+	rm -f ${INPUT_FILE} ${OUTPUT_FILE}
 
 run:
 	/opt/manzan/bin/manzan --configdir=$(CURDIR) &
 	sleep 12
-	echo "ayooooooo" $(CURDIR)/test_input.txt
+	echo ${TEXT} >> ${INPUT_FILE}
 	sleep 5
 
 checkresult:
-	grep -i CAE0023 $(CURDIR)/test.out
+	grep -i ${TEXT} ${OUTPUT_FILE}
