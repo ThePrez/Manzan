@@ -5,7 +5,7 @@ ile:
 	gmake -C ../ile
 
 
-TESTS:=$(shell find * -type d)
+TESTS:=$(shell find * -mindepth 1 -type d)
 TESTLIB:=MZNTEST
 
 # run before every test case
