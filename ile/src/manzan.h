@@ -9,13 +9,16 @@
     if (lastChar != std::string::npos)            \
       dest.erase(1 + lastChar);                   \
   }
-#define BUFSTRN(dest, src, len)                   \
-  std::string dest(src, len);                     \
-  {                                               \
-    size_t lastChar = dest.find_last_not_of(" "); \
-    if (lastChar != std::string::npos)            \
-      dest.erase(1 + lastChar);                   \
-  }
+  
+inline std::string createTrimmedString(std::string src, size_t len) {
+    std::string dest = src.substr(0, len);
+    size_t lastChar = dest.find_last_not_of(" ");
+    if (lastChar != len - 1) {
+        dest.erase(1 + lastChar);
+    }
+    return dest;
+}
+
 #define ITOA(dest, src) \
   char dest[32];        \
   sprintf(dest, "%d", src);
