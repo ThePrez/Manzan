@@ -1,7 +1,5 @@
 #!/bin/bash
+# Deploy Manzan to IBM i, build the java code and run the tests
 
-source ./.env
-rsync --exclude camel/target --exclude out -avz -e ssh . $USER@$HOST:~/mnzntest
-ssh $USER@$HOST "cd /home/$USER/mnzntest; gmake camel" | tee camel.out
+./deployAndBuildCamel.sh
 ./test.sh
-

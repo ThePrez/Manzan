@@ -1,5 +1,5 @@
 #!/bin/bash
+# Deploy Manzan to IBM i, and run the tests
 
-source ./.env
-rsync --exclude camel/target --exclude out -avz -e ssh . $USER@$HOST:~/mnzntest
+./deploy.sh
 ./test.sh
