@@ -62,3 +62,9 @@ To build only the ILE component, you can use `ile` as the target:
 ```sh
 gmake ile
 ```
+
+### Recommended tools for development 
+- ShellCheck vscode extension
+- act https://github.com/nektos/act (github actions local runner)
+- c/c++ vscode extensions
+- Code Spell Checker

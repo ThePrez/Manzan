@@ -1,0 +1,45 @@
+{
+    // See https://go.microsoft.com/fwlink/?LinkId=733558
+    // for the documentation about the tasks.json format
+
+    // Testing tasks
+    "version": "2.0.0",
+    "tasks": [
+        {
+            "label": "deploy",
+            "type": "shell",
+            "command": "./deploy.sh",
+            "problemMatcher": []
+        },
+        {
+            "label": "deployAndBuildAll",
+            "type": "shell",
+            "command": "./deployAndBuildAll.sh",
+            "problemMatcher": []
+        },
+        {
+            "label": "deployAndBuildCamel",
+            "type": "shell",
+            "command": "./deployAndBuildCamel.sh",
+            "problemMatcher": []
+        },
+        {
+            "label": "deployAndTest",
+            "type": "shell",
+            "command": "./deployAndTest.sh",
+            "problemMatcher": []
+        },
+        {
+            "label": "deployBuildAllAndTest",
+            "type": "shell",
+            "command": "./deployBuildAllAndTest.sh",
+            "problemMatcher": []
+        },
+        {
+            "label": "deployBuildCamelAndTest",
+            "type": "shell",
+            "command": "./deployBuildCamelAndTest.sh",
+            "problemMatcher": []
+        }
+    ]
+}

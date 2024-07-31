@@ -1,12 +1,23 @@
 #!/QOpenSys/pkgs/bin/bash
 
 TESTS=$(/QOpenSys/pkgs/bin/find * -mindepth 1 -type d)
+ARGS=("$@")
+
+if [[ ${#ARGS[@]} -ne 0 ]]; then
+  TESTS=("${ARGS[@]}")
+fi
+echo "tests ${TESTS[*]}"
 
 num_fail=0
 num_pass=0
 num_error=0
 
-for test in $TESTS
+failedTests=""
+erroredTests=""
+passedTests=""
+
+
+for test in "${TESTS[@]}"
 do
     echo "Running test $test..."
     gmake pretest
@@ -17,6 +28,7 @@ do
     if [[ "0" != "$?" ]]
     then 
         ((num_error+=1))
+        erroredTests="$erroredTests$test"$'\n'"  "
     fi 
 
     echo "Done running test $test. Exit code was $?"
@@ -41,25 +53,26 @@ do
     if [[ "0" == "$result" ]]
     then 
         ((num_pass+=1))
+        passedTests="$passedTests$test"$'\n'"  "
     else
         ((num_fail+=1))
-    fi 
-	echo "=================================="
-	echo "output"
-	echo "=================================="
-	cat $test/test.out
-	echo "=================================="
+        failedTests="$failedTests$test"$'\n'"  "
+    fi
 
     echo "Performing test-specific cleanup for test $test..."
     gmake -C $test cleanup || echo "no setup needed"
     echo "Performing cleanup..."
     gmake posttest
-	echo "=================================="
-    echo "Results:"
-    echo "  $num_pass passed"
-    echo "  $num_fail failed"
-    echo "  $num_error errored"
 done
+
+echo "=================================="
+echo "Results:"
+echo "  $num_pass passed"
+echo "  $passedTests"
+echo "  $num_fail failed"
+echo "  $failedTests"
+echo "  $num_error errored"
+echo "  $erroredTests"
 
 if [ $num_fail -ne 0 ] || [ $num_error -ne 0 ]; then
   echo "Tests failed."

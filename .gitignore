@@ -1,4 +1,3 @@
-.vscode/
 camel/.vscode
 camel/.settings
 camel/.classpath
@@ -11,9 +10,18 @@ camel/app.ini
 camel/test.txt
 config/app.ini
 *.txt
-*.ini
+/data.ini
+/dests.ini
+/app.ini
 ile/src/mzversion.h
 camel/src/main/java/com/github/theprez/manzan/Version.java
 appinstall.jar
-manzan-installer-*.jar
 .env
+
+test/test.iml
+.secrets
+.idea
+camel.out
+install.out
+tests.out
+/ile/.metadata
