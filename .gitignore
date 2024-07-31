@@ -18,7 +18,6 @@ camel/src/main/java/com/github/theprez/manzan/Version.java
 appinstall.jar
 .env
 
-out
 test/test.iml
 .secrets
 .idea
