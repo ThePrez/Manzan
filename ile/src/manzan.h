@@ -12,7 +12,7 @@
   }
 
 #define BUFSTRN(dest, src, len)                   \
-  std::string dest = src.substr(0, len);          \
+  std::string dest(src, len);                     \
   {                                               \
     size_t lastChar = dest.find_last_not_of(" "); \
     if (lastChar != std::string::npos)            \
