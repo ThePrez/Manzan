@@ -6,7 +6,7 @@ ARGS=("$@")
 if [[ ${#ARGS[@]} -ne 0 ]]; then
   TESTS=("${ARGS[@]}")
 fi
-echo "tests ${TESTS[@]}"
+echo "tests ${TESTS[*]}"
 
 num_fail=0
 num_pass=0
@@ -17,7 +17,7 @@ erroredTests=""
 passedTests=""
 
 
-for test in $TESTS
+for test in "${TESTS[@]}"
 do
     echo "Running test $test..."
     gmake pretest
