@@ -90,8 +90,8 @@ int main(int _argc, char **argv)
     return 0;
   }
 
-  std::string watch_option = createTrimmedString(argv[1], sizeof(argv[1]));
-  std::string session_id = createTrimmedString(argv[2], sizeof(argv[2]));
+  BUFSTRN(watch_option, argv[1], sizeof(argv[1]));
+  BUFSTRN(session_id, argv[2], sizeof(argv[2]));
 
   DEBUG("watch program called. Watch option setting is '%s'\n", watch_option.c_str());
   publisher_info_set *publishers = conf_get_publisher_info(session_id.c_str());
@@ -116,7 +116,7 @@ int main(int _argc, char **argv)
     DEBUG("Timestamp is '%s'\n", message_timestamp.c_str());
     int message_severity = msg_event->message_severity;
     BUFSTR(sending_usrprf, msg_event->sending_user_profile);
-    std::string sending_procedure_name = createTrimmedString((char *)msg_event + msg_event->offset_send_procedure_name, msg_event->length_send_procedure_name)
+    BUFSTRN(sending_procedure_name, (char *)msg_event + msg_event->offset_send_procedure_name, msg_event->length_send_procedure_name);
     BUFSTR(sending_module_name, msg_event->sending_module_name);
     BUFSTR(sending_program_name, msg_event->sending_program_name);
     sending_program_name.erase(1 + sending_program_name.find_last_not_of(" "));
