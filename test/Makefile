@@ -1,11 +1,11 @@
 
-.PHONY: ile testing
+.PHONY: ile testing runtests
 
 ile:
 	gmake -C ../ile
 
 
-TESTS:=$(shell find * -type d)
+TESTS:=$(shell find * -mindepth 1 -type d)
 TESTLIB:=MZNTEST
 
 # run before every test case
@@ -16,12 +16,11 @@ pretest:
 # Run after every test case
 posttest:
 	echo "Doing post-test cleanup"
-	system -kKv "ENDWCH SSNID(TESTING)" || echo "watch not ended"
 	system "clrlib ${TESTLIB}"
 
 runtests:
 	echo "Running tests"
-	exec runTests.sh
+	./runTests.sh $(TESTS)
 
 testing: /qsys.lib/${BUILDLIB}.lib/MANZANQ.msgq  watch_start watch_testq watch_end
 

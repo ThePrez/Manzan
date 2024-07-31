@@ -1,4 +1,4 @@
-BUILDLIB:=MANZAN
+BUILDLIB?=MANZAN
 BUILDVERSION:="Development build \(built with Make\)"
 
 all: init /qsys.lib/${BUILDLIB}.lib/handler.pgm
@@ -25,10 +25,10 @@ src/mzversion.h:
 	system "CRTPGM PGM(${BUILDLIB}/$*) MODULE($(patsubst %.module,$(BUILDLIB)/%,$(notdir $^))) ACTGRP(*CALLER)"
 
 /qsys.lib/${BUILDLIB}.lib/%.module: src/%.cpp src/mzversion.h
-	system "CRTCPPMOD MODULE(${BUILDLIB}/$*) SRCSTMF('$<') OPTION(*EVENTF) SYSIFCOPT(*IFS64IO) DBGVIEW(*SOURCE) TERASPACE(*YES *TSIFC) STGMDL(*SNGLVL) DTAMDL(*p128) DEFINE(DEBUG_ENABLED)"
+	system "CRTCPPMOD MODULE(${BUILDLIB}/$*) SRCSTMF('$(CURDIR)/$<') OPTION(*EVENTF) SYSIFCOPT(*IFS64IO) DBGVIEW(*SOURCE) TERASPACE(*YES *TSIFC) STGMDL(*SNGLVL) DTAMDL(*p128) DEFINE(DEBUG_ENABLED)"
 
 /qsys.lib/${BUILDLIB}.lib/%.module: src/%.sqlc
-	system "CRTSQLCI OBJ(${BUILDLIB}/$*) SRCSTMF('$^') COMMIT(*NONE) DATFMT(*ISO) TIMFMT(*ISO) CVTCCSID(*JOB) COMPILEOPT('INCDIR(''src'')') SQLPATH(${BUILDLIB}) DFTRDBCOL(${BUILDLIB}) OPTION(*SQL)"
+	system "CRTSQLCI OBJ(${BUILDLIB}/$*) SRCSTMF('$(CURDIR)/$^') COMMIT(*NONE) DATFMT(*ISO) TIMFMT(*ISO) DBGVIEW(*SOURCE) CVTCCSID(*JOB) COMPILEOPT('INCDIR(''src'')') SQLPATH(${BUILDLIB}) DFTRDBCOL(${BUILDLIB}) OPTION(*SQL)"
 
 /qsys.lib/${BUILDLIB.lib}:
 	-system "RUNSQL SQL('create schema ${BUILDLIB}') NAMING(*SYS)"
@@ -42,7 +42,7 @@ src/mzversion.h:
 	system -kKv "CRTMSGQ MSGQ(${BUILDLIB}/$*) TEXT('Testing queue') CCSID(1208)"
 
 /qsys.lib/${BUILDLIB}.lib/%.file: install_tasks/%.sql
-	system -kKv "RUNSQLSTM SRCSTMF('$<') COMMIT(*NONE) DFTRDBCOL(${BUILDLIB})"
+	system -kKv "RUNSQLSTM SRCSTMF('$(CURDIR)/$<') COMMIT(*NONE) DFTRDBCOL(${BUILDLIB})"
 	echo "Success"
 
 uninstall:

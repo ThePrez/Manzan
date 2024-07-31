@@ -17,6 +17,7 @@ setup: /qsys.lib/${TESTLIB}.lib/msgs.msgq sndmsg.class
 
 cleanup:
 	rm sndmsg.class
+	system -kKv "ENDWCH SSNID(TESTING)"
 	rm -f $(CURDIR)/test.out
 
 run:
@@ -26,4 +27,6 @@ run:
 	sleep 5
 
 checkresult:
+	echo "contents of file"
+	cat $(CURDIR)/test.out
 	grep -i CAE0023 $(CURDIR)/test.out
