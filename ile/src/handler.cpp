@@ -90,8 +90,8 @@ int main(int _argc, char **argv)
     return 0;
   }
 
-  BUFSTRN(watch_option, std::string(argv[1]), 10);
-  BUFSTRN(session_id, std::string(argv[2]), 10);
+  BUFSTRN(watch_option, argv[1], 10);
+  BUFSTRN(session_id, argv[2], 10);
 
   DEBUG("watch program called. Watch option setting is '%s'\n", watch_option.c_str());
   publisher_info_set *publishers = conf_get_publisher_info(session_id.c_str());
