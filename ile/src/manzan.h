@@ -1,7 +1,6 @@
 #ifndef _MANZAN_H_
 #define _MANZAN_H_
 #include <stdio.h>
-#include <string>
 
 #define BUFSTR(dest, src)                         \
   std::string dest(src, sizeof(src));             \
