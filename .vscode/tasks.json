@@ -6,39 +6,45 @@
     "version": "2.0.0",
     "tasks": [
         {
-            "label": "deploy",
+            "label": "Deploy",
             "type": "shell",
-            "command": "./deploy.sh",
+            "command": "./scripts/deploy.sh",
             "problemMatcher": []
         },
         {
-            "label": "deployAndBuildAll",
+            "label": "Deploy and Build All",
             "type": "shell",
-            "command": "./deployAndBuildAll.sh",
+            "command": "./scripts/deployAndBuildAll.sh",
             "problemMatcher": []
         },
         {
-            "label": "deployAndBuildCamel",
+            "label": "Deploy and Build Camel",
             "type": "shell",
-            "command": "./deployAndBuildCamel.sh",
+            "command": "./scripts/deployAndBuildCamel.sh",
             "problemMatcher": []
         },
         {
-            "label": "deployAndTest",
+            "label": "Deploy and Test",
             "type": "shell",
-            "command": "./deployAndTest.sh",
+            "command": "./scripts/deployAndTest.sh",
             "problemMatcher": []
         },
         {
-            "label": "deployBuildAllAndTest",
+            "label": "Deploy Build All and Test",
             "type": "shell",
-            "command": "./deployBuildAllAndTest.sh",
+            "command": "./scripts/deployBuildAllAndTest.sh",
             "problemMatcher": []
         },
         {
-            "label": "deployBuildCamelAndTest",
+            "label": "Deploy Build Camel and Test",
             "type": "shell",
-            "command": "./deployBuildCamelAndTest.sh",
+            "command": "./scripts/deployBuildCamelAndTest.sh",
+            "problemMatcher": []
+        },
+        {
+            "label": "Run Test",
+            "type": "shell",
+            "command": "./scripts/test.sh",
             "problemMatcher": []
         }
     ]
