@@ -1,4 +1,4 @@
-BUILDLIB:=MANZAN
+BUILDLIB?=MANZAN
 BUILDVERSION:="Development build \(built with Make\)"
 
 all: init /qsys.lib/${BUILDLIB}.lib/handler.pgm

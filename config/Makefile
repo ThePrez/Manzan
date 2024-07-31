@@ -1,5 +1,5 @@
 
-BUILDLIB:=MANZAN
+BUILDLIB?=MANZAN
 
 .PHONY: mkdirs app.ini
 

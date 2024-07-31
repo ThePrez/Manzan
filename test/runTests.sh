@@ -22,7 +22,11 @@ do
     echo "Done running test $test. Exit code was $?"
 
     echo "Killing jobs..."
-    for pid in $(ps | grep jre| awk '{print $1}')
+    echo "Printing processes"
+
+    # Get user string only up to 8th character since it gets truncated in process table
+    ps -ef | grep jre | grep "${USER:0:8}"
+    for pid in $(ps -ef | grep jre | grep "${USER:0:8}" | awk '{print $2}')
     do
         echo killing pid $pid
         kill -INT $pid
@@ -56,3 +60,11 @@ do
     echo "  $num_fail failed"
     echo "  $num_error errored"
 done
+
+if [ $num_fail -ne 0 ] || [ $num_error -ne 0 ]; then
+  echo "Tests failed."
+  exit 1
+else
+  echo "All tests passed."
+  exit 0
+fi
