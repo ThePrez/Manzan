@@ -25,3 +25,7 @@ camel.out
 install.out
 tests.out
 /ile/.metadata
+bazel-bin
+bazel-manzan
+bazel-out
+bazel-testlogs
