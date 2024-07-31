@@ -40,12 +40,6 @@ Many other destinations will be available. Examples include:
 - [Mezmo](http://mezmo.com)
 - [ElasticSearch](http://elastic.co)
 
-# Recommended tools for development 
-- ShellCheck vscode extension
-- act https://github.com/nektos/act (github actions local runner)
-- c/c++ vscode extensions
-- Code Spell Checker
-
 # Running tests
 - First copy the .env.sample file to .env and fill out the values
 - Run tests by executing one of the following tasks 
