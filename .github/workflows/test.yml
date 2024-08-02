@@ -4,9 +4,9 @@ name: Test Manzan
 
 on:
   push:
-    branches: [ "*" ]
+    branches: [ "main" ]
   pull_request:
-    branches: [ "*" ]
+    branches: [ "main" ]
 
 env:
   remote_build_dir: /home/${{ secrets.IBMI_USER }}/testbuild/
