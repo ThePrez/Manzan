@@ -1,32 +1,28 @@
 TESTLIB:=MZNTEST
+INPUT_MSGQ:=QCPFMSG
+OUTPUT_FILE:=/tmp/mzntestoutput
+MESSAGE_ID:=*IMMED
+MESSAGE:=My first message!
+MSGTYPE:=*INFO
+SEVERITY:=80
 
 /qsys.lib/${TESTLIB}.lib/msgs.msgq:
-	system "CRTMSGQ ${TESTLIB}/MSGS"
+	system "CRTMSGQ ${TESTLIB}/MSGS TEXT('Manzan Testing')"
 
-
-sndmsg.class: sndmsg.java
-	/QOpenSys/QIBM/ProdData/JavaVM/jdk80/64bit/bin/javac -cp /QIBM/ProdData/OS400/jt400/lib/jt400.jar sndmsg.java
-
-setup: /qsys.lib/${TESTLIB}.lib/msgs.msgq sndmsg.class
-	rm -f $(CURDIR)/test.out
-	touch $(CURDIR)/test.out
+setup: /qsys.lib/${TESTLIB}.lib/msgs.msgq
 	echo "strwch=WCHMSG((*ALL)) WCHMSGQ((${TESTLIB}/MSGS))" >> data.ini
-	echo "file=$(CURDIR)/test.out" >> dests.ini
-	# echo "[install]" > app.ini
-	# echo "library=${TESTLIB}" >> app.ini
 
 cleanup:
-	rm sndmsg.class
 	system -kKv "ENDWCH SSNID(TESTING)"
-	rm -f $(CURDIR)/test.out
+	system -kKv "DLTMSGQ MSGQ(${TESTLIB}/MSGS)"
+	rm -f ${OUTPUT_FILE}
 
 run:
-	/opt/manzan/bin/manzan --configdir=$(CURDIR) &
+	/opt/manzan/bin/manzan --configdir=$(CURDIR) > /tmp/manzan.out 2>&1 &
 	sleep 12
-	/QOpenSys/QIBM/ProdData/JavaVM/jdk80/64bit/bin/java -cp $(CURDIR):/QIBM/ProdData/OS400/jt400/lib/jt400.jar sndmsg ${TESTLIB} msgs
+	system -kKv "SNDMSG TOMSGQ(${TESTLIB}/MSGS) MSG('${MESSAGE}') MSGTYPE(${MSGTYPE})"
 	sleep 5
 
 checkresult:
-	echo "contents of file"
-	cat $(CURDIR)/test.out
-	grep -i CAE0023 $(CURDIR)/test.out
+	cat ${OUTPUT_FILE}
+	grep -i "${MESSAGE_ID} (severity ${SEVERITY}): ${MESSAGE}" ${OUTPUT_FILE}
