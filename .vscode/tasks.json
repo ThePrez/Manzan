@@ -12,45 +12,45 @@
             "problemMatcher": []
         },
         {
-            "label": "Deploy and Build All",
+            "label": "Build All",
             "type": "shell",
-            "command": "./scripts/deployAndBuildAll.sh",
+            "command": "./scripts/buildAll.sh",
             "problemMatcher": []
         },
         {
-            "label": "Deploy and Build Camel",
+            "label": "Build Camel",
             "type": "shell",
-            "command": "./scripts/deployAndBuildCamel.sh",
+            "command": "./scripts/buildCamel.sh",
             "problemMatcher": []
         },
         {
-            "label": "Deploy and Test",
+            "label": "Build ILE",
             "type": "shell",
-            "command": "./scripts/deployAndTest.sh",
+            "command": "./scripts/buildIle.sh",
             "problemMatcher": []
         },
         {
-            "label": "Deploy Build All and Test",
+            "label": "Run E2E Tests",
             "type": "shell",
-            "command": "./scripts/deployBuildAllAndTest.sh",
+            "command": "./scripts/testE2e.sh",
             "problemMatcher": []
         },
         {
-            "label": "Deploy Build Camel and Test",
+            "label": "Run ILE Tests",
             "type": "shell",
-            "command": "./scripts/deployBuildCamelAndTest.sh",
+            "command": "./scripts/testIle.sh",
             "problemMatcher": []
         },
         {
-            "label": "Run Test",
+            "label": "Build All and Run E2E Tests",
             "type": "shell",
-            "command": "./scripts/test.sh",
+            "command": "./scripts/buildAllAndTestE2e.sh",
             "problemMatcher": []
         },
         {
-            "label": "Run ILE Unit Tests",
+            "label": "Build Camel and Run E2E Tests",
             "type": "shell",
-            "command": "bazel test --cxxopt=-std=c++14 --verbose_failures --test_output=all //:test_util",
+            "command": "./scripts/buildCamelAndTestE2e.sh",
             "problemMatcher": []
         }
     ]
