@@ -48,7 +48,7 @@
             "problemMatcher": []
         },
         {
-            "label": "ileUnitTest",
+            "label": "Run ILE Unit Tests",
             "type": "shell",
             "command": "bazel test --cxxopt=-std=c++14 --verbose_failures --test_output=all //:test_util",
             "problemMatcher": []
