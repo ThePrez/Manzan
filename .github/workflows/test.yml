@@ -40,7 +40,7 @@ jobs:
 
       - name: Run ILE Tests
         working-directory: scripts
-        run: ./scripts/testIle.sh
+        run: bash ./testIle.sh
 
       - name: Install Manzan
         run: | 
