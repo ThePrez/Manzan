@@ -1,14 +1,6 @@
+#!/bin/bash
 # Only run test, without building
-source ./.env
 
-if [ -z "$USER" ]; then
-  echo "USER is not set."
-  exit 1
-fi
-
-if [ -z "$HOST" ]; then
-  echo "HOST is not set."
-  exit 1
-fi
+scripts/deploy.sh
 
 ssh $USER@$HOST "cd ~/mnzntest/test; gmake runtests TESTS=\"${TESTS[@]}\"" | tee tests.out
