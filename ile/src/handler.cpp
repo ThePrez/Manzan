@@ -92,6 +92,7 @@ int main(int _argc, char **argv)
 
   BUFSTRN(watch_option, argv[1], 10);
   BUFSTRN(session_id, argv[2], 10);
+
   DEBUG("watch program called. Watch option setting is '%s'\n", watch_option.c_str());
   publisher_info_set *publishers = conf_get_publisher_info(session_id.c_str());
   int num_publishers = publishers->num_publishers;

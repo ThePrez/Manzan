@@ -40,6 +40,12 @@
             "type": "shell",
             "command": "./deployBuildCamelAndTest.sh",
             "problemMatcher": []
+        },
+        {
+            "label": "ileUnitTest",
+            "type": "shell",
+            "command": "bazel test --cxxopt=-std=c++14 --verbose_failures --test_output=all //:test_util",
+            "problemMatcher": []
         }
     ]
 }
