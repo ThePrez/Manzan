@@ -14,6 +14,7 @@ run:
 	sleep 12
 	echo ${TEXT} >> ${INPUT_FILE}
 	sleep 5
+	cat /tmp/manzan.out
 
 checkresult:
 	grep -i ${TEXT} ${OUTPUT_FILE}

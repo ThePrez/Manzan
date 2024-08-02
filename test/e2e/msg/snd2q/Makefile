@@ -22,6 +22,7 @@ run:
 	sleep 12
 	system -kKv "SNDMSG TOMSGQ(${TESTLIB}/MSGS) MSG('${MESSAGE}') MSGTYPE(${MSGTYPE})"
 	sleep 5
+	cat /tmp/manzan.out
 
 checkresult:
 	cat ${OUTPUT_FILE}
