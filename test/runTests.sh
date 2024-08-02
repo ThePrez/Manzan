@@ -1,6 +1,5 @@
 #!/QOpenSys/pkgs/bin/bash
-
-TESTS=$(/QOpenSys/pkgs/bin/find * -mindepth 1 -type d)
+IFS=' ' read -r -a TESTS < <(/QOpenSys/pkgs/bin/find * -mindepth 1 -type d | tr '\n' ' ')
 ARGS=("$@")
 
 echo "Running tests"

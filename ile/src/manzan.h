@@ -9,23 +9,31 @@
     if (lastChar != std::string::npos)            \
       dest.erase(1 + lastChar);                   \
   }
+
 #define BUFSTRN(dest, src, len)                   \
   std::string dest(src, len);                     \
   {                                               \
     size_t lastChar = dest.find_last_not_of(" "); \
     if (lastChar != std::string::npos)            \
+    {                                             \
       dest.erase(1 + lastChar);                   \
+    }                                             \
+    else                                          \
+    {                                             \
+      dest.clear();                               \
+    }                                             \
   }
+
 #define ITOA(dest, src) \
   char dest[32];        \
   sprintf(dest, "%d", src);
 
-#define MIN(a,b) ((a)<(b)?(a):(b))
+#define MIN(a, b) ((a) < (b) ? (a) : (b))
 
 #define PUBLISH_MESSAGE_FUNCTION_SIGNATURE const char *_session_id,           \
                                            const char *_msgid,                \
                                            const char *_msg_type,             \
-                                           int         _msg_severity,         \
+                                           int _msg_severity,                 \
                                            const char *_msg_timestamp,        \
                                            const char *_job,                  \
                                            const char *_sending_usrprf,       \
@@ -65,7 +73,6 @@
                                        int _sequence
 
 #define PUBLISH_OTHER_FUNCTION_SIGNATURE const char *_session_id, const char *_event_type
-
 
 #ifdef __cplusplus
 extern "C"
