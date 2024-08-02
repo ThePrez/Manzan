@@ -29,3 +29,4 @@ bazel-bin
 bazel-manzan
 bazel-out
 bazel-testlogs
+MODULE.bazel.lock
