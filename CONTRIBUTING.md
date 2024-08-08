@@ -11,15 +11,17 @@ We welcome everyone to work on this cool project. We use a typical PR system:
 ### Visual Studio Code
 
 1. Clone your fork to your local machine
-2. Open the repository up in Visual Studio Code
-3. Connect to a remote IBM i where the build can happen
-4. Correctly set your current library to where your objects can be built
+2. Copy the the relevant c_cpp_properties.json.* file for your operating system to c_cpp_properties.json
+3. Run the downloadIbmiHeader utility on the ile folder to download the relevant headers to your local system: https://github.ibm.com/ibmi-toronto/downloadIBMiHeader
+4. Open the repository up in Visual Studio Code
+5. Connect to a remote IBM i where the build can happen
+6. Correctly set your current library to where your objects can be built
    * Code for IBM i will tell you what you have it set to when you have connected to a system.
-5. Set your Deploy Workspace Location in the IFS
+7. Set your Deploy Workspace Location in the IFS
    * Code for IBM i can set a default location if you have not yet done it before, OR
    * Right click on the chosen directory and select 'Set Deploy Workspace Location'.
    * You only have to do this once.
-6. Actions are available to compile source from your local machine
+8. Actions are available to compile source from your local machine
    * Control / Command + E
 
 
