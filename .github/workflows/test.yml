@@ -4,9 +4,9 @@ name: Test Manzan
 
 on:
   push:
-    branches: [ "*" ]
+    branches: [ "main" ]
   pull_request:
-    branches: [ "*" ]
+    branches: [ "main" ]
 
 env:
   remote_build_dir: /home/${{ secrets.IBMI_USER }}/testbuild/
@@ -38,6 +38,10 @@ jobs:
       - name: Install NPM Dependencies
         run: npm i -g @ibm/ibmi-ci
 
+      - name: Run ILE Tests
+        working-directory: scripts
+        run: bash ./testIle.sh
+
       - name: Install Manzan
         run: | 
           ici \
@@ -50,7 +54,7 @@ jobs:
           IBMI_PASSWORD: ${{ secrets.IBMI_PASSWORD }}
           IBMI_SSH_PORT: ${{ secrets.IBMI_SSH_PORT }}
 
-      - name: Test Manzan
+      - name: Run E2E Tests
         working-directory: test
         run: | 
           ici \

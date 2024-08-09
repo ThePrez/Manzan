@@ -10,10 +10,10 @@ camel:
 	gmake -C camel
 
 test: install
-	gmake -C test
+	gmake -C test/e2e runtests
 
 testonly:
-	gmake -C test runtests
+	gmake -C test/e2e runtests
 
 all: ile camel
 
