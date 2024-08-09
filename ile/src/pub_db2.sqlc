@@ -10,7 +10,7 @@
 
 #define COPY_PARM(dest, parm)    \
   memset(dest, 0, sizeof(dest)); \
-  strncpy(dest, parm, -1 + sizeof(dest));
+  strncpy(dest, parm ? parm : "", -1 + sizeof(dest));
 
 // TODO: implement this
 //     1. define Db2 tables
