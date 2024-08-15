@@ -11,7 +11,7 @@ We welcome everyone to work on this cool project. We use a typical PR system:
 ### Visual Studio Code
 
 1. Clone your fork to your local machine
-2. Copy the the relevant c_cpp_properties.json.* file for your operating system to c_cpp_properties.json
+2. From the command palette, select `c/c++: Select a Configuration...`, and choose the configuration corresponding to your OS
 3. Run the downloadIbmiHeader utility on the ile folder to download the relevant headers to your local system: https://github.ibm.com/ibmi-toronto/downloadIBMiHeader
 4. Open the repository up in Visual Studio Code
 5. Connect to a remote IBM i where the build can happen
