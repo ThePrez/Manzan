@@ -93,18 +93,19 @@ int main(int _argc, char **argv)
   BUFSTRN(watch_option, argv[1], 10);
   BUFSTRN(session_id, argv[2], 10);
 
-  DEBUG("watch program called. Watch option setting is '%s'\n", watch_option.c_str());
+  DEBUG_INFO("HELLO..........");
+  DEBUG_INFO("watch program called. Watch option setting is '%s'\n", watch_option.c_str());
   publisher_info_set *publishers = conf_get_publisher_info(session_id.c_str());
   int num_publishers = publishers->num_publishers;
   if (0 == num_publishers)
   {
-    DEBUG("No publishers found for watch option '%s' and session ID '%s'\n", watch_option.c_str(), session_id.c_str());
+    DEBUG_ERROR("No publishers found for watch option '%s' and session ID '%s'\n", watch_option.c_str(), session_id.c_str());
     ENDDBG();
     return 0;
   }
   if (watch_option == "*MSGID")
   {
-    DEBUG("Handling message\n");
+    DEBUG_INFO("Handling message\n");
     msg_event_raw *msg_event = (msg_event_raw *)argv[4];
     BUFSTR(msgid, msg_event->message_watched);
     BUFSTR(job_name, msg_event->job_name);
@@ -113,7 +114,7 @@ int main(int _argc, char **argv)
     std::string job = job_number + "/" + user_name + "/" + job_name;
     BUFSTR(message_type, msg_event->message_type);
     std::string message_timestamp = get_iso8601_timestamp(msg_event->message_timestamp);
-    DEBUG("Timestamp is '%s'\n", message_timestamp.c_str());
+    DEBUG_INFO("Timestamp is '%s'\n", message_timestamp.c_str());
     int message_severity = msg_event->message_severity;
     BUFSTR(sending_usrprf, msg_event->sending_user_profile);
     BUFSTRN(sending_procedure_name, (char *)msg_event + msg_event->offset_send_procedure_name, msg_event->length_send_procedure_name);
@@ -123,17 +124,17 @@ int main(int _argc, char **argv)
 
     int replacement_data_offset = msg_event->offset_replacement_data;
     int replacement_data_len = msg_event->length_replacement_data;
-    DEBUG("Replacement data offset is '%d'\n", replacement_data_offset);
-    DEBUG("REPLACEMENT DATA LENGTH IS '%d'\n", replacement_data_len);
+    DEBUG_INFO("Replacement data offset is '%d'\n", replacement_data_offset);
+    DEBUG_INFO("REPLACEMENT DATA LENGTH IS '%d'\n", replacement_data_len);
     char message_watched[8];
     message_watched[7] = 0x00;
     memcpy(message_watched, msg_event->message_watched, 7);
-    DEBUG("MESSAGE WATCHED IS '%s'\n",message_watched);
+    DEBUG_INFO("MESSAGE WATCHED IS '%s'\n", message_watched);
     char qualified_msg_file[21];
     qualified_msg_file[20] = 0x00;
     memcpy(qualified_msg_file, msg_event->message_file_name, 10);
     memcpy(qualified_msg_file+10, msg_event->message_file_library, 10);
-    DEBUG("MESSAGE FILE AND NAME IS '%s'\n", qualified_msg_file);
+    DEBUG_INFO("MESSAGE FILE AND NAME IS '%s'\n", qualified_msg_file);
     char *replacement_data = (0 == replacement_data_len) ? "" : (((char *)msg_event) + replacement_data_offset);
     char *replacement_data_aligned = (char *)malloc(1+replacement_data_len);
     memset(replacement_data_aligned, 0x00, 1+replacement_data_len);
@@ -142,13 +143,16 @@ int main(int _argc, char **argv)
     size_t msg_info_buf_size = 128+sizeof(RTVM0100) + replacement_data_len;
     RTVM0100 *msg_info_buf = (RTVM0100*)malloc(msg_info_buf_size);
     memset(msg_info_buf, 0x00, msg_info_buf_size);
-    if(' ' == qualified_msg_file[0]) { 
-      DEBUG("Message not from message file\n");
+    if (' ' == qualified_msg_file[0])
+    {
+      DEBUG_WARNING("Message not from message file\n");
       strncpy(msg_info_buf->message, replacement_data_aligned, replacement_data_len);
-    } else {
+    }
+    else
+    {
       char err_plc[64];
       memset(err_plc, 0x00, sizeof(err_plc));
-      DEBUG("about to format\n");
+      DEBUG_INFO("about to format\n");
 
       QMHRTVM(
           // 1 	Message information 	Output 	Char(*)
@@ -171,11 +175,11 @@ int main(int _argc, char **argv)
           "*NO       ",
           // 10 	Error code 	I/O 	Char(*)
           err_plc);
-      DEBUG("Done formatting \n");
-      DEBUG("The full message is '%s'\n", msg_info_buf->message);
+      DEBUG_INFO("Done formatting \n");
+      DEBUG_INFO("The full message is '%s'\n", msg_info_buf->message);
     }
     free(replacement_data_aligned);
-    DEBUG("About to publish...\n");
+    DEBUG_INFO("About to publish...\n");
     for (int i = 0; i < num_publishers; i++)
     {
       msg_publish_func func = publishers->array[i].msg_publish_func_ptr;
@@ -191,15 +195,15 @@ int main(int _argc, char **argv)
           sending_program_name.c_str(),
           sending_module_name.c_str(),
           sending_procedure_name.c_str());
-      DEBUG("Published\n");
+      DEBUG_INFO("Published\n");
     }
     free(msg_info_buf);
     memset(argv[3], ' ', 10);
-    DEBUG("DONE\n");
+    DEBUG_INFO("DONE\n");
   }
   else if (watch_option == "*LICLOG")
   {
-    DEBUG("Handling LIC log\n");
+    DEBUG_INFO("Handling LIC log\n");
     vlog_event_raw *lic_event = (vlog_event_raw *)argv[4];
     BUFSTR(major_code, lic_event->lic_log_major_code);
     BUFSTR(minor_code, lic_event->lic_log_minor_code);
@@ -242,7 +246,7 @@ int main(int _argc, char **argv)
   }
   else if (watch_option == "*PAL")
   {
-    DEBUG("Handling PAL Entry\n");
+    DEBUG_INFO("Handling PAL Entry\n");
     pal_event_raw *pal_event = (pal_event_raw *)argv[4];
     BUFSTR(system_reference_code, pal_event->system_reference_code);
     BUFSTR(device_name, pal_event->device_name);
@@ -290,7 +294,7 @@ oh_crap:
   printf("Well, shit\n");
   if (4 <= _argc)
     strncpy(argv[3], "*ERROR    ", 10);
-  DEBUG("MCH exception happened!\n");
+  DEBUG_ERROR("MCH exception happened!\n");
   ENDDBG();
   return 1;
 }
