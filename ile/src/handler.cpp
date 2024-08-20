@@ -45,11 +45,11 @@ std::string get_iso8601_timestamp(const char *_in)
   memset(err, 0, sizeof(err));
   QWCCVTDT(
       // 1 	Input format 	Input 	Char(10)
-      "*DTS      ",
+      (void *)"*DTS      ",
       // 2 	Input variable 	Input 	Char(*)
       (void *)_in,
       // 3 	Output format 	Input 	Char(10)
-      "*YYMD     ",
+      (void *)"*YYMD     ",
       // 4 	Output variable 	Output 	Char(*)
       output,
       // 5 	Error code 	I/O 	Char(*)
@@ -135,7 +135,7 @@ int main(int _argc, char **argv)
     memcpy(qualified_msg_file, msg_event->message_file_name, 10);
     memcpy(qualified_msg_file+10, msg_event->message_file_library, 10);
     DEBUG_INFO("MESSAGE FILE AND NAME IS '%s'\n", qualified_msg_file);
-    char *replacement_data = (0 == replacement_data_len) ? "" : (((char *)msg_event) + replacement_data_offset);
+    char *replacement_data = (0 == replacement_data_len) ? (char *)"" : (((char *)msg_event) + replacement_data_offset);
     char *replacement_data_aligned = (char *)malloc(1+replacement_data_len);
     memset(replacement_data_aligned, 0x00, 1+replacement_data_len);
     memcpy(replacement_data_aligned, replacement_data, (size_t)replacement_data_len);
