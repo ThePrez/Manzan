@@ -84,11 +84,41 @@ extern "C"
 
 #define DEBUG_ENABLED 1
 #ifdef DEBUG_ENABLED
-#define DEBUG(...)                  \
-  if (NULL != debug_fd)             \
-  {                                 \
-    fprintf(debug_fd, __VA_ARGS__); \
-    fflush(debug_fd);               \
+
+#define DEBUG_INFO(...)                            \
+  if (getenv("MANZAN_DEBUG_LEVEL") != NULL &&            \
+       strcmp(getenv("MANZAN_DEBUG_LEVEL"), "3") == 0)  \
+  {                                                \
+    if (NULL != debug_fd)                          \
+    {                                              \
+      fprintf(debug_fd, "[INFO] " __VA_ARGS__);    \
+      fflush(debug_fd);                            \
+    }                                              \
+  }
+
+#define DEBUG_WARNING(...)                         \
+  if (getenv("MANZAN_DEBUG_LEVEL") != NULL &&            \
+       strcmp(getenv("MANZAN_DEBUG_LEVEL"), "2") == 0 || \
+       strcmp(getenv("MANZAN_DEBUG_LEVEL"), "3") == 0) \
+  {                                                \
+    if (NULL != debug_fd)                          \
+    {                                              \
+      fprintf(debug_fd, "[WARNING] " __VA_ARGS__); \
+      fflush(debug_fd);                            \
+    }                                              \
+  }
+
+#define DEBUG_ERROR(...)                         \
+  if (getenv("MANZAN_DEBUG_LEVEL") != NULL &&          \
+      strcmp(getenv("MANZAN_DEBUG_LEVEL"), "1") == 0 || \
+      strcmp(getenv("MANZAN_DEBUG_LEVEL"), "2") == 0 || \
+      strcmp(getenv("MANZAN_DEBUG_LEVEL"), "3") == 0) \
+  {                                              \
+    if (NULL != debug_fd)                        \
+    {                                            \
+      fprintf(debug_fd, "[ERROR] " __VA_ARGS__); \
+      fflush(debug_fd);                          \
+    }                                            \
   }
 #else
 #define STRDBG()
