@@ -12,6 +12,7 @@
 #include "event_data.h"
 #include "userconf.h"
 #include "mzversion.h"
+#include <iostream>
 
 static FILE *fd = NULL;
 
@@ -75,20 +76,27 @@ std::string get_iso8601_timestamp(const char *_in)
 int main(int _argc, char **argv)
 {
   static volatile _INTRPT_Hndlr_Parms_T my_commarea;
+  DEBUG_INFO("A")
 // https://www.ibm.com/docs/en/i/7.1?topic=descriptions-exception-handler
 #pragma exception_handler(oh_crap, my_commarea, _C1_ALL, _C2_ALL, _CTLA_HANDLE, 0)
   if (!conf_is_enabled())
   {
+      DEBUG_INFO("B")
     return 0;
   }
   STRDBG();
+          DEBUG_INFO("C")
   if ((2 <= _argc) && (0 == strcmp("*VERSION", argv[1]) || 0 == strcmp("*VERSION  ", argv[1]) || 0 == strcmp("--version", argv[1]) || 0 == strcmp("-v", argv[1])))
   {
     Qp0zLprintf("Version: %s\n", MANZAN_VERSION);
     Qp0zLprintf("Build date (UTC): %s\n", MANZAN_BUILDDATE);
     printf("Version: %s\nBuild date (UTC): %s\n", MANZAN_VERSION, MANZAN_BUILDDATE);
+              DEBUG_INFO("D")
     return 0;
   }
+      for (int i = 0; i < _argc; ++i) {
+        DEBUG_INFO("Argument %d: %s", i, argv[i]);
+    }
 
   BUFSTRN(watch_option, argv[1], 10);
   BUFSTRN(session_id, argv[2], 10);
