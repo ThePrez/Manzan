@@ -18,4 +18,4 @@ run:
 
 checkresult:
 	cat ${OUTPUT_FILE}
-	grep -i ${TEXT} ${OUTPUT_FILE}
+	grep -i "${TEXT}" ${OUTPUT_FILE}
