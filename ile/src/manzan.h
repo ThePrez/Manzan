@@ -78,53 +78,14 @@
 extern "C"
 {
 #endif
-  extern FILE *debug_fd;
   extern void STRDBG();
   extern void ENDDBG();
+  extern void DEBUG_INFO(const char *format, ...);
+  extern void DEBUG_WARNING(const char *format, ...);
+  extern void DEBUG_ERROR(const char *format, ...);
+
 
 #define DEBUG_ENABLED 1
-#ifdef DEBUG_ENABLED
-
-#define DEBUG_INFO(...)                            \
-  if (getenv("MANZAN_DEBUG_LEVEL") != NULL &&            \
-       strcmp(getenv("MANZAN_DEBUG_LEVEL"), "3") == 0)  \
-  {                                                \
-    if (NULL != debug_fd)                          \
-    {                                              \
-      fprintf(debug_fd, "[INFO] " __VA_ARGS__);    \
-      fflush(debug_fd);                            \
-    }                                              \
-  }
-
-#define DEBUG_WARNING(...)                         \
-  if (getenv("MANZAN_DEBUG_LEVEL") != NULL &&            \
-       strcmp(getenv("MANZAN_DEBUG_LEVEL"), "2") == 0 || \
-       strcmp(getenv("MANZAN_DEBUG_LEVEL"), "3") == 0) \
-  {                                                \
-    if (NULL != debug_fd)                          \
-    {                                              \
-      fprintf(debug_fd, "[WARNING] " __VA_ARGS__); \
-      fflush(debug_fd);                            \
-    }                                              \
-  }
-
-#define DEBUG_ERROR(...)                         \
-  if (getenv("MANZAN_DEBUG_LEVEL") != NULL &&          \
-      strcmp(getenv("MANZAN_DEBUG_LEVEL"), "1") == 0 || \
-      strcmp(getenv("MANZAN_DEBUG_LEVEL"), "2") == 0 || \
-      strcmp(getenv("MANZAN_DEBUG_LEVEL"), "3") == 0) \
-  {                                              \
-    if (NULL != debug_fd)                        \
-    {                                            \
-      fprintf(debug_fd, "[ERROR] " __VA_ARGS__); \
-      fflush(debug_fd);                          \
-    }                                            \
-  }
-#else
-#define STRDBG()
-#define DEBUG(...)
-#define ENDDBG()
-#endif
 
 #ifdef __cplusplus
 }

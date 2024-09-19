@@ -93,7 +93,7 @@ int main(int _argc, char **argv)
   BUFSTRN(watch_option, argv[1], 10);
   BUFSTRN(session_id, argv[2], 10);
 
-  DEBUG_INFO("watch program called. Watch option setting is '%s'\n", watch_option.c_str());
+  DEBUG_INFO("Watch program called. Watch option setting is '%s'\n", watch_option.c_str());
   publisher_info_set *publishers = conf_get_publisher_info(session_id.c_str());
   int num_publishers = publishers->num_publishers;
   if (0 == num_publishers)
@@ -135,12 +135,12 @@ int main(int _argc, char **argv)
     memcpy(qualified_msg_file+10, msg_event->message_file_library, 10);
     DEBUG_INFO("MESSAGE FILE AND NAME IS '%s'\n", qualified_msg_file);
     char *replacement_data = (0 == replacement_data_len) ? (char *)"" : (((char *)msg_event) + replacement_data_offset);
-    char *replacement_data_aligned = (char *)malloc(1+replacement_data_len);
-    memset(replacement_data_aligned, 0x00, 1+replacement_data_len);
+    char *replacement_data_aligned = (char *)malloc(1 + replacement_data_len);
+    memset(replacement_data_aligned, 0x00, 1 + replacement_data_len);
     memcpy(replacement_data_aligned, replacement_data, (size_t)replacement_data_len);
 
-    size_t msg_info_buf_size = 128+sizeof(RTVM0100) + replacement_data_len;
-    RTVM0100 *msg_info_buf = (RTVM0100*)malloc(msg_info_buf_size);
+    size_t msg_info_buf_size = 128 + sizeof(RTVM0100) + replacement_data_len;
+    RTVM0100 *msg_info_buf = (RTVM0100 *)malloc(msg_info_buf_size);
     memset(msg_info_buf, 0x00, msg_info_buf_size);
     if (' ' == qualified_msg_file[0])
     {
@@ -151,13 +151,13 @@ int main(int _argc, char **argv)
     {
       char err_plc[64];
       memset(err_plc, 0x00, sizeof(err_plc));
-      DEBUG_INFO("about to format\n");
+      DEBUG_INFO("About to format...\n");
 
       QMHRTVM(
           // 1 	Message information 	Output 	Char(*)
           msg_info_buf,
           // 2 	Length of message information 	Input 	Binary(4)
-          msg_info_buf_size-1,
+          msg_info_buf_size - 1,
           // 3 	Format name 	Input 	Char(8)
           "RTVM0100",
           // 4 	Message identifier 	Input 	Char(7)
