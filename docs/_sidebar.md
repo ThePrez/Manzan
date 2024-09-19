@@ -1,6 +1,7 @@
 <!-- docs/_sidebar.md -->
 * [Home](/)
 * [Install](install.md)
+* [Contributing](contributing.md)
 * [Configuration](config/index.md)
    * [Manzan](config/app.md)
    * [Data Sources](config/data.md)
