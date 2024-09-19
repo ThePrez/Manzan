@@ -80,7 +80,10 @@ extern "C"
 #endif
   extern void STRDBG();
   extern void ENDDBG();
-  extern void DEBUG(const char *format, ...);
+  extern void DEBUG_INFO(const char *format, ...);
+  extern void DEBUG_WARNING(const char *format, ...);
+  extern void DEBUG_ERROR(const char *format, ...);
+
 
 #define DEBUG_ENABLED 1
 
