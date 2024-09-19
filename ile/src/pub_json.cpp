@@ -29,7 +29,7 @@ int to_utf8(char *out, size_t out_len, const char *in)
   int rc = iconv(cd, &input, &inleft, &output, &outleft);
   if (rc == -1)
   {
-    DEBUG("Error in converting characters\n");
+    DEBUG_ERROR("Error in converting characters\n");
     return 9;
   }
   return iconv_close(cd);
@@ -97,8 +97,8 @@ int json_publish(const char *_session_id, std::string &_json)
   char *utf8 = (char *)malloc(56 + _json.length() * 2);
 
   to_utf8(utf8, json_len, _json.c_str());
-  DEBUG("Publishing JSON\n");
-  DEBUG("%s\n", _json.c_str());
+  DEBUG_INFO("Publishing JSON\n");
+  DEBUG_INFO("%s\n", _json.c_str());
 
   __attribute__((aligned(16))) char  dtaq_key[11];
   memset(dtaq_key, ' ', 11);
@@ -108,16 +108,16 @@ int json_publish(const char *_session_id, std::string &_json)
   len2 += strlen(utf8);
   _DecimalT<3,0> keyLen = __D("10.0");
 
-  DEBUG("About to call QSNDDTAQ\n");
+  DEBUG_INFO("About to call QSNDDTAQ\n");
   QSNDDTAQ("MANZANDTAQ",
            "MANZAN    ", // TODO: How to properly resolve the library here?
            len2,
            utf8,
            keyLen,
            &dtaq_key);
-  DEBUG("About to free up stuff\n");
+  DEBUG_INFO("About to free up stuff\n");
   free(utf8);
-  DEBUG("Done publishing JSON\n");
+  DEBUG_INFO("Done publishing JSON\n");
   return 0;
 }
 
