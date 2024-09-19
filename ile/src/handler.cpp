@@ -137,8 +137,12 @@ int main(int _argc, char **argv)
     char *replacement_data = (0 == replacement_data_len) ? (char *)"" : (((char *)msg_event) + replacement_data_offset);
     char *replacement_data_aligned = (char *)malloc(1 + replacement_data_len);
     memset(replacement_data_aligned, 0x00, 1 + replacement_data_len);
+    char *replacement_data_aligned = (char *)malloc(1 + replacement_data_len);
+    memset(replacement_data_aligned, 0x00, 1 + replacement_data_len);
     memcpy(replacement_data_aligned, replacement_data, (size_t)replacement_data_len);
 
+    size_t msg_info_buf_size = 128 + sizeof(RTVM0100) + replacement_data_len;
+    RTVM0100 *msg_info_buf = (RTVM0100 *)malloc(msg_info_buf_size);
     size_t msg_info_buf_size = 128 + sizeof(RTVM0100) + replacement_data_len;
     RTVM0100 *msg_info_buf = (RTVM0100 *)malloc(msg_info_buf_size);
     memset(msg_info_buf, 0x00, msg_info_buf_size);
@@ -146,6 +150,9 @@ int main(int _argc, char **argv)
     {
       DEBUG_WARNING("Message not from message file\n");
       strncpy(msg_info_buf->message, replacement_data_aligned, replacement_data_len);
+    }
+    else
+    {
     }
     else
     {
@@ -157,6 +164,7 @@ int main(int _argc, char **argv)
           // 1 	Message information 	Output 	Char(*)
           msg_info_buf,
           // 2 	Length of message information 	Input 	Binary(4)
+          msg_info_buf_size - 1,
           msg_info_buf_size - 1,
           // 3 	Format name 	Input 	Char(8)
           "RTVM0100",

@@ -50,6 +50,7 @@ extern int db2_publish_message(PUBLISH_MESSAGE_FUNCTION_SIGNATURE)
   COPY_PARM(msg_msg_id, _msgid);
   COPY_PARM(msg_msg_type, _msg_type);
   sprintf(msg_severity, "%d", _msg_severity);
+  sprintf(msg_severity, "%d", _msg_severity);
   COPY_PARM(msg_timestamp, _msg_timestamp);
   COPY_PARM(msg_job, _job);
   COPY_PARM(msg_sending_usrprf, _sending_usrprf);
@@ -61,6 +62,9 @@ extern int db2_publish_message(PUBLISH_MESSAGE_FUNCTION_SIGNATURE)
   EXEC SQL
       INSERT INTO MANZANMSG(
           SESSION_ID, MESSAGE_ID, MESSAGE_TYPE, SEVERITY, JOB, SENDING_USRPRF, SENDING_PROGRAM_NAME, SENDING_MODULE_NAME, SENDING_PROCEDURE_NAME, MESSAGE_TIMESTAMP, MESSAGE)
+          VALUES( : msg_session_id, : msg_msg_id, : msg_msg_type, : msg_severity, : msg_job, : msg_sending_usrprf, : msg_sending_program_name, : msg_sending_module_name, : msg_sending_procedure_name, : msg_timestamp, : msg_message);
+  check_sql_error(sqlca.sqlcode, sqlca.sqlstate);
+  return 0;
           VALUES( : msg_session_id, : msg_msg_id, : msg_msg_type, : msg_severity, : msg_job, : msg_sending_usrprf, : msg_sending_program_name, : msg_sending_module_name, : msg_sending_procedure_name, : msg_timestamp, : msg_message);
   check_sql_error(sqlca.sqlcode, sqlca.sqlstate);
   return 0;
@@ -107,6 +111,10 @@ int db2_publish_pal(PUBLISH_PAL_FUNCTION_SIGNATURE)
           VALUES( : pal_sessid, : pal_system_reference_code, : pal_device_name, : pal_model, : pal_serial_number, : pal_resource_name, : pal_log_identifier, : pal_timestamp, : pal_reference_code, : pal_secondary_code, : pal_table_id, : pal_sequence);
   check_sql_error(sqlca.sqlcode, sqlca.sqlstate);
   return 0;
+      INSERT INTO MANZANPAL(SESSION_ID, SYSTEM_REFERENCE_CODE, DEVICE_NAME, MODEL, SERIAL_NUMBER, RESOURCE_NAME, LOG_ID, PAL_TIMESTAMP, REFERENCE_CODE, SECONDARY_CODE, TABLE_ID, SEQUENCE_NUM)
+          VALUES( : pal_sessid, : pal_system_reference_code, : pal_device_name, : pal_model, : pal_serial_number, : pal_resource_name, : pal_log_identifier, : pal_timestamp, : pal_reference_code, : pal_secondary_code, : pal_table_id, : pal_sequence);
+  check_sql_error(sqlca.sqlcode, sqlca.sqlstate);
+  return 0;
 }
 
 extern int db2_publish_other(PUBLISH_OTHER_FUNCTION_SIGNATURE)
@@ -121,6 +129,8 @@ extern int db2_publish_other(PUBLISH_OTHER_FUNCTION_SIGNATURE)
   strncpy(oth_type, _event_type, 10);
 
   EXEC SQL
+      INSERT INTO MANZANOTH(SESSION_ID, EVENT) VALUES( : oth_sessid, : oth_type);
+  check_sql_error(sqlca.sqlcode, sqlca.sqlstate);
       INSERT INTO MANZANOTH(SESSION_ID, EVENT) VALUES( : oth_sessid, : oth_type);
   check_sql_error(sqlca.sqlcode, sqlca.sqlstate);
   return 0;

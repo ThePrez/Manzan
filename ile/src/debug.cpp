@@ -15,6 +15,7 @@ extern "C" void STRDBG()
 #endif
 }
 
+
 extern "C" void ENDDBG()
 {
 #ifdef DEBUG_ENABLED
