@@ -5,53 +5,53 @@
     // Testing tasks
     "version": "2.0.0",
     "tasks": [
-      {
-        "label": "deploy",
-        "type": "shell",
-        "command": "./deploy.sh",
-        "problemMatcher": []
-      },
-      {
-        "label": "deployAndBuildAll",
-        "type": "shell",
-        "command": "./deployAndBuildAll.sh",
-        "problemMatcher": []
-      },
-      {
-        "label": "deployAndBuildIle",
-        "type": "shell",
-        "command": "./deployAndBuildIle.sh",
-        "problemMatcher": []
-      },
-      {
-        "label": "deployAndBuildCamel",
-        "type": "shell",
-        "command": "./deployAndBuildCamel.sh",
-        "problemMatcher": []
-      },
-      {
-        "label": "deployAndTest",
-        "type": "shell",
-        "command": "./deployAndTest.sh",
-        "problemMatcher": []
-      },
-      {
-        "label": "deployBuildAllAndTest",
-        "type": "shell",
-        "command": "./deployBuildAllAndTest.sh",
-        "problemMatcher": []
-      },
-      {
-        "label": "deployBuildCamelAndTest",
-        "type": "shell",
-        "command": "./deployBuildCamelAndTest.sh",
-        "problemMatcher": []
-      },
-      {
-        "label": "ileUnitTest",
-        "type": "shell",
-        "command": "bazel test --cxxopt=-std=c++14 --verbose_failures --test_output=all //:test_util",
-        "problemMatcher": []
-      }
+        {
+            "label": "Deploy",
+            "type": "shell",
+            "command": "./scripts/deploy.sh",
+            "problemMatcher": []
+        },
+        {
+            "label": "Build All",
+            "type": "shell",
+            "command": "./scripts/buildAll.sh",
+            "problemMatcher": []
+        },
+        {
+            "label": "Build Camel",
+            "type": "shell",
+            "command": "./scripts/buildCamel.sh",
+            "problemMatcher": []
+        },
+        {
+            "label": "Build ILE",
+            "type": "shell",
+            "command": "./scripts/buildIle.sh",
+            "problemMatcher": []
+        },
+        {
+            "label": "Run E2E Tests",
+            "type": "shell",
+            "command": "./scripts/testE2e.sh",
+            "problemMatcher": []
+        },
+        {
+            "label": "Run ILE Tests",
+            "type": "shell",
+            "command": "./scripts/testIle.sh",
+            "problemMatcher": []
+        },
+        {
+            "label": "Build All and Run E2E Tests",
+            "type": "shell",
+            "command": "./scripts/buildAllAndTestE2e.sh",
+            "problemMatcher": []
+        },
+        {
+            "label": "Build Camel and Run E2E Tests",
+            "type": "shell",
+            "command": "./scripts/buildCamelAndTestE2e.sh",
+            "problemMatcher": []
+        }
     ]
 }
