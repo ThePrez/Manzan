@@ -16,8 +16,8 @@ void check_sql_error(int sqlcode, const char* sqlstate)
 {
   if (sqlcode != 0)
   {
-    DEBUG_WARNING("SQL Code: %d\n", sqlcode);
-    DEBUG_WARNING("SQL State: %s\n", sqlstate);
+    DEBUG_ERROR("SQL Code: %d\n", sqlcode);
+    DEBUG_ERROR("SQL State: %s\n", sqlstate);
   }
   else
   {

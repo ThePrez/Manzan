@@ -144,7 +144,7 @@ int main(int _argc, char **argv)
     memset(msg_info_buf, 0x00, msg_info_buf_size);
     if (' ' == qualified_msg_file[0])
     {
-      DEBUG_WARNING("Message not from message file\n");
+      DEBUG_INFO("Message not from message file\n");
       strncpy(msg_info_buf->message, replacement_data_aligned, replacement_data_len);
     }
     else
