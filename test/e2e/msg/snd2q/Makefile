@@ -2,7 +2,7 @@ TESTLIB:=MZNTEST
 INPUT_MSGQ:=QCPFMSG
 OUTPUT_FILE:=/tmp/mzntestoutput
 MESSAGE_ID:=*IMMED
-MESSAGE:=My first message!
+MESSAGE:=My snd2q message
 MSGTYPE:=*INFO
 SEVERITY:=80
 
@@ -10,7 +10,7 @@ SEVERITY:=80
 	system "CRTMSGQ ${TESTLIB}/MSGS TEXT('Manzan Testing')"
 
 setup: /qsys.lib/${TESTLIB}.lib/msgs.msgq
-	echo "strwch=WCHMSG((*ALL)) WCHMSGQ((${TESTLIB}/MSGS))" >> data.ini
+	echo "\nstrwch=WCHMSG((*ALL)) WCHMSGQ((${TESTLIB}/MSGS))" >> data.ini
 
 cleanup:
 	system -kKv "ENDWCH SSNID(TESTING)"
@@ -19,7 +19,7 @@ cleanup:
 
 run:
 	/opt/manzan/bin/manzan --configdir=$(CURDIR) > /tmp/manzan.out 2>&1 &
-	sleep 12
+	sleep 15
 	system -kKv "SNDMSG TOMSGQ(${TESTLIB}/MSGS) MSG('${MESSAGE}') MSGTYPE(${MSGTYPE})"
 	sleep 5
 	cat /tmp/manzan.out

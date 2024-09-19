@@ -78,23 +78,11 @@
 extern "C"
 {
 #endif
-  extern FILE *debug_fd;
   extern void STRDBG();
   extern void ENDDBG();
+  extern void DEBUG(const char *format, ...);
 
 #define DEBUG_ENABLED 1
-#ifdef DEBUG_ENABLED
-#define DEBUG(...)                  \
-  if (NULL != debug_fd)             \
-  {                                 \
-    fprintf(debug_fd, __VA_ARGS__); \
-    fflush(debug_fd);               \
-  }
-#else
-#define STRDBG()
-#define DEBUG(...)
-#define ENDDBG()
-#endif
 
 #ifdef __cplusplus
 }
