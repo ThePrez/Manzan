@@ -16,12 +16,12 @@ void check_sql_error(int sqlcode, const char* sqlstate)
 {
   if (sqlcode != 0)
   {
-    DEBUG("SQL Code: %d\n", sqlcode);
-    DEBUG("SQL State: %s\n", sqlstate);
+    DEBUG_WARNING("SQL Code: %d\n", sqlcode);
+    DEBUG_WARNING("SQL State: %s\n", sqlstate);
   }
   else
   {
-    DEBUG("SQL statement executed succesfully!\n");
+    DEBUG_INFO("SQL statement executed succesfully!\n");
   }
 }
 
