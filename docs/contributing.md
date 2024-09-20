@@ -15,7 +15,7 @@ If you find a bug in the project, please open an issue in the [GitHub Issues](ht
 
 ### 2. Suggesting Features or Enhancements
 
-We love new ideas! If you have a feature request or enhancement suggestion, please open an issue labeled as "enhancement" Describe the following:
+We love new ideas! If you have a feature request or enhancement suggestion, please open an issue labeled as `enhancement`. Describe the following:
 
 - The problem or limitation the feature would solve.
 - A detailed description of the proposed solution.
