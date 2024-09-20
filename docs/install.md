@@ -11,7 +11,9 @@ This document will outline how to install Manzan on to IBM i. Manzan is installe
     ```
 
 2. Download the latest binary release from the [GitHub releases](https://github.com/ThePrez/Manzan/releases) page (the file name will look like `manzan-installer-v#.jar`).
+
 3. If you did not download to IBM i directly, transfer the `.jar` file to IBM i using technique of your choice.
+
 4. Run the installer using:
     ```sh
     java -jar <name of jar file>
