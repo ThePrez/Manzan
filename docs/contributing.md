@@ -47,10 +47,4 @@ For more instructions on how to setup your development environment, build the Ma
 If you find gaps or errors in the documentation, feel free to submit a pull request with your corrections. Documentation contributions are always welcome!
 
 ## Review Process
-After you submit a PR, it will be reviewed by the project maintainers.
-Maintain open communication with the reviewer(s) and address any feedback.
-Once approved, your PR will be merged into the main branch.
-
-
-
-
+After you submit a PR, it will be reviewed by the project maintainers. Maintain open communication with the reviewer(s) and address any feedback. Once approved, your PR will be merged into the main branch.
