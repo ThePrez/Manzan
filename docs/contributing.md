@@ -34,15 +34,14 @@ We welcome pull requests (PRs) from everyone. To contribute code:
     ```bash
     git commit -m "Add feature XYZ"
     ```
-4. **Push to your fork:**
+4. **Follow the existing code style** used in the project and ensure all new code is tested, documented, and free of linting issues.
+5. **Push to your fork:**
     ```bash
     git push origin my-feature
     ```
-5. **Submit a Pull Request** (PR) to the main branch of the main repository.
+6. **Submit a Pull Request** (PR) to the main branch of the main repository.
 
-Code Style
-Follow the existing code style used in the project.
-Ensure all new code is tested, documented, and free of linting issues.
+For more instructions on how to setup your development environment, build the Mazan components (handler/distributor), and run tests, check out the detailed guide [here](https://github.com/ThePrez/Manzan/blob/main/CONTRIBUTING.md).
 
 ### 4. Documentation Improvements
 If you find gaps or errors in the documentation, feel free to submit a pull request with your corrections. Documentation contributions are always welcome!
