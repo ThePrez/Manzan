@@ -10,3 +10,4 @@
       * [File](config/examples/file.md)
       * [Twilio](config/examples/twilio.md)
       * [Sentry watch](config/examples/sentry.md)
+* [Contributing](contributing.md)
