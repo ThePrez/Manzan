@@ -48,5 +48,5 @@ manzan-installer-v%.jar: /QOpenSys/pkgs/bin/zip appinstall.jar
 	gmake -C ile BUILDVERSION="$*" BUILDLIB=${BUILDLIB}
 	gmake -C camel BUILDVERSION="$*" clean install
 	install -m 555 -o qsys service-commander-def.yaml ${INSTALL_ROOT}/opt/manzan/lib/manzan.yaml
-	install -m 555 -o qsys service-commander-def.yaml /QOpenSys/etc/sc/services/manzan.yaml
+	ln -sf ${INSTALL_ROOT}/opt/manzan/lib/manzan.yaml /QOpenSys/etc/sc/services/manzan.yaml
 	/QOpenSys/QIBM/ProdData/JavaVM/jdk80/64bit/bin/java -jar appinstall.jar --qsys manzan --file /QOpenSys/etc/manzan --file /opt/manzan --file /QOpenSys/etc/sc/services/manzan.yaml -o $@
