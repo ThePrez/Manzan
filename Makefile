@@ -41,9 +41,12 @@ manzan-installer-v%.jar: /QOpenSys/pkgs/bin/zip appinstall.jar
 	system "dltlib ${BUILDLIB}" || echo "could not delete"
 	system "crtlib ${BUILDLIB}"
 	system "dltlib ${BUILDLIB}"
+	> config/app.ini > config/data.ini > config/dests.ini
 	rm -fr /QOpenSys/etc/manzan
+	rm -fr /opt/manzan
 	gmake -C config BUILDVERSION="$*" install BUILDLIB=${BUILDLIB}
 	gmake -C ile BUILDVERSION="$*" BUILDLIB=${BUILDLIB}
 	gmake -C camel BUILDVERSION="$*" clean install
 	install -m 555 -o qsys service-commander-def.yaml ${INSTALL_ROOT}/opt/manzan/lib/manzan.yaml
-	/QOpenSys/QIBM/ProdData/JavaVM/jdk80/64bit/bin/java -jar appinstall.jar --qsys manzan --dir /QOpenSys/etc/manzan --file /opt/manzan -o $@
+	install -m 555 -o qsys service-commander-def.yaml /QOpenSys/etc/sc/services/manzan.yaml
+	/QOpenSys/QIBM/ProdData/JavaVM/jdk80/64bit/bin/java -jar appinstall.jar --qsys manzan --file /QOpenSys/etc/manzan --file /opt/manzan --file /QOpenSys/etc/sc/services/manzan.yaml -o $@
