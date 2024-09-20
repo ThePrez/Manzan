@@ -32,7 +32,7 @@ We welcome pull requests (PRs) from everyone. To contribute code:
    ```
 3. **Make your changes** and commit them with clear, descriptive messages:
     ```bash
-    git commit -m "Add feature XYZ"
+    git commit -s -m "Add feature XYZ"
     ```
 4. **Follow the existing code style** used in the project and ensure all new code is tested, documented, and free of linting issues.
 5. **Push to your fork:**
