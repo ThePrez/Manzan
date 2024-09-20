@@ -1,5 +1,5 @@
 
-**Note: For almost all real-life deploutments of Manzan, this file can remain untouched!**
+**Note: For almost all real-life deployments of Manzan, this file can remain untouched!**
 
 `app.ini` is made to hold two pieces of information:
 

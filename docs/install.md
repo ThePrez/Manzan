@@ -1,27 +1,68 @@
-This document will outline how to install Manzan on to IBM i. Manzan is install through a pase shell. We don't recommend using `qsh` or `qp2term`, and instead using SSH and a bash shell.
+# Install
 
-Building Manzan is easy for IBM i and we provide makefiles to simplify the entire process.
+This document will outline how to install Manzan on to IBM i. Manzan is installed through a pase shell. We do not recommend using `qsh` or `qp2term`, and instead using SSH and a bash shell.
 
-## Install from GitHub release 
+## Install from GitHub
 
-To install from a github release, simply perform the following steps:
-1. Download the latest binary release from [the releases page](https://github.com/ThePrez/Manzan/releases)
-1. If you didn't download to IBM i directly, transfer the `.jar` file to IBM i using technique of your choice
-1. Run `java -jar <name of jar file>`
+1. Make a "download" directory on IBM i by running the following from an SSH terminal:
+
+    ```sh
+    mkdir -p /opt/download
+    ```
+
+2. Download the latest binary release from the [GitHub releases](https://github.com/ThePrez/Manzan/releases) page (the file name will look like `manzan-installer-v#.jar`).
+3. If you did not download to IBM i directly, transfer the `.jar` file to IBM i using technique of your choice.
+4. Run the installer using:
+    ```sh
+    java -jar <name of jar file>
+    ```
 
 For instance, to install version `0.0.6`, the steps from an IBM i (using open source `wget`) would look like:
+
 ```bash
 wget https://github.com/ThePrez/Manzan/releases/download/v0.0.6/manzan-installer-v0.0.6.jar
 java -jar manzan-installer-v0.0.6.jar
 ```
 
-## Deployment basics
+## Configuration
 
-* The configuration files (`.ini` extension) get created in `/QOpenSys/etc/manzan/`
-* Manzan can be started with `/opt/manzan/bin/manzan`
-* (optional) It is recommended to use [Service Commander](https://theprez.github.io/ServiceCommander-IBMi/#service-commander-for-ibm-i) to start/stop Manzan (or to have Manzan autostart at IBM)
+Before starting Manzan, several configuration files (`.ini` extension) should be configured in `/QOpenSys/etc/manzan/`. For more details, refer to the [configuration](/config/index.md) page.
 
-## Next steps
+## Startup
+
+### Option 1: Service Commander
+
+It is recommended to use [Service Commander](https://theprez.github.io/ServiceCommander-IBMi/#service-commander-for-ibm-i) to start/stop Manzan (or to have Manzan autostart). You can install it using:
+
+```sh
+yum install service-commander
+```
+
+Once installed, you can use it to start, stop, and check the status of Manzan:
+
+```sh
+## Start
+sc start manzan
+
+## Check it's running
+sc check manzan
+
+## Stop
+sc stop manzan
+
+## Check it's stopped
+sc check manzan
+```
+
+### Option 2: Manual Startup
+
+Manzan can be manually started using:
+
+```sh
+/opt/manzan/bin/manzan
+```
+
+## Next Steps
 
 * Read more about the [configuration files](/config/index.md)
-* Build your very first [handler](/examples/file.md)
+* Build your very first [handler](config/examples/file.md)
