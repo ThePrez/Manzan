@@ -38,10 +38,6 @@ jobs:
       - name: Install NPM Dependencies
         run: npm i -g @ibm/ibmi-ci
 
-      - name: Run ILE Tests
-        working-directory: scripts
-        run: bash ./testIle.sh
-
       - name: Install Manzan
         run: | 
           ici \
@@ -65,6 +61,10 @@ jobs:
           IBMI_USER: ${{ secrets.IBMI_USER }}
           IBMI_PASSWORD: ${{ secrets.IBMI_PASSWORD }}
           IBMI_SSH_PORT: ${{ secrets.IBMI_SSH_PORT }}
+
+      - name: Run ILE Tests
+        working-directory: scripts
+        run: bash ./testIle.sh
 
       - name: Cleanup
         if: always()
