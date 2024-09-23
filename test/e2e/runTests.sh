@@ -42,12 +42,13 @@ do
   # Execute tests
   echo -e "\tRunning test..."
   run_command_with_output "gmake -C $test run"
-  if [[ "0" != "$?" ]]
+  exit_code=$?
+  if [[ "0" != "$exit_code" ]]
   then
     ((num_error+=1))
     erroredTests="$erroredTests$test"$'\n'"  "
   fi  
-  echo -e "\t\tExit code for test was $?"
+  echo -e "\t\tExit code for test was $exit_code"
   
   # Kill processes
   echo -e "\tKilling processes..."
