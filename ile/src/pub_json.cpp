@@ -121,7 +121,7 @@ int json_publish(const char *_session_id, std::string &_json)
   return 0;
 }
 
-extern "C" int json_publish_message(PUBLISH_MESSAGE_FUNCTION_SIGNATURE)
+std::string construct_json_message(PUBLISH_MESSAGE_FUNCTION_SIGNATURE)
 {
   std::string jsonStr;
   jsonStr += "{\n    ";
@@ -148,8 +148,19 @@ extern "C" int json_publish_message(PUBLISH_MESSAGE_FUNCTION_SIGNATURE)
   append_json_element(jsonStr, "sending_module_name", _sending_module_name);
   jsonStr += ",\n    ";
   append_json_element(jsonStr, "sending_procedure_name", _sending_procedure_name);
-
   jsonStr += "\n}";
+  return 0;
+  // return jsonStr;
+}
+
+/**
+ * Publish json message to DTAQ
+ */
+extern "C" int json_publish_message(PUBLISH_MESSAGE_FUNCTION_SIGNATURE)
+{
+  std::string jsonStr = construct_json_message(_session_id, _msgid, _msg_type, _msg_severity, _msg_timestamp, _job, _sending_usrprf,
+  _message, _sending_program_name, _sending_module_name, _sending_procedure_name);
+  
   return json_publish(_session_id, jsonStr);
 }
 

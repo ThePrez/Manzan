@@ -12,6 +12,8 @@
 #include "event_data.h"
 #include "userconf.h"
 #include "mzversion.h"
+#include "pub_json.h"
+#include "SockClient.h"
 
 static FILE *fd = NULL;
 
@@ -182,8 +184,12 @@ int main(int _argc, char **argv)
     for (int i = 0; i < num_publishers; i++)
     {
       msg_publish_func func = publishers->array[i].msg_publish_func_ptr;
-      func(
-          session_id.c_str(),
+      // This is where we send the data to the publish function which encodes it and also
+      // publishes it to the table
+
+      // Instead, lets encode the data and then send it to the socket
+      std::string json_message = construct_json_message(
+        session_id.c_str(),
           msgid.c_str(),
           message_type.c_str(),
           message_severity,
@@ -193,7 +199,34 @@ int main(int _argc, char **argv)
           msg_info_buf->message,
           sending_program_name.c_str(),
           sending_module_name.c_str(),
-          sending_procedure_name.c_str());
+          sending_procedure_name.c_str()
+      );
+
+    // Create a SocketClient instance
+    SockClient client;
+
+    // Open a socket and connect to server
+    if (!client.openSocket("127.0.0.1", 8080)) {
+        return 1;
+    }
+
+    // Send a message over the socket
+    client.sendMessage(json_message);
+
+    // Close the socket
+    client.closeSocket();
+      // func(
+      //     session_id.c_str(),
+      //     msgid.c_str(),
+      //     message_type.c_str(),
+      //     message_severity,
+      //     message_timestamp.c_str(),
+      //     job.c_str(),
+      //     sending_usrprf.c_str(),
+      //     msg_info_buf->message,
+      //     sending_program_name.c_str(),
+      //     sending_module_name.c_str(),
+      //     sending_procedure_name.c_str());
       DEBUG_INFO("Published\n");
     }
     free(msg_info_buf);
