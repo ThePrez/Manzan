@@ -3,6 +3,8 @@ package com.github.theprez.manzan.routes.event;
 import java.io.IOException;
 import java.util.List;
 
+import org.apache.camel.model.dataformat.JsonLibrary;
+
 import com.github.theprez.jcmdutils.StringUtils;
 import com.github.theprez.manzan.ManzanEventType;
 import com.github.theprez.manzan.ManzanMessageFormatter;
@@ -29,7 +31,20 @@ public class WatchMsgEvent extends ManzanRoute {
 //@formatter:off
     @Override
     public void configure() {
-        from("timer://foo?synchronous=true&period=" + m_interval)
+        from("netty:tcp://0.0.0.0:8080?sync=false")
+                .log("Received raw message: ${body}")
+                .unmarshal().json(JsonLibrary.Jackson)
+                .process(exchange -> {
+                    // Access the decoded JSON object
+                    MsgEvent myJsonObject = exchange.getIn().getBody(MsgEvent.class);
+                    // Process the object (e.g., log it)
+                    exchange.getIn().setBody("Received JSON: " + myJsonObject); // Set body for logging
+                    System.out.println("Result: " + myJsonObject);
+                })
+                .log("body ${body}") // Log the processed message (deserialized object)
+
+                // Optionally log the incoming message
+//        from("timer://foo?synchronous=true&period=" + m_interval)
         .routeId("manzan_msg:"+m_name)
         .setHeader(EVENT_TYPE, constant(ManzanEventType.WATCH_MSG))
         .setBody(constant("SeLeCt * fRoM " + m_schema + ".mAnZaNmSg wHeRe SESSION_ID = '"+m_sessionId+"' limit " + m_numToProcess ))
