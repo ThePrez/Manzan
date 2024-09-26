@@ -14,6 +14,8 @@
 #include "mzversion.h"
 #include "pub_json.h"
 #include "SockClient.h"
+#include <locale.h>
+
 
 static FILE *fd = NULL;
 
@@ -91,6 +93,8 @@ int main(int _argc, char **argv)
     printf("Version: %s\nBuild date (UTC): %s\n", MANZAN_VERSION, MANZAN_BUILDDATE);
     return 0;
   }
+
+  setlocale(LC_ALL, "En_US.UTF-8");
 
   BUFSTRN(watch_option, argv[1], 10);
   BUFSTRN(session_id, argv[2], 10);
@@ -188,6 +192,7 @@ int main(int _argc, char **argv)
       // publishes it to the table
 
       // Instead, lets encode the data and then send it to the socket
+      DEBUG_INFO("Constructing JSON MESSAGE\n");
       std::string json_message = construct_json_message(
         session_id.c_str(),
           msgid.c_str(),
@@ -201,6 +206,13 @@ int main(int _argc, char **argv)
           sending_module_name.c_str(),
           sending_procedure_name.c_str()
       );
+      int json_len = 1 + json_message.length();
+      DEBUG_INFO("Sending message %s",  const_cast<char*>(json_message.c_str()));
+
+      char *json_utf8 = (char *)malloc(56 + json_message.length() * 2);
+      to_utf8(json_utf8, json_len, json_message.c_str());
+      DEBUG_INFO("DONE JSON MESSAGE\n");
+
 
     // Create a SocketClient instance
     SockClient client;
@@ -211,7 +223,11 @@ int main(int _argc, char **argv)
     }
 
     // Send a message over the socket
-    client.sendMessage(json_message);
+    DEBUG_INFO("SENDING JSON MESSAGE\n");
+
+    client.sendMessage(json_utf8);
+    DEBUG_INFO("CLOSING SOCKET\n");
+
 
     // Close the socket
     client.closeSocket();
