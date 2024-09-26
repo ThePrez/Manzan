@@ -23,7 +23,7 @@ public class ManzanMessageFormatter {
     private final String m_fmtStr;
 
     public ManzanMessageFormatter(final String _fmtStr) {
-        m_fmtStr = _fmtStr;
+        m_fmtStr = _fmtStr.toUpperCase();
     }
 
     public String format(final Map<String, Object> _mappings) {
@@ -33,8 +33,9 @@ public class ManzanMessageFormatter {
         ret = ret.replace("\\n", "\n").replace("\\t", "\t");
 
         for (final Entry<String, Object> repl : _mappings.entrySet()) {
-            ret = ret.replace("$" + repl.getKey() + "$", "" + repl.getValue());
-            String jsonIndicator ="$json:" + repl.getKey() + "$"; 
+            final String key = repl.getKey().toUpperCase();
+            ret = ret.replace("$" + key + "$", "" + repl.getValue());
+            String jsonIndicator ="$json:" + key + "$";
             if(ret.contains(jsonIndicator)) {
                 ret = ret.replace(jsonIndicator, jsonEncode("" + repl.getValue()));
             }
