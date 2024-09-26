@@ -154,7 +154,11 @@
       <artifactId>fluent-logger</artifactId>
       <version>0.3.4</version>
     </dependency>
-
+    <dependency>
+      <groupId>io.github.mjfryc</groupId>
+      <artifactId>mjaron-tinyloki-java</artifactId>
+      <version>0.3.11</version>
+    </dependency>
 
     <!-- testing -->
     <dependency>

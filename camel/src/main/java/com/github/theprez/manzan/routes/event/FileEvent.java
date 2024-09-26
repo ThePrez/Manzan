@@ -43,13 +43,13 @@ public class FileEvent extends ManzanRoute {
         .setHeader(EVENT_TYPE, constant(ManzanEventType.FILE))
         .setBody(constant(m_file.getAbsolutePath()))
         .process((exchange) -> {
-            final File f = new File(exchange.getIn().getBody().toString());
+            final File f = new File(getBody(exchange));
             exchange.getIn().setBody(new FileNewContentsReader(f, "*TAG"));
         })
         .split(body().tokenize("\n")).streaming().parallelProcessing(false).stopOnException()
         .convertBodyTo(String.class)
         .process(exchange -> {
-                String bodyStr = exchange.getIn().getBody(String.class);
+                String bodyStr = getBody(exchange);
                 exchange.getIn().setHeader("abort", m_filter.matches(bodyStr) && StringUtils.isNonEmpty(bodyStr)?"continue":"abort");
         })
         .choice().when(simple("${header.abort} != 'abort'"))
@@ -57,7 +57,7 @@ public class FileEvent extends ManzanRoute {
             final Map<String,Object> data_map = new LinkedHashMap<String,Object>();
             data_map.put(FILE_NAME, m_file.getName());
             data_map.put(FILE_PATH, m_file.getAbsolutePath());
-            data_map.put(FILE_DATA, exchange.getIn().getBody(String.class).replace("\r",""));
+            data_map.put(FILE_DATA, getBody(exchange).replace("\r",""));
             exchange.getIn().setHeader("data_map", data_map);
             exchange.getIn().setBody(data_map);
         })

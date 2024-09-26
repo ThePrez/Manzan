@@ -16,16 +16,6 @@ import io.sentry.protocol.User;
 
 public class SentryDestination extends ManzanRoute {
     private static SentryDestination m_singleton = null;
-    private static final String MSG_MESSAGE = "MESSAGE";
-    private static final String MSG_MESSAGE_ID = "MESSAGE_ID";
-    private static final String MSG_ORDINAL_POSITION = "ORDINAL_POSITION";
-    private static final String MSG_SENDING_MODULE_NAME = "SENDING_MODULE_NAME";
-
-    private static final String MSG_SENDING_PROCEDURE_NAME = "SENDING_PROCEDURE_NAME";
-    private static final String MSG_SENDING_PROGRAM_NAME = "SENDING_PROGRAM_NAME";
-    private static final String MSG_SENDING_USRPRF = "SENDING_USRPRF";
-
-    private static final String MSG_SEVERITY = "SEVERITY";
 
     public SentryDestination(final String _name, final String _dsn) {
         super(_name);
