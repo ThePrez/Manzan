@@ -14,8 +14,6 @@
 #include "mzversion.h"
 #include "pub_json.h"
 #include "SockClient.h"
-#include <locale.h>
-
 
 static FILE *fd = NULL;
 
@@ -93,8 +91,6 @@ int main(int _argc, char **argv)
     printf("Version: %s\nBuild date (UTC): %s\n", MANZAN_VERSION, MANZAN_BUILDDATE);
     return 0;
   }
-
-  setlocale(LC_ALL, "En_US.UTF-8");
 
   BUFSTRN(watch_option, argv[1], 10);
   BUFSTRN(session_id, argv[2], 10);
@@ -192,9 +188,8 @@ int main(int _argc, char **argv)
       // publishes it to the table
 
       // Instead, lets encode the data and then send it to the socket
-      DEBUG_INFO("Constructing JSON MESSAGE\n");
-      std::string json_message = construct_json_message(
-        session_id.c_str(),
+      func(
+          session_id.c_str(),
           msgid.c_str(),
           message_type.c_str(),
           message_severity,
@@ -204,45 +199,7 @@ int main(int _argc, char **argv)
           msg_info_buf->message,
           sending_program_name.c_str(),
           sending_module_name.c_str(),
-          sending_procedure_name.c_str()
-      );
-      int json_len = 1 + json_message.length();
-      DEBUG_INFO("Sending message %s",  const_cast<char*>(json_message.c_str()));
-
-      char *json_utf8 = (char *)malloc(56 + json_message.length() * 2);
-      to_utf8(json_utf8, json_len, json_message.c_str());
-      DEBUG_INFO("DONE JSON MESSAGE\n");
-
-
-    // Create a SocketClient instance
-    SockClient client;
-
-    // Open a socket and connect to server
-    if (!client.openSocket("127.0.0.1", 8080)) {
-        return 1;
-    }
-
-    // Send a message over the socket
-    DEBUG_INFO("SENDING JSON MESSAGE\n");
-
-    client.sendMessage(json_utf8);
-    DEBUG_INFO("CLOSING SOCKET\n");
-
-
-    // Close the socket
-    client.closeSocket();
-      // func(
-      //     session_id.c_str(),
-      //     msgid.c_str(),
-      //     message_type.c_str(),
-      //     message_severity,
-      //     message_timestamp.c_str(),
-      //     job.c_str(),
-      //     sending_usrprf.c_str(),
-      //     msg_info_buf->message,
-      //     sending_program_name.c_str(),
-      //     sending_module_name.c_str(),
-      //     sending_procedure_name.c_str());
+          sending_procedure_name.c_str());
       DEBUG_INFO("Published\n");
     }
     free(msg_info_buf);
