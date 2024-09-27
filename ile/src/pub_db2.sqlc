@@ -12,7 +12,6 @@
 #include "SockClient.h"
 
 
-
 #define COPY_PARM(dest, parm)    \
   memset(dest, 0, sizeof(dest)); \
   strncpy(dest, parm ? parm : "", -1 + sizeof(dest));
@@ -81,9 +80,9 @@ extern int db2_publish_message(PUBLISH_MESSAGE_FUNCTION_SIGNATURE)
   DEBUG_INFO("Sending message %s", const_cast<char *>(json_message.c_str()));
 
   // Allocate memory for the utf-8 encoded json message
-  char *json_utf8 = get_json_utf8_output_buf(json_message);
+  char *json_utf8 = get_utf8_output_buf(json_message);
 
-  to_utf8(json_utf8, 1 + json_message.length(), json_message.c_str());
+  to_utf8(json_utf8, get_utf8_output_buf_length(json_message), json_message.c_str());
 
   // Send the message to the socket
   bool res = send_message(json_utf8);

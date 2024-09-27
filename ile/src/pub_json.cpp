@@ -176,37 +176,6 @@ std::string construct_json_message(PUBLISH_MESSAGE_FUNCTION_SIGNATURE)
   return jsonStr;
 }
 
-std::string kill_me_now2(PUBLISH_MESSAGE_FUNCTION_SIGNATURE)
-{
-  std::string jsonStr;
-  jsonStr += "{\n    ";
-  append_json_element(jsonStr, "event_type", "message");
-  jsonStr += ",\n    ";
-  append_json_element(jsonStr, "session_id", _session_id);
-  jsonStr += ",\n    "; 
-  append_json_element(jsonStr, "job", _job);
-  jsonStr += ",\n    ";
-  append_json_element(jsonStr, "msgid", _msgid);
-  jsonStr += ",\n    ";
-  append_json_element(jsonStr, "msgtype", _msg_type);
-  jsonStr += ",\n    ";
-  append_json_element(jsonStr, "severity", _msg_severity);
-  jsonStr += ",\n    ";
-  append_json_element(jsonStr, "message_timestamp", _msg_timestamp);
-  jsonStr += ",\n    ";
-  append_json_element(jsonStr, "sending_usrprf", _sending_usrprf);
-  jsonStr += ",\n    ";
-  append_json_element(jsonStr, "message", _message);
-  jsonStr += ",\n    ";
-  append_json_element(jsonStr, "sending_program_name", _sending_program_name);
-  jsonStr += ",\n    ";
-  append_json_element(jsonStr, "sending_module_name", _sending_module_name);
-  jsonStr += ",\n    ";
-  append_json_element(jsonStr, "sending_procedure_name", _sending_procedure_name);
-  jsonStr += "\n}";
-  return jsonStr;
-}
-
 /**
  * Publish json message to DTAQ
  */
