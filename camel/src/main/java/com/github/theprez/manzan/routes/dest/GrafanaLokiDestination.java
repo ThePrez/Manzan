@@ -1,5 +1,7 @@
 package com.github.theprez.manzan.routes.dest;
 
+import java.sql.Timestamp;
+
 import com.github.theprez.manzan.ManzanEventType;
 import com.github.theprez.manzan.routes.ManzanRoute;
 
@@ -45,7 +47,6 @@ public class GrafanaLokiDestination extends ManzanRoute {
                         .stream()
                         .l("app", "manzan")
                         .l(Labels.LEVEL, ((Integer) get(exchange, MSG_SEVERITY)) > 29 ? Labels.FATAL : Labels.INFO)
-                        .l(MSG_MESSAGE_TIMESTAMP, getString(exchange, MSG_MESSAGE_TIMESTAMP))
                         .l(SESSION_ID, getWatchName(exchange))
                         .l(MSG_MESSAGE_ID, getString(exchange, MSG_MESSAGE_ID))
                         .l(MSG_MESSAGE_TYPE, getString(exchange, MSG_MESSAGE_TYPE))
@@ -56,9 +57,8 @@ public class GrafanaLokiDestination extends ManzanRoute {
                         .l(MSG_SENDING_MODULE_NAME, getString(exchange, MSG_SENDING_MODULE_NAME))
                         // TODO: Uncomment once MSG_SENDING_PROCEDURE_NAME is not empty
                         // .l(MSG_SENDING_PROCEDURE_NAME, getString(exchange, MSG_SENDING_PROCEDURE_NAME))
-                        .l(MSG_ORDINAL_POSITION, getString(exchange, MSG_ORDINAL_POSITION))
                         .build();
-                stream.log(getBody(exchange));
+                stream.log(Timestamp.valueOf(getString(exchange, MSG_MESSAGE_TIMESTAMP)).getTime(), getBody(exchange));
             } else {
                 throw new RuntimeException("Grafana Loki route doesn't know how to process type "+type);
             }
