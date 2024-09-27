@@ -6,8 +6,6 @@
 #include "SockClient.h"
 #include "manzan.h"
 
-
-
 // Constructor to initialize the socket descriptor to -1
 SockClient::SockClient(){
     sock_fd = -1;
