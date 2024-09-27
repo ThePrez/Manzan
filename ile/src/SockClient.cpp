@@ -4,119 +4,68 @@
 #include <arpa/inet.h>  // For inet_addr
 #include <unistd.h>  // For close
 #include "SockClient.h"
+#include "manzan.h"
 
 
 
-    // Constructor to initialize the socket descriptor to -1
-    SockClient::SockClient(){
-        sock_fd = -1;
-    } 
+// Constructor to initialize the socket descriptor to -1
+SockClient::SockClient(){
+    sock_fd = -1;
+} 
 
-    // Method to open a socket and connect to the server
-    bool SockClient::openSocket(const std::string ip, int port) {
-        // Create socket
-        sock_fd = socket(AF_INET, SOCK_STREAM, 0);
-        if (sock_fd < 0) {
-            std::cerr << "Error creating socket\n";
-            return false;
-        }
-
-        // Define server address
-        struct sockaddr_in server_address;
-        server_address.sin_family = AF_INET;
-        server_address.sin_port = htons(port);
-        server_address.sin_addr.s_addr = inet_addr(const_cast<char*>(ip.c_str()));
-
-        // Connect to server
-        if (connect(sock_fd, (struct sockaddr*)&server_address, sizeof(server_address)) < 0) {
-            std::cerr << "Error connecting to server\n";
-            closeSocket();
-            return false;
-        }
-
-        std::cout << "Connected to server at " << ip << ":" << port << "\n";
-        return true;
+// Method to open a socket and connect to the server
+bool SockClient::openSocket(const std::string ip, int port) {
+    // Create socket
+    sock_fd = socket(AF_INET, SOCK_STREAM, 0);
+    if (sock_fd < 0) {
+        DEBUG_ERROR("Error creating socket\n");
+        return false;
     }
 
-    // Method to send a message (string) over the socket
-    bool SockClient::sendMessage(const std::string message) {
-        if (sock_fd < 0) {
-            std::cerr << "Socket is not open\n";
-            return false;
-        }
+    // Define server address
+    struct sockaddr_in server_address;
+    server_address.sin_family = AF_INET;
+    server_address.sin_port = htons(port);
+    server_address.sin_addr.s_addr = inet_addr(const_cast<char*>(ip.c_str()));
 
-        int bytes_sent = send(sock_fd, const_cast<char*>(message.c_str()), message.size(), 0);
-        if (bytes_sent < 0) {
-            std::cerr << "Error sending message\n";
-            return false;
-        }
-
-        std::cout << "Sent message: " << message << "\n";
-        return true;
-    }
-
-    // // Method to send a struct over the socket
-    // template<typename T>
-    // bool SockClient::sendStruct(const T& data) {
-    //     if (sock_fd < 0) {
-    //         std::cerr << "Socket is not open\n";
-    //         return false;
-    //     }
-
-    //     // Send the raw data of the struct
-    //     int bytes_sent = send(sock_fd, &data, sizeof(data), 0);
-    //     if (bytes_sent < 0) {
-    //         std::cerr << "Error sending struct\n";
-    //         return false;
-    //     }
-
-    //     std::cout << "Sent struct of size: " << sizeof(data) << " bytes\n";
-    //     return true;
-    // }
-
-    // Method to close the socket
-    void SockClient::closeSocket() {
-        if (sock_fd >= 0) {
-            close(sock_fd);
-            sock_fd = -1;
-            std::cout << "Socket closed\n";
-        }
-    }
-
-    // Destructor to ensure socket is closed
-    SockClient::~SockClient() {
+    // Connect to server
+    if (connect(sock_fd, (struct sockaddr*)&server_address, sizeof(server_address)) < 0) {
+        DEBUG_ERROR("Error connecting to server\n");
         closeSocket();
+        return false;
     }
 
-    
+    DEBUG_INFO("Connected to server at %s:%d\n", ip.c_str(), port); 
+    return true;
+}
 
- // Socket file descriptor
+// Method to send a message (string) over the socket
+bool SockClient::sendMessage(const std::string message) {
+    if (sock_fd < 0) {
+        DEBUG_ERROR("Socket is not open\n");
+        return false;
+    }
 
-// Example struct to send over the socket
-// struct ExampleStruct {
-//     int id;
-//     float value;
-//     char name[50];
-// };
+    int bytes_sent = send(sock_fd, const_cast<char*>(message.c_str()), message.size(), 0);
+    if (bytes_sent < 0) {
+        DEBUG_ERROR("Error sending message\n");
+        return false;
+    }
+    DEBUG_INFO("Sent message: %s\n", message);
 
-// int main() {
-//     // Create a SockClient instance
-//     SockClient client;
+    return true;
+}
 
-//     // Open a socket and connect to a server
-//     if (!client.openSocket("127.0.0.1", 8080)) {
-//         return 1;
-//     }
+// Method to close the socket
+void SockClient::closeSocket() {
+    if (sock_fd >= 0) {
+        close(sock_fd);
+        sock_fd = -1;
+        DEBUG_INFO("Socket closed\n");
+    }
+}
 
-//     // Send a message over the socket
-//     client.sendMessage("Hello from C++");
-
-//     // Prepare and send a struct over the socket
-//     ExampleStruct data = { 1, 3.14, "TestStruct" };
-//     client.sendStruct(data);
-
-//     // Close the socket
-//     client.closeSocket();
-
-//     return 0;
-// }
+// Destructor to ensure socket is closed
+SockClient::~SockClient() {
+    closeSocket();
+}
