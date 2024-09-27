@@ -144,7 +144,7 @@ std::string construct_json_message(PUBLISH_MESSAGE_FUNCTION_SIGNATURE)
   jsonStr += "{\n    ";
   append_json_element(jsonStr, "event_type", "message");
   jsonStr += ",\n    ";
-  append_json_element(jsonStr, "sessionId", _session_id);
+  append_json_element(jsonStr, "session_id", _session_id);
   jsonStr += ",\n    "; 
   append_json_element(jsonStr, "job", _job);
   jsonStr += ",\n    ";
@@ -166,7 +166,6 @@ std::string construct_json_message(PUBLISH_MESSAGE_FUNCTION_SIGNATURE)
   jsonStr += ",\n    ";
   append_json_element(jsonStr, "sending_procedure_name", _sending_procedure_name);
   jsonStr += "\n}";
-
   return jsonStr;
 }
 

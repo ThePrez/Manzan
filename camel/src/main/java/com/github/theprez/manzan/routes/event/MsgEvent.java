@@ -7,7 +7,7 @@ public class MsgEvent {
     @JsonProperty("event_type")
     private String eventType;
 
-    @JsonProperty("sessionId")
+    @JsonProperty("session_id")
     private String sessionId;
 
     private String job;
