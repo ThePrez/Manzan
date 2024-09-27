@@ -18,6 +18,9 @@ public class WatchMsgEvent extends ManzanRoute {
     private final String m_schema;
     private final String m_sessionId;
     private final ManzanMessageFormatter m_formatter;
+    private final String m_socketIp = "0.0.0.0";
+    private final String m_socketPort = "8080";
+
 
     public WatchMsgEvent(final String _name, final String _session_id, final String _format,
             final List<String> _destinations, final String _schema, final int _interval, final int _numToProcess)
@@ -34,7 +37,7 @@ public class WatchMsgEvent extends ManzanRoute {
 //@formatter:off
     @Override
     public void configure() {
-        from("netty:tcp://0.0.0.0:8080?sync=false")
+        from(String.format("netty:tcp://%s:%s?sync=false", m_socketIp, m_socketPort))
             .log("Received raw message: ${body}")
             .unmarshal().json(JsonLibrary.Jackson, Map.class)
             .routeId("manzan_msg:"+m_name)
