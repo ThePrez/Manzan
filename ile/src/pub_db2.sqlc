@@ -54,8 +54,6 @@ bool send_message(std::string message){
     return true;
 }
 
-
-
 // TODO: implement this
 //     1. define Db2 tables
 //            // have autoincrement and autotimestamp columns
