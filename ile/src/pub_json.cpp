@@ -76,7 +76,7 @@ void json_encode(std::string &str, const char *_src)
 }
 void append_json_element(std::string &_str, const char *_key, const char *_value)
 {
-    _str += "\"";
+  _str += "\"";
   _str += _key;
   _str += "\":\"";
   std::string encoded;

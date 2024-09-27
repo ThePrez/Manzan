@@ -184,10 +184,6 @@ int main(int _argc, char **argv)
     for (int i = 0; i < num_publishers; i++)
     {
       msg_publish_func func = publishers->array[i].msg_publish_func_ptr;
-      // This is where we send the data to the publish function which encodes it and also
-      // publishes it to the table
-
-      // Instead, lets encode the data and then send it to the socket
       func(
           session_id.c_str(),
           msgid.c_str(),
