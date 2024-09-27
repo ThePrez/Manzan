@@ -74,7 +74,7 @@ void json_encode(std::string &str, const char *_src)
 }
 void append_json_element(std::string &_str, const char *_key, const char *_value)
 {
-  _str += "\"";
+    _str += "\"";
   _str += _key;
   _str += "\":\"";
   std::string encoded;
@@ -91,12 +91,29 @@ void append_json_element(std::string &_str, const char *_key, const int _value)
   _str += value;
 }
 
+/*
+* Return an output buffer containing enough space for the utf-8 encoded json message.
+* Return NULL if there is no space remaining on the heap.
+* Remember to free the buffer after use.
+*/
+char* get_json_utf8_output_buf(std::string json_message){
+  char *buf = (char *)malloc(56 + json_message.length() * 2);
+    if (buf == NULL) {
+        DEBUG_ERROR("No heap space available to allocate buffer for %s\n", json_message.c_str());
+        return NULL;
+    }
+    return buf;
+}
+
 int json_publish(const char *_session_id, std::string &_json)
 {
-  int json_len = 1 + _json.length();
-  char *utf8 = (char *)malloc(56 + _json.length() * 2);
+  char *utf8 = get_json_utf8_output_buf(_json);
+  if (utf8 == NULL){
+    DEBUG_ERROR("No heap space available. Aborting publishing message %s\n", utf8);
+    return -1;
+  }
 
-  to_utf8(utf8, json_len, _json.c_str());
+  to_utf8(utf8, 1 + _json.length(), _json.c_str());
   DEBUG_INFO("Publishing JSON\n");
   DEBUG_INFO("%s\n", _json.c_str());
 
@@ -123,11 +140,11 @@ int json_publish(const char *_session_id, std::string &_json)
 
 std::string construct_json_message(PUBLISH_MESSAGE_FUNCTION_SIGNATURE)
 {
-  std::string jsonStr;
+    std::string jsonStr;
   jsonStr += "{\n    ";
   append_json_element(jsonStr, "event_type", "message");
   jsonStr += ",\n    ";
-  append_json_element(jsonStr, "session_id", _session_id);
+  append_json_element(jsonStr, "sessionId", _session_id);
   jsonStr += ",\n    "; 
   append_json_element(jsonStr, "job", _job);
   jsonStr += ",\n    ";
@@ -149,8 +166,8 @@ std::string construct_json_message(PUBLISH_MESSAGE_FUNCTION_SIGNATURE)
   jsonStr += ",\n    ";
   append_json_element(jsonStr, "sending_procedure_name", _sending_procedure_name);
   jsonStr += "\n}";
-  return 0;
-  // return jsonStr;
+
+  return jsonStr;
 }
 
 /**
