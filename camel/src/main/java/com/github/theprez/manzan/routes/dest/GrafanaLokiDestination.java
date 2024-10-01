@@ -2,12 +2,14 @@ package com.github.theprez.manzan.routes.dest;
 
 import java.sql.Timestamp;
 
+import com.fasterxml.jackson.databind.ObjectMapper;
 import com.github.theprez.manzan.ManzanEventType;
 import com.github.theprez.manzan.routes.ManzanRoute;
 
 import pl.mjaron.tinyloki.ILogStream;
 import pl.mjaron.tinyloki.Labels;
 import pl.mjaron.tinyloki.LogController;
+import pl.mjaron.tinyloki.StreamBuilder;
 import pl.mjaron.tinyloki.TinyLoki;
 
 public class GrafanaLokiDestination extends ManzanRoute {
@@ -43,22 +45,34 @@ public class GrafanaLokiDestination extends ManzanRoute {
         .routeId(m_name).process(exchange -> {
             final ManzanEventType type = (ManzanEventType) exchange.getIn().getHeader(EVENT_TYPE);
             if(ManzanEventType.WATCH_MSG == type) {
-                ILogStream stream = logController
+                StreamBuilder builder = logController
                         .stream()
                         .l("app", "manzan")
                         .l(Labels.LEVEL, ((Integer) get(exchange, MSG_SEVERITY)) > 29 ? Labels.FATAL : Labels.INFO)
-                        .l(SESSION_ID, getWatchName(exchange))
-                        .l(MSG_MESSAGE_ID, getString(exchange, MSG_MESSAGE_ID))
-                        .l(MSG_MESSAGE_TYPE, getString(exchange, MSG_MESSAGE_TYPE))
-                        .l(MSG_SEVERITY, getString(exchange, MSG_SEVERITY))
-                        .l(JOB, getString(exchange, JOB))
-                        .l(MSG_SENDING_USRPRF, getString(exchange, MSG_SENDING_USRPRF))
-                        .l(MSG_SENDING_PROGRAM_NAME, getString(exchange, MSG_SENDING_PROGRAM_NAME))
-                        .l(MSG_SENDING_MODULE_NAME, getString(exchange, MSG_SENDING_MODULE_NAME))
-                        // TODO: Uncomment once MSG_SENDING_PROCEDURE_NAME is not empty
-                        // .l(MSG_SENDING_PROCEDURE_NAME, getString(exchange, MSG_SENDING_PROCEDURE_NAME))
-                        .build();
-                stream.log(Timestamp.valueOf(getString(exchange, MSG_MESSAGE_TIMESTAMP)).getTime(), getBody(exchange));
+                        .l(SESSION_ID, getWatchName(exchange));
+
+                String[] keys = {
+                    MSG_MESSAGE_ID,
+                    MSG_MESSAGE_TYPE,
+                    MSG_SEVERITY,
+                    JOB,
+                    MSG_SENDING_USRPRF,
+                    MSG_SENDING_PROGRAM_NAME,
+                    MSG_SENDING_MODULE_NAME,
+                    MSG_SENDING_PROCEDURE_NAME
+                };
+
+                for (String key: keys) {
+                    String value = getString(exchange, key);
+                    if(value != "") {
+                        builder.l(key, value);
+                    }
+                }
+
+                ILogStream stream = builder.build();
+                ObjectMapper objectMapper = new ObjectMapper();
+                String jsonString = objectMapper.writeValueAsString(getDataMap(exchange));                        
+                stream.log(Timestamp.valueOf(getString(exchange, MSG_MESSAGE_TIMESTAMP)).getTime(), jsonString);
             } else {
                 throw new RuntimeException("Grafana Loki route doesn't know how to process type "+type);
             }

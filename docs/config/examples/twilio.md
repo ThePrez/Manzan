@@ -1,8 +1,10 @@
+# Twilio
+
 This example shows how to use `twilio` as a destination.
 
 ## Configuration
 
-Be sure to have read up on [Manzan configuration](/config/index.md) to understand where this files exist on your system.
+Be sure to have read up on [Manzan configuration](/config/index.md) to understand where these files exist on your system.
 
 ### `data.ini`
 
@@ -40,4 +42,4 @@ from=+12058135364
 
 ##  Result
 
-![](./images/twilio.png)
+![](../../images/twilio.png)
