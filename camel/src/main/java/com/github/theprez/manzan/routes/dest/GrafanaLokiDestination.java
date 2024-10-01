@@ -2,7 +2,6 @@ package com.github.theprez.manzan.routes.dest;
 
 import java.sql.Timestamp;
 
-import com.fasterxml.jackson.databind.ObjectMapper;
 import com.github.theprez.manzan.ManzanEventType;
 import com.github.theprez.manzan.routes.ManzanRoute;
 
@@ -64,15 +63,13 @@ public class GrafanaLokiDestination extends ManzanRoute {
 
                 for (String key: keys) {
                     String value = getString(exchange, key);
-                    if(value != "") {
+                    if(!value.equals("")) {
                         builder.l(key, value);
                     }
                 }
 
                 ILogStream stream = builder.build();
-                ObjectMapper objectMapper = new ObjectMapper();
-                String jsonString = objectMapper.writeValueAsString(getDataMap(exchange));                        
-                stream.log(Timestamp.valueOf(getString(exchange, MSG_MESSAGE_TIMESTAMP)).getTime(), jsonString);
+                stream.log(Timestamp.valueOf(getString(exchange, MSG_MESSAGE_TIMESTAMP)).getTime(), getBody(exchange));
             } else {
                 throw new RuntimeException("Grafana Loki route doesn't know how to process type "+type);
             }
