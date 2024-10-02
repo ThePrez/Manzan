@@ -15,6 +15,8 @@ Here are the requirements for each section.
 These are optional properties available on all types:
 
 * `format` can be used to define a nicer messages to be sent to the destination
+* `interval` can be used to configure how often messages are queried for by the distributor in milliseconds (default `5`)
+* `numToProcess` can be used to configure how many messages are queried for by the distributor (default `5000`)
 * `enabled` is a boolean (`true` or `false`) so a data source can be defined but disabled
 
 ```ini
@@ -57,11 +59,14 @@ format=$FILE_DATA$
 
 # This will manage information from the watch session with id "jesse".
 # The event will be formatted as specified in the format value, and
-# the system watch will automatically be started when the Manzan Distributor is run
+# the system watch will automatically be started when the Manzan Distributor is run.
+# The distributor will query for 10000 messages every 10 milliseconds.
 [watchout]
 type=watch
 id=jesse
 destinations=test_out, slackme
 format=$MESSAGE_ID$ (severity $SEVERITY$): $MESSAGE$ 
 strwch=WCHMSG((*ALL)) WCHMSGQ((*HSTLOG))
+interval=10
+numToProcess=10000
 ```
