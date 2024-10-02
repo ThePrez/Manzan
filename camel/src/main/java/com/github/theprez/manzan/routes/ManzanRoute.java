@@ -26,6 +26,8 @@ public abstract class ManzanRoute extends RouteBuilder {
     protected static final String MSG_MESSAGE_TIMESTAMP = "MESSAGE_TIMESTAMP";
     protected static final String MSG_MESSAGE = "MESSAGE";
 
+    protected static final int SEVERITY_LIMIT = 29;
+
     protected static String getWatchName(final Exchange exchange) {
         final Object watchNameObject = exchange.getIn().getHeader(SESSION_ID);
         if (null == watchNameObject) {
@@ -58,8 +60,8 @@ public abstract class ManzanRoute extends RouteBuilder {
         return (Map<String, Object>) _exchange.getIn().getHeader("data_map");
     }
 
-    protected String getBody(final Exchange _exchange) {
-        return _exchange.getIn().getBody(String.class);
+    protected <T> T getBody(final Exchange _exchange, Class<T> type) {
+        return _exchange.getIn().getBody(type);
     }
 
     protected String getInUri() {

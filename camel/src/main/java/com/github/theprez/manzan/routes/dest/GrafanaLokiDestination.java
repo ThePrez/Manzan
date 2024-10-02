@@ -13,13 +13,16 @@ import pl.mjaron.tinyloki.TinyLoki;
 
 public class GrafanaLokiDestination extends ManzanRoute {
     private final LogController logController;
+    private final static String endpoint = "/loki/api/v1/push";
+    private final static String appLabelName = "app";
+    private final static String appLabelValue = "manzan";
 
     public GrafanaLokiDestination(final String _name, final String _url, final String _username, final String _password,
             final String _format) {
         super(_name);
 
         logController = TinyLoki
-                .withUrl(_url + "/loki/api/v1/push")
+                .withUrl(_url + endpoint)
                 .withBasicAuth(_username, _password)
                 .start();
 
@@ -46,8 +49,8 @@ public class GrafanaLokiDestination extends ManzanRoute {
             if(ManzanEventType.WATCH_MSG == type) {
                 StreamBuilder builder = logController
                         .stream()
-                        .l("app", "manzan")
-                        .l(Labels.LEVEL, ((Integer) get(exchange, MSG_SEVERITY)) > 29 ? Labels.FATAL : Labels.INFO)
+                        .l(appLabelName, appLabelValue)
+                        .l(Labels.LEVEL, ((Integer) get(exchange, MSG_SEVERITY)) > SEVERITY_LIMIT ? Labels.FATAL : Labels.INFO)
                         .l(SESSION_ID, getWatchName(exchange));
 
                 String[] keys = {
@@ -69,7 +72,7 @@ public class GrafanaLokiDestination extends ManzanRoute {
                 }
 
                 ILogStream stream = builder.build();
-                stream.log(Timestamp.valueOf(getString(exchange, MSG_MESSAGE_TIMESTAMP)).getTime(), getBody(exchange));
+                stream.log(Timestamp.valueOf(getString(exchange, MSG_MESSAGE_TIMESTAMP)).getTime(), getBody(exchange, String.class));
             } else {
                 throw new RuntimeException("Grafana Loki route doesn't know how to process type "+type);
             }

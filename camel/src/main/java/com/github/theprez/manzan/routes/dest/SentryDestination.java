@@ -58,7 +58,7 @@ public class SentryDestination extends ManzanRoute {
 
             SentryLevel level;
             final int sev = (Integer) get(exchange, MSG_SEVERITY);
-            if (sev > 29) {
+            if (sev > SEVERITY_LIMIT) {
                 level = SentryLevel.ERROR;
             } else {
                 level = SentryLevel.INFO;
