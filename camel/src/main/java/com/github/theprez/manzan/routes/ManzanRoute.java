@@ -13,8 +13,23 @@ public abstract class ManzanRoute extends RouteBuilder {
 
     protected static final String EVENT_TYPE = "event_type";
 
+    protected static final String SESSION_ID = "SESSION_ID";
+    protected static final String MSG_MESSAGE_ID = "MESSAGE_ID";
+    protected static final String MSG_MESSAGE_TYPE = "MESSAGE_TYPE";
+    protected static final String MSG_SEVERITY = "SEVERITY";
+    protected static final String JOB = "JOB";
+    protected static final String MSG_SENDING_USRPRF = "SENDING_USRPRF";
+    protected static final String MSG_SENDING_PROGRAM_NAME = "SENDING_PROGRAM_NAME";
+    protected static final String MSG_SENDING_MODULE_NAME = "SENDING_MODULE_NAME";
+    protected static final String MSG_SENDING_PROCEDURE_NAME = "SENDING_PROCEDURE_NAME";
+    protected static final String MSG_ORDINAL_POSITION = "ORDINAL_POSITION";
+    protected static final String MSG_MESSAGE_TIMESTAMP = "MESSAGE_TIMESTAMP";
+    protected static final String MSG_MESSAGE = "MESSAGE";
+
+    protected static final int SEVERITY_LIMIT = 29;
+
     protected static String getWatchName(final Exchange exchange) {
-        final Object watchNameObject = exchange.getIn().getHeader("session_id");
+        final Object watchNameObject = exchange.getIn().getHeader(SESSION_ID);
         if (null == watchNameObject) {
             throw new RuntimeException("Couldn't figure out watch ID");
         }
@@ -43,6 +58,10 @@ public abstract class ManzanRoute extends RouteBuilder {
     @SuppressWarnings("unchecked")
     protected Map<String, Object> getDataMap(final Exchange _exchange) {
         return (Map<String, Object>) _exchange.getIn().getHeader("data_map");
+    }
+
+    protected <T> T getBody(final Exchange _exchange, Class<T> type) {
+        return _exchange.getIn().getBody(type);
     }
 
     protected String getInUri() {

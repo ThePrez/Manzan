@@ -22,11 +22,12 @@ Some types have additional properties that they required.
 | id               | Description                     | Required properties                                        | Optional properties   |
 |------------------|---------------------------------|------------------------------------------------------------|                       |
 | `stdout`         | Write all data to standard out. | None.                                                      |                       |
-| `slack`          | Send data to a Slack channel    | * `webhook` <br> * `channel` <br>                          |                       |
-| `fluentd`        | Sent data to FluentD            | * `tag` <br> * `host` <br> * `port` <br>                   |                       |
-| `smtp`/`smtps`   | Sent data via email             | * `server` <br> * `subject` <br> * `to` <br> * `from` <br> | * `port`              |
+| `slack`          | Send data to a Slack channel    | * `webhook` <br> * `channel`                               |                       |
+| `fluentd`        | Sent data to FluentD            | * `tag` <br> * `host` <br> * `port`                        |                       |
+| `smtp`/`smtps`   | Sent data via email             | * `server` <br> * `subject` <br> * `to` <br> * `from`      | * `port`              |
 | `sentry`         | Send data into Sentry           | * `dsn`                                                    |                       |
 | `twilio`         | Send via SMS                    | * `sid` <br> * `token` <br> * `to` <br> * `from`           |                       |
+| `loki`           | Send data into Grafana Loki     | * `url` <br> * `username` <br> * `password` <br>           |                       |
 
 ### Example
 
@@ -44,7 +45,7 @@ type=stdout
 
 [sentry_out]
 type=sentry
-dsn=<slackdsn>
+dsn=<sentry_dsn>
 
 [twilio_sms]
 type=twilio
@@ -52,6 +53,12 @@ sid=x
 token=x
 to=+x
 from=+x
+
+[loki_out]
+type=loki
+url=<loki_url>
+username=<loki_username>
+password=<loki_password>
 
 [slackme]
 type=slack
