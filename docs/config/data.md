@@ -15,8 +15,7 @@ Here are the requirements for each section.
 These are optional properties available on all types:
 
 * `format` can be used to define a nicer messages to be sent to the destination
-* `interval` can be used to configure how often messages are queried for by the distributor in milliseconds (default `5`)
-* `numToProcess` can be used to configure how many messages are queried for by the distributor (default `5000`)
+* `interval` can be used to configure how often the distributor checks for events in milliseconds (default `5`)
 * `enabled` is a boolean (`true` or `false`) so a data source can be defined but disabled
 
 ```ini
@@ -35,8 +34,8 @@ Some types have additional properties that they required.
 
 | id      | Description                                 | Required properties            | Optional properties                                                                                                        |
 |---------|---------------------------------------------|--------------------------------|-----------------------------------------------------------------------------------------------------------------------|
-| `file`  | Triggered when a file changes               | `file` path of file to watch   | `filter` only listen for lines that include this value                                                                |
-| `watch` | Triggered when the Manzan handler is called | `id` of the watch (session ID) | `strwch` is part of the `STRWCH` CL command that can be used to describe how to start the watch when Manzan starts up |
+| `file`  | Triggered when a file changes               | `file` path of file to watch   | * `filter` only listen for lines that include this value                                                                |
+| `watch` | Triggered when the Manzan handler is called | `id` of the watch (session ID) | * `strwch` is part of the `STRWCH` CL command that can be used to describe how to start the watch when Manzan starts up <br> * * `numToProcess` can be used to configure how many messages are queried for by the distributor (default `5000`) |
 
 
 ### Example
