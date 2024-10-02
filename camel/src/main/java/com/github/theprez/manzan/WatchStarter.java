@@ -43,7 +43,7 @@ public class WatchStarter {
 
     public void endwch()
             throws AS400SecurityException, ErrorCompletingRequestException, IOException, InterruptedException {
-        System.out.println("ending watch");
+        System.out.println("Ending watch '" + m_session_id + "'");
         runCmd(m_stopCommand);
     }
 
