@@ -67,7 +67,7 @@ jobs:
           ici \
             --rcwd "${{ env.remote_build_dir }}" \
             --cmd "/QOpenSys/pkgs/bin/gmake BUILDLIB=${{ env.BUILDLIB }} uninstall"
-            --ignore --cmd "rm -fr ${{ env.remote_build_dir }}"
+            --cmd "rm -fr ${{ env.remote_build_dir }}"
         env:
           IBMI_HOST: ${{ secrets.IBMI_HOST }}
           IBMI_USER: ${{ secrets.IBMI_USER }}
