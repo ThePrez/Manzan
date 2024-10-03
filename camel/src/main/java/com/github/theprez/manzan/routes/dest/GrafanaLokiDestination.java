@@ -44,39 +44,87 @@ public class GrafanaLokiDestination extends ManzanRoute {
     @Override
     public void configure() {
         from(getInUri())
-        .routeId(m_name).process(exchange -> {
-            final ManzanEventType type = (ManzanEventType) exchange.getIn().getHeader(EVENT_TYPE);
-            if(ManzanEventType.WATCH_MSG == type) {
-                StreamBuilder builder = logController
-                        .stream()
-                        .l(appLabelName, appLabelValue)
-                        .l(Labels.LEVEL, ((Integer) get(exchange, MSG_SEVERITY)) > SEVERITY_LIMIT ? Labels.FATAL : Labels.INFO)
-                        .l(SESSION_ID, getWatchName(exchange));
+            .routeId(m_name).process(exchange -> {
+                final ManzanEventType type = (ManzanEventType) exchange.getIn().getHeader(EVENT_TYPE);
+                StreamBuilder builder;
+                String timestamp;
+                String[] keys;
+                if (type == ManzanEventType.WATCH_MSG) {
+                    builder = logController
+                            .stream()
+                            .l(appLabelName, appLabelValue)
+                            .l(Labels.LEVEL,
+                                    ((Integer) get(exchange, MSG_SEVERITY)) > SEVERITY_LIMIT ? Labels.FATAL
+                                            : Labels.INFO)
+                            .l(SESSION_ID, getWatchName(exchange));
 
-                String[] keys = {
-                    MSG_MESSAGE_ID,
-                    MSG_MESSAGE_TYPE,
-                    MSG_SEVERITY,
-                    JOB,
-                    MSG_SENDING_USRPRF,
-                    MSG_SENDING_PROGRAM_NAME,
-                    MSG_SENDING_MODULE_NAME,
-                    MSG_SENDING_PROCEDURE_NAME
-                };
+                    timestamp = MSG_MESSAGE_TIMESTAMP;
+                    keys = new String[] {
+                            MSG_MESSAGE_ID,
+                            MSG_MESSAGE_TYPE,
+                            MSG_SEVERITY,
+                            JOB,
+                            MSG_SENDING_USRPRF,
+                            MSG_SENDING_PROGRAM_NAME,
+                            MSG_SENDING_MODULE_NAME,
+                            MSG_SENDING_PROCEDURE_NAME
+                    };
+                } else if (type == ManzanEventType.WATCH_VLOG) {
+                    builder = logController
+                            .stream()
+                            .l(appLabelName, appLabelValue)
+                            .l(SESSION_ID, getWatchName(exchange));
 
-                for (String key: keys) {
+                    timestamp = LOG_TIMESTAMP;
+                    keys = new String[] {
+                            MAJOR_CODE,
+                            MINOR_CODE,
+                            LOG_ID,
+                            TDE_NUM,
+                            TASK_NAME,
+                            SERVER_TYPE,
+                            EXCEPTION_ID,
+                            JOB,
+                            THREAD_ID,
+                            MODULE_OFFSET,
+                            MODULE_RU_NAME,
+                            MODULE_NAME,
+                            MODULE_ENTRY_POINT_NAME
+                    };
+                } else if (type == ManzanEventType.WATCH_PAL) {
+                    builder = logController
+                            .stream()
+                            .l(appLabelName, appLabelValue)
+                            .l(SESSION_ID, getWatchName(exchange));
+
+                    timestamp = PAL_TIMESTAMP;
+                    keys = new String[] {
+                            SYSTEM_REFERENCE_CODE,
+                            DEVICE_NAME,
+                            MODEL,
+                            SERIAL_NUMBER,
+                            RESOURCE_NAME,
+                            LOG_ID,
+                            REFERENCE_CODE,
+                            SECONDARY_CODE,
+                            TABLE_ID,
+                            SEQUENCE_NUM
+                    };
+                } else {
+                    throw new RuntimeException("Unknown event type " + type);
+                }
+
+                for (String key : keys) {
                     String value = getString(exchange, key);
-                    if(!value.equals("")) {
+                    if (!value.equals("")) {
                         builder.l(key, value);
                     }
                 }
 
                 ILogStream stream = builder.build();
-                stream.log(Timestamp.valueOf(getString(exchange, MSG_MESSAGE_TIMESTAMP)).getTime(), getBody(exchange, String.class));
-            } else {
-                throw new RuntimeException("Grafana Loki route doesn't know how to process type "+type);
-            }
-        });
+                stream.log(Timestamp.valueOf(getString(exchange, timestamp)).getTime(),
+                        getBody(exchange, String.class));
+            });
     }
     //@formatter:on
 }
