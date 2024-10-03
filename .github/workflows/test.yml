@@ -9,7 +9,8 @@ on:
     branches: [ "main" ]
 
 env:
-  remote_build_dir: /home/${{ secrets.IBMI_USER }}/testbuild/
+  remote_home_dir: /home/${{ secrets.IBMI_USER }}/
+  remote_build_dir: /home/${{ secrets.IBMI_USER }}/manzan/test/${{ github.sha }}/
   BUILDLIB: MZNTEST
 
 jobs:
@@ -41,6 +42,9 @@ jobs:
       - name: Install Manzan
         run: | 
           ici \
+            --rcwd "${{ env.remote_home_dir }}" \
+            --ignore --cmd "rm -rf ${{ env.remote_build_dir }}" \
+            --cmd "mkdir -p ${{ env.remote_build_dir }}" \
             --rcwd "${{ env.remote_build_dir }}" \
             --push "." \
             --cmd "/QOpenSys/pkgs/bin/gmake BUILDLIB=${{ env.BUILDLIB }} install" \
