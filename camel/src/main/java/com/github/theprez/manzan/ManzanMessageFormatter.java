@@ -27,23 +27,7 @@ public class ManzanMessageFormatter {
     private final String m_fmtStr;
 
     public ManzanMessageFormatter(final String _fmtStr) {
-        StringBuilder result = new StringBuilder();
-        
-        // Use a boolean array to avoid final constraint
-        boolean[] keyOpened = {false};
-        _fmtStr.chars().forEach(c -> {
-            char next = (char) c;
-            if (c == '$'){
-                keyOpened[0] = !keyOpened[0];
-                result.append(next);
-            }
-            else if (keyOpened[0]){
-                result.append(Character.toUpperCase(next));
-            } else {
-                result.append(next);
-            }
-        });
-        m_fmtStr = result.toString();
+        m_fmtStr = _fmtStr;
     }
 
     public String format(final Map<String, Object> _mappings) {
@@ -53,7 +37,7 @@ public class ManzanMessageFormatter {
         ret = ret.replace("\\n", "\n").replace("\\t", "\t");
 
         for (final Entry<String, Object> repl : _mappings.entrySet()) {
-            final String key = repl.getKey().toUpperCase();
+            final String key = repl.getKey();
             ret = ret.replace("$" + key + "$", "" + repl.getValue());
             String jsonIndicator ="$json:" + key + "$";
             if(ret.contains(jsonIndicator)) {
