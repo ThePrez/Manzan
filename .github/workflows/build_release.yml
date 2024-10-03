@@ -8,7 +8,8 @@ on:
     types: [created]
 
 env:
-  remote_build_dir: /home/${{ secrets.IBMI_USER }}/build/${{ github.sha }}/
+  remote_home_dir: /home/${{ secrets.IBMI_USER }}/
+  remote_build_dir: /home/${{ secrets.IBMI_USER }}/manzan/release/${{ github.sha }}/
   jar_file: manzan-installer-${{ github.ref_name }}.jar
   BUILDLIB: MANZAN
 
@@ -47,6 +48,9 @@ jobs:
       - name: Build on IBM i
         run: | 
           ici \
+            --rcwd "${{ env.remote_home_dir }}" \
+            --ignore --cmd "rm -rf ${{ env.remote_build_dir }}" \
+            --cmd "mkdir -p ${{ env.remote_build_dir }}" \
             --rcwd "${{ env.remote_build_dir }}" \
             --push "." \
             --cmd "/QOpenSys/pkgs/bin/gmake --jobs=1 ${{ env.jar_file }}" \
@@ -63,7 +67,8 @@ jobs:
           ici \
             --rcwd "${{ env.remote_build_dir }}" \
             --cmd "/QOpenSys/pkgs/bin/gmake BUILDLIB=${{ env.BUILDLIB }} uninstall"
-            --ignore --cmd "rm -fr ${{ env.remote_build_dir }}"
+            --rcwd "${{ env.remote_home_dir }}" \
+            --cmd "rm -fr ${{ env.remote_build_dir }}"
         env:
           IBMI_HOST: ${{ secrets.IBMI_HOST }}
           IBMI_USER: ${{ secrets.IBMI_USER }}
