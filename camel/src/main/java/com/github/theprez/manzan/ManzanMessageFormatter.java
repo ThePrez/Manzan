@@ -20,10 +20,30 @@ public class ManzanMessageFormatter {
         return formatter.format(_mappings);
     }
 
+    public String getM_fmtStr() {
+        return m_fmtStr;
+    }
+
     private final String m_fmtStr;
 
     public ManzanMessageFormatter(final String _fmtStr) {
-        m_fmtStr = _fmtStr.toUpperCase();
+        StringBuilder result = new StringBuilder();
+        
+        // Use a boolean array to avoid final constraint
+        boolean[] keyOpened = {false};
+        _fmtStr.chars().forEach(c -> {
+            char next = (char) c;
+            if (c == '$'){
+                keyOpened[0] = !keyOpened[0];
+                result.append(next);
+            }
+            else if (keyOpened[0]){
+                result.append(Character.toUpperCase(next));
+            } else {
+                result.append(next);
+            }
+        });
+        m_fmtStr = result.toString();
     }
 
     public String format(final Map<String, Object> _mappings) {
