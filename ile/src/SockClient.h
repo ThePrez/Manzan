@@ -14,10 +14,6 @@ public:
     // Method to send a message (string) over the socket
     bool sendMessage(const std::string message);
 
-    // // Method to send a struct over the socket
-    // template<typename T>
-    // bool sendStruct(const typename T& data);
-
     // Method to close the socket
     void closeSocket();
 
