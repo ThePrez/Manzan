@@ -13,7 +13,7 @@ run:
 	/opt/manzan/bin/manzan --configdir=$(CURDIR) > /tmp/manzan.out 2>&1 &
 	sleep 15
 	echo ${TEXT} >> ${INPUT_FILE}
-	sleep 5
+	sleep 15
 	cat /tmp/manzan.out
 
 checkresult:

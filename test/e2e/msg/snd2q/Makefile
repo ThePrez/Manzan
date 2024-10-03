@@ -21,7 +21,7 @@ run:
 	/opt/manzan/bin/manzan --configdir=$(CURDIR) > /tmp/manzan.out 2>&1 &
 	sleep 15
 	system -kKv "SNDMSG TOMSGQ(${TESTLIB}/MSGS) MSG('${MESSAGE}') MSGTYPE(${MSGTYPE})"
-	sleep 5
+	sleep 15
 	cat /tmp/manzan.out
 
 checkresult:

@@ -15,9 +15,9 @@ cleanup:
 run:
 	nohup node ../../../smtp-server/server.js &
 	/opt/manzan/bin/manzan --configdir=$(CURDIR) > ${OUTPUT_FILE} 2>&1 &
-	sleep 10
+	sleep 15
 	echo ${TEXT} >> ${INPUT_FILE}
-	sleep 10
+	sleep 15
 	ps -ef | grep 'smtp-server/server.js' | grep -v 'grep' | awk '{ print $$2 }' | xargs kill
 
 checkresult:
