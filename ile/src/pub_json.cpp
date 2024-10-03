@@ -155,7 +155,7 @@ std::string construct_json_message(PUBLISH_MESSAGE_FUNCTION_SIGNATURE)
   jsonStr += ",\n    "; 
   append_json_element(jsonStr, "job", _job);
   jsonStr += ",\n    ";
-  append_json_element(jsonStr, "msgid", _msgid);
+  append_json_element(jsonStr, "message_id", _msgid);
   jsonStr += ",\n    ";
   append_json_element(jsonStr, "msgtype", _msg_type);
   jsonStr += ",\n    ";
