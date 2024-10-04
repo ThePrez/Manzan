@@ -14,7 +14,12 @@ Here are the requirements for each section.
 
 These are optional properties available on all types:
 
-* `format` can be used to define a nicer messages to be sent to the destination
+* `format` can be used to define a nicer messages to be sent to the destination.\
+ For file events we have the following variables available: FILE_DATA, FILE_NAME, FILE_PATH.\
+ For watch events we have the following variables available: SESSION_ID, MESSAGE_ID, MESSAGE_TYPE, SEVERITY, JOB, SENDING_USRPRF, SENDING_PROGRAM_NAME, SENDING_MODULE_NAME, SENDING_PROCEDURE_NAME, MESSAGE_TIMESTAMP, MESSAGE.\
+ \
+  By specifying the variable in your format string surrounded by dollar signs, the variables value will be replaced in your format string. Ex. For a file `a.txt` that received the data `hello world` the format string `Data: $FILE_DATA$, Name: $FILE_NAME$` will evaluate to `Data: hello world, Name: a.txt`. `format` can be provided in both data sources and destinations.
+ 
 * `enabled` is a boolean (`true` or `false`) so a data source can be defined but disabled
 
 ```ini

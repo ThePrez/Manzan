@@ -14,10 +14,11 @@ type=<type>
 
 # other properties for <id> here..
 ```
+As well, each section can provide `format` as an optional type.
 
 ## Available types
 
-Some types have additional properties that they required.
+Some types have additional properties that they require.
 
 | id               | Description                     | Required properties                                        | Optional properties   |
 |------------------|---------------------------------|------------------------------------------------------------|                       |
@@ -27,6 +28,7 @@ Some types have additional properties that they required.
 | `smtp`/`smtps`   | Sent data via email             | * `server` <br> * `subject` <br> * `to` <br> * `from` <br> | * `port`              |
 | `sentry`         | Send data into Sentry           | * `dsn`                                                    |                       |
 | `twilio`         | Send via SMS                    | * `sid` <br> * `token` <br> * `to` <br> * `from`           |                       |
+| `http`/`https`   | Send data via http/https        | * `url`                                                    | * `httpMethod` <br> * `x` where x is any query parameter         |
 
 ### Example
 
@@ -57,4 +59,19 @@ from=+x
 type=slack
 channel=open-source-system-status
 webhook=https://hooks.slack.com/services/TA3EF58G4...
+
+[myLocalHttpServer]
+type=http
+url=http://localhost:3000
+a=54
+b=heybuddy
+httpMethod=POST
+format={"message": "$FILE_DATA$"}
+
+[myProdServer]
+type=https
+url=https://production.com
+foo=bar
+httpMethod=POST
+format={"message": "$FILE_DATA$", "path": "$FILE_PATH$", "name": "$FILE_NAME$"}
 ```
