@@ -21,7 +21,7 @@ As well, each section can provide `format` as an optional type.
 Some types have additional properties that they require.
 
 | id               | Description                     | Required properties                                        | Optional properties                                      |
-|------------------|---------------------------------|------------------------------------------------------------|                                                          |
+|------------------|---------------------------------|------------------------------------------------------------| -------------------------------------------------------- |
 | `stdout`         | Write all data to standard out. | None.                                                      |                                                          |
 | `slack`          | Send data to a Slack channel    | * `webhook` <br> * `channel`                               |                                                          |
 | `fluentd`        | Sent data to FluentD            | * `tag` <br> * `host` <br> * `port`                        |                                                          |
