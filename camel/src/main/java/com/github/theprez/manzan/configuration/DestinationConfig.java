@@ -99,8 +99,9 @@ public class DestinationConfig extends Config {
                     getUriAndHeaderParameters(name, sectionObj, "sid", "token")));
                     break;
                 case "http":
+                case "https":
                     final String url = getRequiredString(name, "url");
-                    ret.put(name, HttpDestination.get(name, url, format, getUriAndHeaderParameters(name, sectionObj, "url")));
+                    ret.put(name, HttpDestination.get(name, type, url, format, getUriAndHeaderParameters(name, sectionObj, "url")));
                     break;
                 default:
                     throw new RuntimeException("Unknown destination type: " + type);

@@ -42,7 +42,7 @@ Many other destinations will be available. Examples include:
 - [Google Pub/Sub](http://cloud.google.com/pubsub) ⏳
 - [Grafana Loki](https://grafana.com/oss/loki/) ⏳
 - HTTP endpoints (REST, etc) ✅
-- HTTPS endpoints (REST, etc) ⏳
+- HTTPS endpoints (REST, etc) ✅
 - [Internet of Things (mqtt)](https://www.eclipse.org/paho/) ⏳
 - [Kafka](http://kafka.apache.org) ✅
 - [Mezmo](http://mezmo.com) ⏳
