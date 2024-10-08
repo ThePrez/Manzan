@@ -18,6 +18,7 @@ import com.github.theprez.manzan.routes.dest.DirDestination;
 import com.github.theprez.manzan.routes.dest.EmailDestination;
 import com.github.theprez.manzan.routes.dest.FileDestination;
 import com.github.theprez.manzan.routes.dest.FluentDDestination;
+import com.github.theprez.manzan.routes.dest.GrafanaLokiDestination;
 import com.github.theprez.manzan.routes.dest.HttpDestination;
 import com.github.theprez.manzan.routes.dest.KafkaDestination;
 import com.github.theprez.manzan.routes.dest.SentryDestination;
@@ -84,6 +85,12 @@ public class DestinationConfig extends Config {
                     final int port = getRequiredInt(name, "port");
                     ret.put(name, new FluentDDestination(name, tag, host, port));
                 }
+                case "loki": {
+                    final String url = getRequiredString(name, "url");
+                    final String username = getRequiredString(name, "username");
+                    final String password = getRequiredString(name, "password");
+                    ret.put(name, new GrafanaLokiDestination(name, url, username, password, format));
+                }
                     break;
                 case "smtp":
                 case "smtps":
@@ -99,8 +106,9 @@ public class DestinationConfig extends Config {
                     getUriAndHeaderParameters(name, sectionObj, "sid", "token")));
                     break;
                 case "http":
+                case "https":
                     final String url = getRequiredString(name, "url");
-                    ret.put(name, HttpDestination.get(name, url, format, getUriAndHeaderParameters(name, sectionObj, "url")));
+                    ret.put(name, HttpDestination.get(name, type, url, format, getUriAndHeaderParameters(name, sectionObj, "url")));
                     break;
                 default:
                     throw new RuntimeException("Unknown destination type: " + type);

@@ -1,8 +1,10 @@
-This example shows how to use `sentry` as a destination for a `watch` data source
+# Sentry
+
+This example shows how to use `sentry` as a destination for a `watch` data source.
 
 ## Configuration
 
-Be sure to have read up on [Manzan configuration](/config/index.md) to understand where this files exist on your system.
+Be sure to have read up on [Manzan configuration](/config/index.md) to understand where these files exist on your system.
 
 ### `data.ini`
 
@@ -20,11 +22,11 @@ strwch=WCHMSG((*ALL)) WCHMSGQ((*HSTLOG))
 ```ini
 [sentry_out]
 type=sentry
-dsn=<sentryDSN>
+dsn=<sentry_dsn>
 ```
 
 ## Result
 
-![](./images/sentry1.png)
+![](../../images/sentry1.png)
 
-![](./images/sentry2.png)
+![](../../images/sentry2.png)

@@ -40,9 +40,9 @@ Many other destinations will be available. Examples include:
 - [Google Drive](http://drive.google.com) ⏳
 - [Google Mail (gmail)](http://gmail.com) ⏳
 - [Google Pub/Sub](http://cloud.google.com/pubsub) ⏳
-- [Grafana Loki](https://grafana.com/oss/loki/) ⏳
+- [Grafana Loki](https://grafana.com/oss/loki/) ✅
 - HTTP endpoints (REST, etc) ✅
-- HTTPS endpoints (REST, etc) ⏳
+- HTTPS endpoints (REST, etc) ✅
 - [Internet of Things (mqtt)](https://www.eclipse.org/paho/) ⏳
 - [Kafka](http://kafka.apache.org) ✅
 - [Mezmo](http://mezmo.com) ⏳
