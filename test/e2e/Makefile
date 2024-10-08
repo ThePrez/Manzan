@@ -9,11 +9,11 @@ TESTS:=$(shell find * -mindepth 1 -type d)
 TESTLIB:=MZNTEST
 
 # run before every test case
-pretest:
-	system "crtlib ${TESTLIB}" || system "clrlib ${TESTLIB}"
+beforeAll:
+	for dir in msg/*/; do printf "[install]\nlibrary=%s\n" "${TESTLIB}" > "$$dir/app.ini"; done
 
 # Run after every test case
-posttest:
+afterAll:
 	system "clrlib ${TESTLIB}"
 
 runtests:
