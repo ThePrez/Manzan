@@ -11,7 +11,7 @@ on:
 env:
   remote_home_dir: /home/${{ secrets.IBMI_USER }}/
   remote_build_dir: /home/${{ secrets.IBMI_USER }}/manzan/test/${{ github.sha }}/
-  BUILDLIB: MANZAN
+  BUILDLIB: MZNTEST
 
 jobs:
   test:
