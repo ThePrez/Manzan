@@ -20,25 +20,27 @@ public class FileEvent extends ManzanRoute {
     private static final String FILE_NAME = "FILE_NAME";
     private static final String FILE_PATH = "FILE_PATH";
     private final File m_file;
+    private final int m_interval;
     private final ManzanMessageFilter m_filter;
     private final ManzanMessageFormatter m_formatter;
 
-    public FileEvent(final String _name, final File _f, final String _format, final List<String> _destinations, final String _filter) throws IOException {
+    public FileEvent(final String _name, final File _f, final String _format, final List<String> _destinations, final String _filter, final int _interval) throws IOException {
         super(_name);
         m_file = _f;
         super.setRecipientList(_destinations);
+        m_interval = _interval;
         m_formatter = StringUtils.isEmpty(_format) ? null: new ManzanMessageFormatter(_format);
         m_filter = new ManzanMessageFilter(_filter);
     }
 
-    public FileEvent(final String _name, final String _f, final String _format, final List<String> _destinations, final String _filter) throws IOException {
-        this(_name, new File(_f), _format, _destinations, _filter);
+    public FileEvent(final String _name, final String _f, final String _format, final List<String> _destinations, final String _filter, final int _interval) throws IOException {
+        this(_name, new File(_f), _format, _destinations, _filter, _interval);
     }
 
 //@formatter:off
     @Override
     public void configure() {
-        from("timer://foo?period=5000&synchronous=true")
+        from("timer://foo?period=" + m_interval + "&synchronous=true")
         .routeId(m_name)
         .setHeader(EVENT_TYPE, constant(ManzanEventType.FILE))
         .setBody(constant(m_file.getAbsolutePath()))
