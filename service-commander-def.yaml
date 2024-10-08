@@ -1,0 +1,9 @@
+name: Manzan
+dir: .
+start_cmd: ../bin/manzan
+check_alive: manzan
+batch_mode: 'true'
+sbmjob_jobname: manzan
+sbmjob_opts: JOBQ(QUSRNOMAX)
+environment_vars:
+- PATH=/QOpenSys/pkgs/bin:/QOpenSys/usr/bin:/usr/ccs/bin:/QOpenSys/usr/bin/X11:/usr/sbin:.:/usr/bin
