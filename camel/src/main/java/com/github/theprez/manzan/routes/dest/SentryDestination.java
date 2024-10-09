@@ -1,5 +1,6 @@
 package com.github.theprez.manzan.routes.dest;
 
+import java.sql.Date;
 import java.util.LinkedList;
 import java.util.List;
 import java.util.UUID;
@@ -35,51 +36,55 @@ public class SentryDestination extends ManzanRoute {
     @Override
     public void configure() {
         from(getInUri())
-        .routeId(m_name)
-        .convertBodyTo(String.class)
-        .process(exchange -> {
-            final ManzanEventType type = (ManzanEventType) exchange.getIn().getHeader(EVENT_TYPE);
-            if(ManzanEventType.WATCH_MSG == type) {
-            System.out.println("sentry");
-            final SentryEvent event = new SentryEvent();
-            final String watch = getWatchName(exchange);
-            final SentryId id = new SentryId(UUID.randomUUID());
-            event.setTag("session id", watch);
-            event.setEventId(id);
-            event.setExtras(getDataMap(exchange));
-            final User user = new User();
-            user.setUsername(getString(exchange, MSG_SENDING_USRPRF));
-            event.setUser(user);
-            event.setPlatform("IBM i");
-            event.setTag("runtime", "IBM i");
-            event.setTag("runtime.name", "IBM i");
-            event.setDist("PASE");
-            event.setTransaction(getString(exchange, MSG_ORDINAL_POSITION));
+            .routeId(m_name)
+            .convertBodyTo(String.class)
+            .process(exchange -> {
+                final SentryEvent event = new SentryEvent();
+                event.setTag(SESSION_ID, getWatchName(exchange)); //TODO: Check if SESSION_ID or just session id
+                event.setEventId(new SentryId(UUID.randomUUID()));
+                event.setExtras(getDataMap(exchange));
+                event.setPlatform("IBM i");
+                event.setTag("runtime", "IBM i");
+                event.setTag("runtime.name", "IBM i");
+                event.setDist("PASE");
+                event.setTransaction(getString(exchange, MSG_ORDINAL_POSITION));
 
-            SentryLevel level;
-            final int sev = (Integer) get(exchange, MSG_SEVERITY);
-            if (sev > SEVERITY_LIMIT) {
-                level = SentryLevel.ERROR;
-            } else {
-                level = SentryLevel.INFO;
-            }
+                final User user = new User();
+                user.setUsername(getString(exchange, MSG_SENDING_USRPRF));
+                event.setUser(user);
 
-            event.setLevel(level);
-            final Message message = new Message();
-            final String messageStr = getString(exchange, MSG_MESSAGE_ID) + ": " + getString(exchange, MSG_MESSAGE);
-            message.setMessage(messageStr);
-            final List<String> fingerprints = new LinkedList<String>();
-            fingerprints.add(getString(exchange, MSG_MESSAGE_ID));
-            fingerprints.add(getString(exchange, MSG_SENDING_PROCEDURE_NAME));
-            fingerprints.add(getString(exchange, MSG_SENDING_MODULE_NAME));
-            fingerprints.add(getString(exchange, MSG_SENDING_PROGRAM_NAME));
-            event.setFingerprints(fingerprints);
-            event.setMessage(message);
-            Sentry.captureEvent(event);
-            } else {
-                throw new RuntimeException("Sentry route doesn't know how to process type "+type);
-            }
-        });
+                final Message message = new Message();
+                message.setMessage(getBody(exchange, String.class));
+                event.setMessage(message);
+
+                String timestamp;
+                final List<String> fingerprints = new LinkedList<String>();
+
+                final ManzanEventType type = (ManzanEventType) exchange.getIn().getHeader(EVENT_TYPE);
+                if (ManzanEventType.WATCH_MSG == type) {
+                    event.setLevel(((Integer) get(exchange, MSG_SEVERITY)) > SEVERITY_LIMIT ? SentryLevel.ERROR : SentryLevel.INFO);
+                    timestamp = MSG_MESSAGE_TIMESTAMP;
+                    fingerprints.add(getString(exchange, MSG_MESSAGE_ID));
+                    fingerprints.add(getString(exchange, MSG_SENDING_PROCEDURE_NAME));
+                    fingerprints.add(getString(exchange, MSG_SENDING_MODULE_NAME));
+                    fingerprints.add(getString(exchange, MSG_SENDING_PROGRAM_NAME));
+                } else if (type == ManzanEventType.WATCH_VLOG) {
+                    // TODO: Set log level
+                    timestamp = LOG_TIMESTAMP;
+                    fingerprints.add(getString(exchange, MAJOR_CODE));
+                    fingerprints.add(getString(exchange, MINOR_CODE));
+                } else if (type == ManzanEventType.WATCH_PAL) {
+                    // TODO: Set log level
+                    timestamp = PAL_TIMESTAMP;
+                    fingerprints.add(getString(exchange, SYSTEM_REFERENCE_CODE));
+                } else {
+                    throw new RuntimeException("Sentry route doesn't know how to process type " + type);
+                }
+
+                event.setTimestamp(Date.valueOf(getString(exchange, timestamp))); //TODO: Verify date is valid
+                event.setFingerprints(fingerprints);
+                Sentry.captureEvent(event);
+            });
     }
-    //@formatter:on
+//@formatter:on
 }
