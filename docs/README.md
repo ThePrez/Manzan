@@ -38,7 +38,6 @@ Many other destinations will be available. Examples include:
 - Email (SMTP/SMTPS) ✅
 - [FluentD](http://fluentd.org) ✅
 - [Google Drive](http://drive.google.com) ⏳
-- [Google Mail (gmail)](http://gmail.com) ⏳
 - [Google Pub/Sub](http://cloud.google.com/pubsub) ⏳
 - [Grafana Loki](https://grafana.com/oss/loki/) ✅
 - HTTP endpoints (REST, etc) ✅
