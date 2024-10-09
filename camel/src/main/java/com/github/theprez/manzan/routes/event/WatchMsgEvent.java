@@ -45,8 +45,7 @@ public class WatchMsgEvent extends ManzanRoute {
         from("timer://foo?synchronous=true&period=" + m_interval)
             .routeId("manzan_msg:" + m_name)
             .setHeader(EVENT_TYPE, constant(m_eventType))
-            .setBody(constant("SELECT * FROM " + m_schema + "." + m_table + " WHERE SESSION_ID = '" + m_sessionId
-                    + "' LIMIT " + m_numToProcess))
+            .setBody(constant("SELECT * FROM " + m_schema + "." + m_table + " WHERE SESSION_ID = '" + m_sessionId + "' LIMIT " + m_numToProcess))
             // .to("stream:out")
             .to("jdbc:jt400?outputType=StreamList")
             .split(body()).streaming().parallelProcessing()
@@ -61,8 +60,7 @@ public class WatchMsgEvent extends ManzanRoute {
                 }
             })
             .recipientList(constant(getRecipientList())).parallelProcessing().stopOnException().end()
-            .setBody(simple(
-                    "DELETE FROM " + m_schema + "." + m_table + " WHERE ORDINAL_POSITION = ${header.id} WITH NC"))
+            .setBody(simple( "DELETE FROM " + m_schema + "." + m_table + " WHERE ORDINAL_POSITION = ${header.id} WITH NC"))
             .to("jdbc:jt400").to("stream:err");
     }
     //@formatter:on

@@ -12,7 +12,7 @@
   memset(dest, 0, sizeof(dest)); \
   strncpy(dest, parm ? parm : "", -1 + sizeof(dest));
 
-void check_sql_error(int sqlcode, const char* sqlstate)
+void check_sql_error(int sqlcode, const char *sqlstate)
 {
   if (sqlcode != 0)
   {
@@ -68,13 +68,50 @@ extern int db2_publish_message(PUBLISH_MESSAGE_FUNCTION_SIGNATURE)
 
 extern int db2_publish_vlog(PUBLISH_VLOG_FUNCTION_SIGNATURE)
 {
+  exec sql include SQLCA;
+  char vlog_session_id[11];
+  char vlog_major_code[11];
+  char vlog_minor_code[11];
+  char vlog_log_id[11];
+  char vlog_log_timestamp[11];
+  char vlog_tde_num[11];
+  char vlog_task_name[11];
+  char vlog_server_type[11];
+  char vlog_exception_id[11];
+  char vlog_job[11];
+  char vlog_thread_id[11];
+  char vlog_module_offset[11];
+  char vlog_module_ru_name[11];
+  char vlog_module_name[11];
+  char vlog_module_entry_point_name[11];
+
+  COPY_PARM(vlog_session_id, _session_id);
+  COPY_PARM(vlog_major_code, _major_code);
+  COPY_PARM(vlog_minor_code, _minor_code);
+  COPY_PARM(vlog_log_id, _log_id);
+  COPY_PARM(vlog_log_timestamp, _timestamp);
+  COPY_PARM(vlog_tde_num, _tde_number);
+  COPY_PARM(vlog_task_name, _task_name);
+  COPY_PARM(vlog_server_type, _server_type);
+  COPY_PARM(vlog_exception_id, _exception_id);
+  COPY_PARM(vlog_job, _job);
+  COPY_PARM(vlog_thread_id, _thread_id);
+  COPY_PARM(vlog_module_offset, _module_offset);
+  COPY_PARM(vlog_module_ru_name, _module_ru_name);
+  COPY_PARM(vlog_module_name, _module_name);
+  COPY_PARM(vlog_module_entry_point_name, _module_entry_point_name);
+
+  EXEC SQL
+      INSERT INTO MANZANVLOG(SESSION_ID, MAJOR_CODE, MINOR_CODE, LOG_ID, LOG_TIMESTAMP, TDE_NUM, TASK_NAME, SERVER_TYPE, EXCEPTION_ID, JOB, THREAD_ID, MODULE_OFFSET, MODULE_RU_NAME, MODULE_NAME, MODULE_ENTRY_POINT_NAME)
+          VALUES( : vlog_session_id, : vlog_major_code, : vlog_minor_code, : vlog_log_id, : vlog_log_timestamp, : vlog_tde_num, : vlog_task_name, : vlog_server_type, : vlog_exception_id, : vlog_job, : vlog_thread_id, : vlog_module_offset, : vlog_module_ru_name, : vlog_module_name, : vlog_module_entry_point_name:);
+  check_sql_error(sqlca.sqlcode, sqlca.sqlstate);
   return 0;
 }
 
 int db2_publish_pal(PUBLISH_PAL_FUNCTION_SIGNATURE)
 {
   exec sql include SQLCA;
-  char pal_sessid[11];
+  char pal_session_id[11];
   char pal_system_reference_code[11];
   char pal_device_name[11];
   char pal_device_type[11];
@@ -88,7 +125,7 @@ int db2_publish_pal(PUBLISH_PAL_FUNCTION_SIGNATURE)
   char pal_table_id[11];
   char pal_sequence[32];
 
-  COPY_PARM(pal_sessid, _session_id);
+  COPY_PARM(pal_session_id, _session_id);
   COPY_PARM(pal_system_reference_code, _system_reference_code);
   COPY_PARM(pal_device_name, _device_name);
   COPY_PARM(pal_device_type, _device_type);
@@ -104,7 +141,7 @@ int db2_publish_pal(PUBLISH_PAL_FUNCTION_SIGNATURE)
 
   EXEC SQL
       INSERT INTO MANZANPAL(SESSION_ID, SYSTEM_REFERENCE_CODE, DEVICE_NAME, MODEL, SERIAL_NUMBER, RESOURCE_NAME, LOG_ID, PAL_TIMESTAMP, REFERENCE_CODE, SECONDARY_CODE, TABLE_ID, SEQUENCE_NUM)
-          VALUES( : pal_sessid, : pal_system_reference_code, : pal_device_name, : pal_model, : pal_serial_number, : pal_resource_name, : pal_log_identifier, : pal_timestamp, : pal_reference_code, : pal_secondary_code, : pal_table_id, : pal_sequence);
+          VALUES( : pal_session_id, : pal_system_reference_code, : pal_device_name, : pal_model, : pal_serial_number, : pal_resource_name, : pal_log_identifier, : pal_timestamp, : pal_reference_code, : pal_secondary_code, : pal_table_id, : pal_sequence);
   check_sql_error(sqlca.sqlcode, sqlca.sqlstate);
   return 0;
 }

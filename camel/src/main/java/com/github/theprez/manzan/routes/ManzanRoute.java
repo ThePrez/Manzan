@@ -16,6 +16,7 @@ public abstract class ManzanRoute extends RouteBuilder {
     protected static final String SESSION_ID = "SESSION_ID";
     protected static final String MSG_ORDINAL_POSITION = "ORDINAL_POSITION";
     protected static final String HANDLED_TIMESTAMP = "HANDLED_TIMESTAMP";
+
     protected static final String MSG_MESSAGE_ID = "MESSAGE_ID";
     protected static final String MSG_MESSAGE_TYPE = "MESSAGE_TYPE";
     protected static final String MSG_SEVERITY = "SEVERITY";

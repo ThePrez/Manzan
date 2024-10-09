@@ -45,18 +45,17 @@ public class GrafanaLokiDestination extends ManzanRoute {
     public void configure() {
         from(getInUri())
             .routeId(m_name).process(exchange -> {
-                final ManzanEventType type = (ManzanEventType) exchange.getIn().getHeader(EVENT_TYPE);
-                StreamBuilder builder;
+                StreamBuilder builder = logController
+                    .stream()
+                    .l(appLabelName, appLabelValue)
+                    .l(SESSION_ID, getWatchName(exchange));
                 String timestamp;
                 String[] keys;
+                
+                final ManzanEventType type = (ManzanEventType) exchange.getIn().getHeader(EVENT_TYPE);
                 if (type == ManzanEventType.WATCH_MSG) {
-                    builder = logController
-                            .stream()
-                            .l(appLabelName, appLabelValue)
-                            .l(Labels.LEVEL,
-                                    ((Integer) get(exchange, MSG_SEVERITY)) > SEVERITY_LIMIT ? Labels.FATAL
-                                            : Labels.INFO)
-                            .l(SESSION_ID, getWatchName(exchange));
+                    builder
+                        .l(Labels.LEVEL, ((Integer) get(exchange, MSG_SEVERITY)) > SEVERITY_LIMIT ? Labels.FATAL : Labels.INFO);
 
                     timestamp = MSG_MESSAGE_TIMESTAMP;
                     keys = new String[] {
@@ -70,10 +69,7 @@ public class GrafanaLokiDestination extends ManzanRoute {
                             MSG_SENDING_PROCEDURE_NAME
                     };
                 } else if (type == ManzanEventType.WATCH_VLOG) {
-                    builder = logController
-                            .stream()
-                            .l(appLabelName, appLabelValue)
-                            .l(SESSION_ID, getWatchName(exchange));
+                    // TODO: Set log level
 
                     timestamp = LOG_TIMESTAMP;
                     keys = new String[] {
@@ -92,11 +88,8 @@ public class GrafanaLokiDestination extends ManzanRoute {
                             MODULE_ENTRY_POINT_NAME
                     };
                 } else if (type == ManzanEventType.WATCH_PAL) {
-                    builder = logController
-                            .stream()
-                            .l(appLabelName, appLabelValue)
-                            .l(SESSION_ID, getWatchName(exchange));
-
+                    // TODO: Set log level
+                    
                     timestamp = PAL_TIMESTAMP;
                     keys = new String[] {
                             SYSTEM_REFERENCE_CODE,
@@ -111,7 +104,7 @@ public class GrafanaLokiDestination extends ManzanRoute {
                             SEQUENCE_NUM
                     };
                 } else {
-                    throw new RuntimeException("Unknown event type " + type);
+                    throw new RuntimeException("Grafana Loki route doesn't know how to process type " + type);
                 }
 
                 for (String key : keys) {
