@@ -11,4 +11,5 @@
       * [Twilio](config/examples/twilio.md)
       * [Sentry](config/examples/sentry.md)
       * [Grafana Loki](config/examples/grafanaLoki.md)
+      * [Google Pub/Sub](config/examples/googlePubSub.md)
 * [Contributing](contributing.md)

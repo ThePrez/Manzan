@@ -9,7 +9,6 @@ import org.apache.camel.Exchange;
 import com.github.theprez.jcmdutils.StringUtils;
 import com.github.theprez.manzan.ManzanMessageFormatter;
 
-
 public abstract class ManzanGenericCamelRoute extends ManzanRoute {
 
     private final String m_camelComponent;
@@ -25,12 +24,12 @@ public abstract class ManzanGenericCamelRoute extends ManzanRoute {
         m_headerParams = null == _headerParams ? new HashMap<String, Object>(1) : _headerParams;
         m_camelComponent = _camelComponent;
         m_path = _path;
-        m_formatter = StringUtils.isEmpty(_format) ? null: new ManzanMessageFormatter(_format);
-      
+        m_formatter = StringUtils.isEmpty(_format) ? null : new ManzanMessageFormatter(_format);
+
     }
 
     protected abstract void customPostProcess(Exchange exchange);
-    //@formatter:off
+
     @Override
     public void configure() {
         from(getInUri())
@@ -43,11 +42,12 @@ public abstract class ManzanGenericCamelRoute extends ManzanRoute {
                     }
                 })
                 .setBody(simple("${body}\n"))
-                //.wireTap("stream:out")
-                .process(exchange -> {customPostProcess(exchange);})
+                // .wireTap("stream:out")
+                .process(exchange -> {
+                    customPostProcess(exchange);
+                })
                 .to(getTargetUri());
     }
-    //@formatter:on
 
     private String getTargetUri() {
         String ret = m_camelComponent;
@@ -61,16 +61,16 @@ public abstract class ManzanGenericCamelRoute extends ManzanRoute {
             ret += entry.getKey();
             ret += "=";
             ret += entry.getValue();
-            //TODO: what's right here? with "file://" targets Camel wants real paths
+            // TODO: what's right here? with "file://" targets Camel wants real paths
             // try {
-            //     ret += URLEncoder.encode(entry.getValue(), "UTF-8");
+            // ret += URLEncoder.encode(entry.getValue(), "UTF-8");
             // } catch (final UnsupportedEncodingException e) {
-            //     ret += URLEncoder.encode(entry.getValue());
+            // ret += URLEncoder.encode(entry.getValue());
             // }
             ret += "&";
         }
         ret = ret.replaceFirst("&$", "");
-        System.out.println("target URI: "+ret);
+        System.out.println("target URI: " + ret);
         return ret;
     }
 }
