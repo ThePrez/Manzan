@@ -12,7 +12,7 @@ Be sure to have read up on [Manzan configuration](/config/index.md) to understan
 [watchout]
 type=watch
 id=sanjula
-destinations=pubSub_out
+destinations=pubsub_out
 format=$MESSAGE_ID$ (severity $SEVERITY$): $MESSAGE$
 strwch=WCHMSG((*ALL)) WCHMSGQ((*HSTLOG))
 ```
@@ -20,17 +20,17 @@ strwch=WCHMSG((*ALL)) WCHMSGQ((*HSTLOG))
 ### `dests.ini`
 
 ```ini
-[pubSub_out]
+[pubsub_out]
 type=google-pubsub
 
 # Set your project ID (ie. my-project-438217)
-projectId=<pub_sub_project_id>
+projectId=<pubsub_project_id>
 
 # Set your topic name (ie. my-topic)
-topicName=<pub_sub_topic_name>
+topicName=<pubsub_topic_name>
 
 # Set your service account name (ie. file:/QOpenSys/etc/manzan/my-project-438217-b7392819a7hf.json)
-serviceAccountKey=<pub_sub_service_account_key>
+serviceAccountKey=<pubsub_service_account_key>
 ```
 
 ## Result

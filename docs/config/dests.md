@@ -63,11 +63,11 @@ url=<loki_url>
 username=<loki_username>
 password=<loki_password>
 
-[pubSub_out]
+[pubsub_out]
 type=google-pubsub
-projectId=<pub_sub_project_id>
-topicName=<pub_sub_topic_name>
-serviceAccountKey=<pub_sub_service_account_key>
+projectId=<pubsub_project_id>
+topicName=<pubsub_topic_name>
+serviceAccountKey=<pubsub_service_account_key>
 
 [slackme]
 type=slack
