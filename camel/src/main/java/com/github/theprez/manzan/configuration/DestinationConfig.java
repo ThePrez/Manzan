@@ -68,7 +68,7 @@ public class DestinationConfig extends Config {
                     final String topic = getRequiredString(name, "topic");
                     ret.put(name, new KafkaDestination(name, topic, format, getUriAndHeaderParameters(name, sectionObj, "topic")));
                     break;
-                case "pubsub":
+                case "google-pubsub":
                     final String projectId = getRequiredString(name, "projectId");
                     final String topicName = getRequiredString(name, "topicName");
                     final String serviceAccountKey = getRequiredString(name, "serviceAccountKey");

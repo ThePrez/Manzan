@@ -1,5 +1,6 @@
 package com.github.theprez.manzan.routes.dest;
 
+import java.util.HashMap;
 import java.util.Map;
 
 import org.apache.camel.CamelContext;
@@ -29,6 +30,11 @@ public class GooglePubSubDestination extends ManzanGenericCamelRoute {
         } else if (ManzanEventType.WATCH_PAL == type) {
             // exchange.getIn().setHeader(GooglePubsubConstants.PUBLISH_TIME, getString(exchange, PAL_TIMESTAMP));
         }
-        exchange.getIn().setHeader(GooglePubsubConstants.ATTRIBUTES, getBody(exchange, String.class));
+
+        Map<String, String> map = new HashMap<>();
+        for (Map.Entry<String, Object> entry : getDataMap(exchange).entrySet()) {
+            map.put(entry.getKey(), entry.getValue().toString());
+        }
+        exchange.getIn().setHeader(GooglePubsubConstants.ATTRIBUTES, map);
     }
 }
