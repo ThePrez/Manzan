@@ -18,6 +18,7 @@ import com.github.theprez.manzan.routes.dest.DirDestination;
 import com.github.theprez.manzan.routes.dest.EmailDestination;
 import com.github.theprez.manzan.routes.dest.FileDestination;
 import com.github.theprez.manzan.routes.dest.FluentDDestination;
+import com.github.theprez.manzan.routes.dest.GooglePubSubDestination;
 import com.github.theprez.manzan.routes.dest.GrafanaLokiDestination;
 import com.github.theprez.manzan.routes.dest.HttpDestination;
 import com.github.theprez.manzan.routes.dest.KafkaDestination;
@@ -66,6 +67,12 @@ public class DestinationConfig extends Config {
                 case "kafka":
                     final String topic = getRequiredString(name, "topic");
                     ret.put(name, new KafkaDestination(name, topic, format, getUriAndHeaderParameters(name, sectionObj, "topic")));
+                    break;
+                case "pubsub":
+                    final String projectId = getRequiredString(name, "projectId");
+                    final String topicName = getRequiredString(name, "topicName");
+                    final String serviceAccountKey = getRequiredString(name, "serviceAccountKey");
+                    ret.put(name, new GooglePubSubDestination(context, name, format, projectId, topicName, serviceAccountKey, getUriAndHeaderParameters(name, sectionObj, "projectId", "topicName", "serviceAccountKey")));
                     break;
                 case "file":
                     final String file = getRequiredString(name, "file");
