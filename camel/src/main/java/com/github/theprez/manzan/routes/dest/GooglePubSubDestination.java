@@ -12,7 +12,7 @@ import com.github.theprez.manzan.ManzanEventType;
 import com.github.theprez.manzan.routes.ManzanGenericCamelRoute;
 
 public class GooglePubSubDestination extends ManzanGenericCamelRoute {
-    public GooglePubSubDestination(CamelContext context, final String _name, final String _format, final String _projectId, final String _topicName, final String _serviceAccountKey, final Map<String, String> _uriParams) {
+    public GooglePubSubDestination(CamelContext context, final String _name, final String _projectId, final String _topicName, final String _serviceAccountKey, final String _format, final Map<String, String> _uriParams) {
         super(_name, "google-pubsub", _projectId + ":" + _topicName, _format, _uriParams, null);
         GooglePubsubComponent pubsub = context.getComponent("google-pubsub", GooglePubsubComponent.class);
         pubsub.setServiceAccountKey(_serviceAccountKey);
