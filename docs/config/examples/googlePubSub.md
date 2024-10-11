@@ -1,4 +1,4 @@
-# Google Pubsub
+# Google Pub/Sub
 
 This example shows how to use `google-pubsub` as a destination for a `watch` data source.
 
