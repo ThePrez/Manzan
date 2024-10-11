@@ -1,4 +1,4 @@
-# Grafana Loki
+# Google Pubsub
 
 This example shows how to use `google-pubsub` as a destination for a `watch` data source.
 
