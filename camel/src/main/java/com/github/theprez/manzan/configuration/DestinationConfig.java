@@ -9,7 +9,6 @@ import java.util.List;
 import java.util.Map;
 
 import org.apache.camel.CamelContext;
-import org.apache.kafka.common.protocol.types.Field;
 import org.ini4j.InvalidFileFormatException;
 import org.ini4j.Profile.Section;
 
@@ -63,7 +62,7 @@ public class DestinationConfig extends Config {
                 case "slack": {
                     final String webhook = getRequiredString(name, "webhook");
                     final String channel = getRequiredString(name, "channel");
-                    ret.put(name, new SlackDestination( name, webhook, channel, format));
+                    ret.put(name, new SlackDestination(name, webhook, channel, format));
                 }
                     break;
                 case "kafka":
@@ -98,7 +97,7 @@ public class DestinationConfig extends Config {
                     final String url = getRequiredString(name, "url");
                     final String username = getRequiredString(name, "username");
                     final String password = getRequiredString(name, "password");
-                    ret.put(name, new GrafanaLokiDestination( name, url, username, password, format));
+                    ret.put(name, new GrafanaLokiDestination(name, url, username, password, format));
                 }
                     break;
                 case "smtp":
@@ -109,8 +108,6 @@ public class DestinationConfig extends Config {
                     ret.put(name, d);
                     break;
                 case "twilio":
-                    // final String sid = getRequiredString(name, "sid");
-                    // final String token = getRequiredString(name, "token");
                     ret.put(name, new TwilioDestination(context, name, format,
                     componentOptions,
                     getUriAndHeaderParameters(name, sectionObj, "sid", "token")));
