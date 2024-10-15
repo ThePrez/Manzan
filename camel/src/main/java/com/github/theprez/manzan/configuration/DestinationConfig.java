@@ -22,6 +22,7 @@ import com.github.theprez.manzan.routes.dest.FluentDDestination;
 import com.github.theprez.manzan.routes.dest.GrafanaLokiDestination;
 import com.github.theprez.manzan.routes.dest.HttpDestination;
 import com.github.theprez.manzan.routes.dest.KafkaDestination;
+import com.github.theprez.manzan.routes.dest.ActiveMqDestination;
 import com.github.theprez.manzan.routes.dest.SentryDestination;
 import com.github.theprez.manzan.routes.dest.SlackDestination;
 import com.github.theprez.manzan.routes.dest.StreamDestination;
@@ -68,6 +69,12 @@ public class DestinationConfig extends Config {
                 case "kafka":
                     final String topic = getRequiredString(name, "topic");
                     ret.put(name, new KafkaDestination(context, name, topic, format, componentOptions, getUriAndHeaderParameters(name, sectionObj, "topic")));
+                    break;
+                case "activemq":
+                    final String destName = getRequiredString(name, "destName");
+                    String destType = getOptionalString(name, "destType");
+                    destType = destType.equals("topic") ? "topic" : "queue";
+                    ret.put(name, new ActiveMqDestination(name, destType, destName, format, getUriAndHeaderParameters(name, sectionObj, "destName", "destType")));
                     break;
                 case "file":
                     final String file = getRequiredString(name, "file");
