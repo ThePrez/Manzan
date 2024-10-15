@@ -17,16 +17,15 @@ public class SlackDestination extends ManzanRoute {
         m_format = StringUtils.isEmpty(_format) ? null : new ManzanMessageFormatter(_format);
     }
 
-//@formatter:off
     @Override
     public void configure() {
         if (null == m_format) {
             from(getInUri())
-            .routeId(m_name)
-            .to("slack:" + m_channel + "?webhookUrl=" + m_webhook);
+                    .routeId(m_name)
+                    .to("slack:" + m_channel + "?webhookUrl=" + m_webhook);
         } else {
             from(getInUri())
-        .routeId(m_name).convertBodyTo(String.class, "UTF-8")
+                    .routeId(m_name).convertBodyTo(String.class, "UTF-8")
                     .process(exchange -> {
                         final String formatted = m_format.format(getDataMap(exchange));
                         exchange.getIn().setBody(formatted);
@@ -35,6 +34,4 @@ public class SlackDestination extends ManzanRoute {
                     .to("slack:" + m_channel + "?webhookUrl=" + m_webhook);
         }
     }
-    //@formatter:on
-
 }

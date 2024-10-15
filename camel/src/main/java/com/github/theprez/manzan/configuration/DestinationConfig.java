@@ -18,6 +18,7 @@ import com.github.theprez.manzan.routes.dest.DirDestination;
 import com.github.theprez.manzan.routes.dest.EmailDestination;
 import com.github.theprez.manzan.routes.dest.FileDestination;
 import com.github.theprez.manzan.routes.dest.FluentDDestination;
+import com.github.theprez.manzan.routes.dest.GooglePubSubDestination;
 import com.github.theprez.manzan.routes.dest.GrafanaLokiDestination;
 import com.github.theprez.manzan.routes.dest.HttpDestination;
 import com.github.theprez.manzan.routes.dest.KafkaDestination;
@@ -67,6 +68,12 @@ public class DestinationConfig extends Config {
                     final String topic = getRequiredString(name, "topic");
                     ret.put(name, new KafkaDestination(name, topic, format, getUriAndHeaderParameters(name, sectionObj, "topic")));
                     break;
+                case "google-pubsub":
+                    final String projectId = getRequiredString(name, "projectId");
+                    final String topicName = getRequiredString(name, "topicName");
+                    final String serviceAccountKey = getRequiredString(name, "serviceAccountKey");
+                    ret.put(name, new GooglePubSubDestination(context, name, projectId, topicName, serviceAccountKey, format, getUriAndHeaderParameters(name, sectionObj, "projectId", "topicName", "serviceAccountKey")));
+                    break;
                 case "file":
                     final String file = getRequiredString(name, "file");
                     ret.put(name, new FileDestination(name, file, format, getUriAndHeaderParameters(name, sectionObj, "file")));
@@ -96,14 +103,13 @@ public class DestinationConfig extends Config {
                 case "smtps":
                     final String server = getRequiredString(name, "server");
                     final int port = getOptionalInt(name, "port");
-                    final EmailDestination d = new EmailDestination(name, type, server, format, port, getUriAndHeaderParameters(name, sectionObj, "server", "port"), null);
+                    final EmailDestination d = new EmailDestination(name, type, server, port, format, getUriAndHeaderParameters(name, sectionObj, "server", "port"), null);
                     ret.put(name, d);
                     break;
                 case "twilio":
                     final String sid = getRequiredString(name, "sid");
                     final String token = getRequiredString(name, "token");
-                    ret.put(name, new TwilioDestination(context, name, format, sid, token, 
-                    getUriAndHeaderParameters(name, sectionObj, "sid", "token")));
+                    ret.put(name, new TwilioDestination(context, name, sid, token, format, getUriAndHeaderParameters(name, sectionObj, "sid", "token")));
                     break;
                 case "http":
                 case "https":
