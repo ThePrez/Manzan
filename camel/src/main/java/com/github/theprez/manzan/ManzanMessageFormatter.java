@@ -20,6 +20,10 @@ public class ManzanMessageFormatter {
         return formatter.format(_mappings);
     }
 
+    public String getM_fmtStr() {
+        return m_fmtStr;
+    }
+
     private final String m_fmtStr;
 
     public ManzanMessageFormatter(final String _fmtStr) {
@@ -33,8 +37,9 @@ public class ManzanMessageFormatter {
         ret = ret.replace("\\n", "\n").replace("\\t", "\t");
 
         for (final Entry<String, Object> repl : _mappings.entrySet()) {
-            ret = ret.replace("$" + repl.getKey() + "$", "" + repl.getValue());
-            String jsonIndicator ="$json:" + repl.getKey() + "$"; 
+            final String key = repl.getKey();
+            ret = ret.replace("$" + key + "$", "" + repl.getValue());
+            String jsonIndicator ="$json:" + key + "$";
             if(ret.contains(jsonIndicator)) {
                 ret = ret.replace(jsonIndicator, jsonEncode("" + repl.getValue()));
             }
