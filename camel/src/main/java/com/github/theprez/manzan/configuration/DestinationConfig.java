@@ -9,6 +9,7 @@ import java.util.List;
 import java.util.Map;
 
 import org.apache.camel.CamelContext;
+import org.apache.kafka.common.protocol.types.Field;
 import org.ini4j.InvalidFileFormatException;
 import org.ini4j.Profile.Section;
 
@@ -53,27 +54,28 @@ public class DestinationConfig extends Config {
             final String name = section;
             final Section sectionObj = getIni().get(name);
             final String format = getOptionalString(name, "format");
+            final Map<String, String> componentOptions = getComponentOptions(name);
             switch (type) {
                 case "stdout":
-                    ret.put(name, new StreamDestination(name, getOptionalString(name, "format")));
+                    ret.put(name, new StreamDestination(context, name, format, componentOptions));
                     break;
                 case "slack": {
                     final String webhook = getRequiredString(name, "webhook");
                     final String channel = getRequiredString(name, "channel");
-                    ret.put(name, new SlackDestination(name, webhook, channel, format));
+                    ret.put(name, new SlackDestination( name, webhook, channel, format));
                 }
                     break;
                 case "kafka":
                     final String topic = getRequiredString(name, "topic");
-                    ret.put(name, new KafkaDestination(name, topic, format, getUriAndHeaderParameters(name, sectionObj, "topic")));
+                    ret.put(name, new KafkaDestination(context, name, topic, format, componentOptions, getUriAndHeaderParameters(name, sectionObj, "topic")));
                     break;
                 case "file":
                     final String file = getRequiredString(name, "file");
-                    ret.put(name, new FileDestination(name, file, format, getUriAndHeaderParameters(name, sectionObj, "file")));
+                    ret.put(name, new FileDestination(context, name, file, format, componentOptions, getUriAndHeaderParameters(name, sectionObj, "file")));
                     break;
                 case "dir":
                     final String dir = getRequiredString(name, "dir");
-                    ret.put(name, new DirDestination(name, dir, format, getUriAndHeaderParameters(name, sectionObj, "dir")));
+                    ret.put(name, new DirDestination(context, name, dir, format, componentOptions, getUriAndHeaderParameters(name, sectionObj, "dir")));
                     break;
                 case "sentry":
                     final String dsn = getRequiredString(name, "dsn");
@@ -89,26 +91,27 @@ public class DestinationConfig extends Config {
                     final String url = getRequiredString(name, "url");
                     final String username = getRequiredString(name, "username");
                     final String password = getRequiredString(name, "password");
-                    ret.put(name, new GrafanaLokiDestination(name, url, username, password, format));
+                    ret.put(name, new GrafanaLokiDestination( name, url, username, password, format));
                 }
                     break;
                 case "smtp":
                 case "smtps":
                     final String server = getRequiredString(name, "server");
                     final int port = getOptionalInt(name, "port");
-                    final EmailDestination d = new EmailDestination(name, type, server, format, port, getUriAndHeaderParameters(name, sectionObj, "server", "port"), null);
+                    final EmailDestination d = new EmailDestination(context, name, type, server, format, port, componentOptions, getUriAndHeaderParameters(name, sectionObj, "server", "port"), null);
                     ret.put(name, d);
                     break;
                 case "twilio":
-                    final String sid = getRequiredString(name, "sid");
-                    final String token = getRequiredString(name, "token");
-                    ret.put(name, new TwilioDestination(context, name, format, sid, token, 
+                    // final String sid = getRequiredString(name, "sid");
+                    // final String token = getRequiredString(name, "token");
+                    ret.put(name, new TwilioDestination(context, name, format,
+                    componentOptions,
                     getUriAndHeaderParameters(name, sectionObj, "sid", "token")));
                     break;
                 case "http":
                 case "https":
                     final String url = getRequiredString(name, "url");
-                    ret.put(name, HttpDestination.get(name, type, url, format, getUriAndHeaderParameters(name, sectionObj, "url")));
+                    ret.put(name, HttpDestination.get(context, name, type, url, format, componentOptions, getUriAndHeaderParameters(name, sectionObj, "url")));
                     break;
                 default:
                     throw new RuntimeException("Unknown destination type: " + type);
