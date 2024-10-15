@@ -18,7 +18,9 @@ As well, each section can provide `format` as an optional type.
 
 ## Available types
 
-Some types have additional properties that they require.
+Some types have additional properties that they require. Note, to specify a property that is a [component option](https://camel.apache.org/manual/component.html#_configuring_component_options),
+you need to prefix the property with `componentOptions.` in your dest.ini configuration file. For example, to specify the option [brokerURL](https://camel.apache.org/components/3.22.x/activemq-component.html#_component_option_brokerURL) 
+for ActiveMQ, you should write the option as `componentOptions.brokerURL=<yourActiveMQUrl>`
 
 | id               | Description                     | Required properties                                        | Optional properties                                      |
 |------------------|---------------------------------|------------------------------------------------------------| -------------------------------------------------------- |
@@ -30,6 +32,8 @@ Some types have additional properties that they require.
 | `twilio`         | Send via SMS                    | * `sid` <br> * `token` <br> * `to` <br> * `from`           |                                                          |
 | `loki`           | Send data into Grafana Loki     | * `url` <br> * `username` <br> * `password` <br>           |                                                          |
 | `http`/`https`   | Send data via http/https        | * `url`                                                    | * `httpMethod` <br> * `x` where x is any query parameter |
+| `activemq`       | Send data to activemq           | * `destinationName`                                        | https://camel.apache.org/components/3.22.x/activemq-component.html |
+
 
 ### Example
 
@@ -81,4 +85,12 @@ url=https://production.com
 foo=bar
 httpMethod=POST
 format={"message": "$FILE_DATA$", "path": "$FILE_PATH$", "name": "$FILE_NAME$"}
+
+[mq]
+type=activemq
+destType=queue
+destName=TEST.QUEUE
+format=This is the $FILE_DATA$
+componentOptions.brokerURL=tcp://myactivemq:61616
+
 ```

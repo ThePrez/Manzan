@@ -71,10 +71,10 @@ public class DestinationConfig extends Config {
                     ret.put(name, new KafkaDestination(context, name, topic, format, componentOptions, getUriAndHeaderParameters(name, sectionObj, "topic")));
                     break;
                 case "activemq":
-                    final String destName = getRequiredString(name, "destName");
-                    String destType = getOptionalString(name, "destType");
+                    final String destName = getRequiredString(name, "destinationName");
+                    String destType = getOptionalString(name, "destinationType");
                     destType = destType.equals("topic") ? "topic" : "queue";
-                    ret.put(name, new ActiveMqDestination(context, name, destType, destName, format, componentOptions, getUriAndHeaderParameters(name, sectionObj, "destName", "destType")));
+                    ret.put(name, new ActiveMqDestination(context, name, destType, destName, format, componentOptions, getUriAndHeaderParameters(name, sectionObj, "destinationName", "destinationType")));
                     break;
                 case "file":
                     final String file = getRequiredString(name, "file");
