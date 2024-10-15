@@ -4,10 +4,13 @@ import java.util.HashMap;
 import java.util.Map;
 import java.util.Map.Entry;
 
+import org.apache.camel.CamelContext;
+import org.apache.camel.Component;
 import org.apache.camel.Exchange;
 
 import com.github.theprez.jcmdutils.StringUtils;
 import com.github.theprez.manzan.ManzanMessageFormatter;
+import org.apache.camel.spi.PropertyConfigurer;
 
 
 public abstract class ManzanGenericCamelRoute extends ManzanRoute {
@@ -18,14 +21,21 @@ public abstract class ManzanGenericCamelRoute extends ManzanRoute {
     private final String m_path;
     protected final Map<String, String> m_uriParams;
 
-    public ManzanGenericCamelRoute(final String _name, final String _camelComponent, final String _path,
-            final String _format, final Map<String, String> _uriParams, final Map<String, Object> _headerParams) {
+    public <T> ManzanGenericCamelRoute(final CamelContext _context, final String _name, final String _camelComponent, final String _path,
+                                       final String _format, final Map<String, String> _uriParams, final Map<String, Object> _headerParams,
+                                       final Map<String, String> componentOptions) {
         super(_name);
         m_uriParams = null == _uriParams ? new HashMap<String, String>(1) : _uriParams;
         m_headerParams = null == _headerParams ? new HashMap<String, Object>(1) : _headerParams;
         m_camelComponent = _camelComponent;
         m_path = _path;
         m_formatter = StringUtils.isEmpty(_format) ? null: new ManzanMessageFormatter(_format);
+
+        Component component = _context.getComponent(_camelComponent, true, false);
+        PropertyConfigurer configurer = component.getComponentPropertyConfigurer();
+        componentOptions.forEach((key, value) -> {
+            configurer.configure(_context, component, key, value,  true);
+        });
       
     }
 
