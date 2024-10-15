@@ -67,7 +67,7 @@ password=<loki_password>
 type=google-pubsub
 projectId=<pubsub_project_id>
 topicName=<pubsub_topic_name>
-serviceAccountKey=<pubsub_service_account_key>
+serviceAccountKey=<path_to_pubsub_service_account_key>
 
 [slackme]
 type=slack
