@@ -57,8 +57,8 @@ dsn=<sentry_dsn>
 
 [twilio_sms]
 type=twilio
-sid=x
-token=x
+componentOptions.sid=x
+componentOptions.token=x
 to=+x
 from=+x
 
@@ -72,7 +72,7 @@ password=<loki_password>
 type=google-pubsub
 projectId=<pubsub_project_id>
 topicName=<pubsub_topic_name>
-serviceAccountKey=<path_to_pubsub_service_account_key>
+componentOptions.serviceAccountKey=<path_to_pubsub_service_account_key>
 
 [slackme]
 type=slack
