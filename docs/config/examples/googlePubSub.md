@@ -36,5 +36,5 @@ componentOptions.serviceAccountKey=<path_to_pubsub_service_account_key>
 ## Result
 
 <div style="text-align: center; margin: 20px;">
-    <img src="https://github.com/ThePrez/Manzan/blob/main/docs/images/googlePubSub1.png?raw=true" alt="Google Pub/Sub 1" style="box-shadow: 0 4px 8px rgba(0, 0, 0, 0.2); border-radius: 8px; max-width: 100%; display: block; margin-bottom: 20px;">
+    <img src="/images/googlePubSub1.png?raw=true" alt="Google Pub/Sub 1" style="box-shadow: 0 4px 8px rgba(0, 0, 0, 0.2); border-radius: 8px; max-width: 100%; display: block; margin-bottom: 20px;">
 </div>

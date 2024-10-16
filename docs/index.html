@@ -11,8 +11,11 @@
 <body>
   <div id="app"></div>
   <script>
+    const isLocal = window.location.hostname === 'localhost' || window.location.hostname === '127.0.0.1';
+
     window.$docsify = {
       name: 'Manzan',
+      basePath: isLocal ? '/' : '/Manzan/',
       repo: 'https://github.com/ThePrez/Manzan',
       loadSidebar: true,
     }
