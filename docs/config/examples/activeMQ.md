@@ -1,6 +1,6 @@
 # ActiveMQ
 
-This example shows how to use `activemq` as a destination for a `file` data source. This data will also be routed to the test_out destination, but we will only show the activemq configuration here.
+This example shows how to use `activemq` as a destination for a `file` data source.
 
 ## Configuration
 
@@ -12,7 +12,7 @@ Be sure to have read up on [Manzan configuration](/config/index.md) to understan
 [logfile1]
 type=file
 file=/Users/zakjonat/Documents/myfile.txt
-destinations=test_out, mq
+destinations=mq
 format=$FILE_DATA$
 ```
 

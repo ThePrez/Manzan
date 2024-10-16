@@ -30,7 +30,7 @@ projectId=<pubsub_project_id>
 topicName=<pubsub_topic_name>
 
 # Set your service account name (ie. file:/QOpenSys/etc/manzan/my-project-438217-b7392819a7hf.json)
-serviceAccountKey=<path_to_pubsub_service_account_key>
+componentOptions.serviceAccountKey=<path_to_pubsub_service_account_key>
 ```
 
 ## Result
