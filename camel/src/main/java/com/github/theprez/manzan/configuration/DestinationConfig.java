@@ -79,8 +79,7 @@ public class DestinationConfig extends Config {
                 case "google-pubsub":
                     final String projectId = getRequiredString(name, "projectId");
                     final String topicName = getRequiredString(name, "topicName");
-                    final String serviceAccountKey = getRequiredString(name, "serviceAccountKey");
-                    ret.put(name, new GooglePubSubDestination(context, name, projectId, topicName, serviceAccountKey, format, getUriAndHeaderParameters(name, sectionObj, "projectId", "topicName", "serviceAccountKey")));
+                    ret.put(name, new GooglePubSubDestination(context, name, projectId, topicName, format, componentOptions, getUriAndHeaderParameters(name, sectionObj, "projectId", "topicName")));
                     break;
                 case "file":
                     final String file = getRequiredString(name, "file");
