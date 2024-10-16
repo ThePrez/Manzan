@@ -18,6 +18,7 @@ import com.github.theprez.manzan.routes.dest.DirDestination;
 import com.github.theprez.manzan.routes.dest.EmailDestination;
 import com.github.theprez.manzan.routes.dest.FileDestination;
 import com.github.theprez.manzan.routes.dest.FluentDDestination;
+import com.github.theprez.manzan.routes.dest.GooglePubSubDestination;
 import com.github.theprez.manzan.routes.dest.GrafanaLokiDestination;
 import com.github.theprez.manzan.routes.dest.HttpDestination;
 import com.github.theprez.manzan.routes.dest.KafkaDestination;
@@ -74,6 +75,12 @@ public class DestinationConfig extends Config {
                     String destType = getOptionalString(name, "destinationType");
                     destType = (destType != null && destType.equals("topic")) ? "topic" : "queue";
                     ret.put(name, new ActiveMqDestination(context, name, destType, destName, format, componentOptions, getUriAndHeaderParameters(name, sectionObj, "destinationName", "destinationType")));
+                    break;
+                case "google-pubsub":
+                    final String projectId = getRequiredString(name, "projectId");
+                    final String topicName = getRequiredString(name, "topicName");
+                    final String serviceAccountKey = getRequiredString(name, "serviceAccountKey");
+                    ret.put(name, new GooglePubSubDestination(context, name, projectId, topicName, serviceAccountKey, format, getUriAndHeaderParameters(name, sectionObj, "projectId", "topicName", "serviceAccountKey")));
                     break;
                 case "file":
                     final String file = getRequiredString(name, "file");

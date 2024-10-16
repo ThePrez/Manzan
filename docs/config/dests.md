@@ -68,6 +68,12 @@ url=<loki_url>
 username=<loki_username>
 password=<loki_password>
 
+[pubsub_out]
+type=google-pubsub
+projectId=<pubsub_project_id>
+topicName=<pubsub_topic_name>
+serviceAccountKey=<path_to_pubsub_service_account_key>
+
 [slackme]
 type=slack
 channel=open-source-system-status
