@@ -33,8 +33,8 @@ type=stdout
 type=twilio
 
 # These come from a Twilio account
-sid=x
-token=x
+componentOptions.sid=x
+componentOptions.token=x
 
 to=...
 from=+12058135364

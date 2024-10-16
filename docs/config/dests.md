@@ -18,19 +18,24 @@ As well, each section can provide `format` as an optional type.
 
 ## Available types
 
-Some types have additional properties that they require.
+Some types have additional properties that they require. Note, to specify a property that is a [component option](https://camel.apache.org/manual/component.html#_configuring_component_options),
+you need to prefix the property with `componentOptions.` in your dest.ini configuration file. For example, to specify the option [brokerURL](https://camel.apache.org/components/3.22.x/activemq-component.html#_component_option_brokerURL) 
+for ActiveMQ, you should write the option as `componentOptions.brokerURL=<yourActiveMQUrl>`
 
-| id               | Description                     | Required properties                                              | Optional properties                                      |
-|------------------|---------------------------------|------------------------------------------------------------------|--------------------------------------------------------- |
-| `stdout`         | Write all data to standard out. | None.                                                            |                                                          |
-| `slack`          | Send data to a Slack channel    | * `webhook` <br> * `channel`                                     |                                                          |
-| `fluentd`        | Sent data to FluentD            | * `tag` <br> * `host` <br> * `port`                              |                                                          |
-| `smtp`/`smtps`   | Sent data via email             | * `server` <br> * `subject` <br> * `to` <br> * `from`            | * `port`                                                 |
-| `sentry`         | Send data into Sentry           | * `dsn`                                                          |                                                          |
-| `twilio`         | Send via SMS                    | * `sid` <br> * `token` <br> * `to` <br> * `from`                 |                                                          |
-| `loki`           | Send data into Grafana Loki     | * `url` <br> * `username` <br> * `password` <br>                 |                                                          |
-| `google-pubsub`  | Send data into Google Pub/Sub   | * `projectId` <br> * `topicName` <br> * `serviceAccountKey` <br> |                                                          |
-| `http`/`https`   | Send data via http/https        | * `url`                                                          | * `httpMethod` <br> * `x` where x is any query parameter |
+| id               | Description                     | Required properties                                        | Commonly used properties                                 | All properties
+|------------------|---------------------------------|------------------------------------------------------------| -------------------------------------------------------- |--------------------------------------------------------------------|
+| `stdout`         | Write all data to standard out. | None.                                                      |                                                          | https://camel.apache.org/components/3.22.x/stream-component.html   |  
+| `slack`          | Send data to a Slack channel    | * `webhook` <br> * `channel`                               |                                                          | https://camel.apache.org/components/3.22.x/slack-component.html    |
+| `fluentd`        | Send data to FluentD            | * `tag` <br> * `host` <br> * `port`                        |                                                          |                                                                    |
+| `file`           | Send data to a file             | * `file`                                                   |                                                          | https://camel.apache.org/components/3.22.x/stream-component.html   |
+| `dir`            | Send data to a directory        | * `dir`                                                    |                                                          | https://camel.apache.org/components/3.22.x/file-component.html                                                                   |    
+| `smtp`/`smtps`   | Sent data via email             | * `server` <br> * `subject` <br> * `to` <br> * `from`      | * `port`                                                 | https://camel.apache.org/components/3.22.x/mail-component.html     |
+| `sentry`         | Send data into Sentry           | * `dsn`                                                    |                                                          |                                                                    |
+| `twilio`         | Send via SMS                    | * `sid` <br> * `token` <br> * `to` <br> * `from`           |                                                          | https://camel.apache.org/components/3.22.x/twilio-component.html   |
+| `loki`           | Send data into Grafana Loki     | * `url` <br> * `username` <br> * `password` <br>           |                                                          |                                                                    |
+| `http`/`https`   | Send data via http/https        | * `url`                                                    | * `httpMethod` <br> * `x` where x is any query parameter | https://camel.apache.org/components/3.22.x/http-component.html     |
+| `activemq`       | Send data to activemq           | * `destinationName`                                        | * `destinationType` <br> * `brokerURL`                    | https://camel.apache.org/components/3.22.x/activemq-component.html |
+
 
 ### Example
 
@@ -52,8 +57,8 @@ dsn=<sentry_dsn>
 
 [twilio_sms]
 type=twilio
-sid=x
-token=x
+componentOptions.sid=x
+componentOptions.token=x
 to=+x
 from=+x
 
@@ -67,7 +72,7 @@ password=<loki_password>
 type=google-pubsub
 projectId=<pubsub_project_id>
 topicName=<pubsub_topic_name>
-serviceAccountKey=<path_to_pubsub_service_account_key>
+componentOptions.serviceAccountKey=<path_to_pubsub_service_account_key>
 
 [slackme]
 type=slack
@@ -88,4 +93,12 @@ url=https://production.com
 foo=bar
 httpMethod=POST
 format={"message": "$FILE_DATA$", "path": "$FILE_PATH$", "name": "$FILE_NAME$"}
+
+[mq]
+type=activemq
+destType=queue
+destName=TEST.QUEUE
+format=This is the $FILE_DATA$
+componentOptions.brokerURL=tcp://myactivemq:61616
+
 ```
