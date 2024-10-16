@@ -72,7 +72,7 @@ public class DestinationConfig extends Config {
                 case "activemq":
                     final String destName = getRequiredString(name, "destinationName");
                     String destType = getOptionalString(name, "destinationType");
-                    destType = destType.equals("topic") ? "topic" : "queue";
+                    destType = (destType != null && destType.equals("topic")) ? "topic" : "queue";
                     ret.put(name, new ActiveMqDestination(context, name, destType, destName, format, componentOptions, getUriAndHeaderParameters(name, sectionObj, "destinationName", "destinationType")));
                     break;
                 case "file":
@@ -129,7 +129,7 @@ public class DestinationConfig extends Config {
         List<String> exclusions = new LinkedList<>(Arrays.asList(_exclusions));
         exclusions.addAll(Arrays.asList("type", "filter", "format"));
         for (final String sectionKey : sectionObj.keySet()) {
-            if (exclusions.contains(sectionKey) || sectionKey.startsWith("componentOptions.")) {
+            if (exclusions.contains(sectionKey) || sectionKey.startsWith(Config.COMPONENT_OPTIONS_PREFIX)) {
                 continue;
             }
             pathParameters.put(sectionKey, getRequiredString(_name, sectionKey));

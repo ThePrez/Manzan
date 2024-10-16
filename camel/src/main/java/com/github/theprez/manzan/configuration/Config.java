@@ -13,6 +13,7 @@ import com.github.theprez.jcmdutils.StringUtils;
 public abstract class Config {
 
     public static final String DIRECTORY_OVERRIDE_PROPERTY = "manzan.configdir";
+    public static final String COMPONENT_OPTIONS_PREFIX = "componentOptions.";
 
     protected static boolean isIBMi() {
         final String osName = System.getProperty("os.name", "Misty");
@@ -74,9 +75,6 @@ public abstract class Config {
 
     protected Map<String, String> getComponentOptions(final String _name) {
             Map<String, String> section = m_ini.get(_name);
-            String prefix = "componentOptions.";
-            int prefixLength = prefix.length();
-
 
             // Map to store key-value pairs
             Map<String, String> componentOptionsMap = new HashMap<>();
@@ -87,9 +85,9 @@ public abstract class Config {
                     String value = entry.getValue();
 
                     // Check if the key starts with "componentOptions."
-                    if (key.startsWith("componentOptions.")) {
+                    if (key.startsWith(COMPONENT_OPTIONS_PREFIX)) {
                         // Store it in the map
-                        componentOptionsMap.put(key.substring(prefixLength), value);
+                        componentOptionsMap.put(key.substring(COMPONENT_OPTIONS_PREFIX.length()), value);
                     }
                 }
             }
