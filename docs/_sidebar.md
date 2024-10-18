@@ -9,5 +9,8 @@
    * Examples
       * [File](config/examples/file.md)
       * [Twilio](config/examples/twilio.md)
-      * [Sentry watch](config/examples/sentry.md)
+      * [Sentry](config/examples/sentry.md)
+      * [Grafana Loki](config/examples/grafanaLoki.md)
+      * [Google Pub/Sub](config/examples/googlePubSub.md)
+      * [ActiveMQ](config/examples/activeMQ.md)
 * [Contributing](contributing.md)

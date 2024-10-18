@@ -18,17 +18,18 @@ public class WatchMsgEvent extends ManzanRoute {
     private final String m_sessionId;
     private final ManzanMessageFormatter m_formatter;
 
-    public WatchMsgEvent(final String _name, final String _session_id, final String _format, final List<String> _destinations, final String _schema, final int _interval, final int _numToProcess) throws IOException {
+    public WatchMsgEvent(final String _name, final String _session_id, final String _format,
+            final List<String> _destinations, final String _schema, final int _interval, final int _numToProcess)
+            throws IOException {
         super(_name);
         m_interval = _interval;
         m_numToProcess = _numToProcess;
         m_schema = _schema;
-        m_formatter = StringUtils.isEmpty(_format) ? null: new ManzanMessageFormatter(_format);
+        m_formatter = StringUtils.isEmpty(_format) ? null : new ManzanMessageFormatter(_format);
         super.setRecipientList(_destinations);
         m_sessionId = _session_id.trim().toUpperCase();
     }
 
-//@formatter:off
     @Override
     public void configure() {
         from("timer://foo?synchronous=true&period=" + 5)
@@ -95,6 +96,4 @@ public class WatchMsgEvent extends ManzanRoute {
         .otherwise()
             .log("No rows to delete, skipping JDBC call");
     }
-    //@formatter:on
-
 }

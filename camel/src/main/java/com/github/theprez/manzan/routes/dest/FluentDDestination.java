@@ -28,15 +28,12 @@ public class FluentDDestination extends ManzanRoute {
         });
     }
 
-//@formatter:off
     @Override
     public void configure() {
         from(getInUri())
-        .routeId(m_name).process(exchange -> {
-            m_logger.log(m_tag, getDataMap(exchange));
-        });
+                .routeId(m_name).process(exchange -> {
+                    m_logger.log(m_tag, getDataMap(exchange));
+                });
     }
-
-//@formatter:on
 
 }

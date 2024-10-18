@@ -29,13 +29,14 @@ run_command_with_output() {
   return "$exit_code"
 }
 
+echo -e "\tRunning pre-test setup..."
+gmake beforeAll 2>&1 | sed 's/^/\t\t/'
+
 for test in "${TESTS[@]}"
 do
   echo "Test: $test"
   
   # General and test specific setup
-	echo -e "\tRunning pre-test setup..."
-  gmake pretest 2>&1 | sed 's/^/\t\t/'
   echo -e "\tRunning test-specific setup..."
   gmake -C $test setup 2>&1 | sed 's/^/\t\t/' || exit 1
   
@@ -78,9 +79,10 @@ do
   # Cleanup
   echo -e "\tRunning test-specific cleanup..."
   gmake -C $test cleanup 2>&1 | sed 's/^/\t\t/' || echo -e "\t\tNo test-specific cleanup needed"
-	echo -e "\tRunning post-test cleanup"
-  gmake posttest 2>&1 | sed 's/^/\t\t/'
 done
+echo -e "\tRunning post-test cleanup"
+gmake afterAll 2>&1 | sed 's/^/\t\t/'
+
 
 # Output results
 echo "=================================="
