@@ -32,7 +32,7 @@ public class WatchMsgEvent extends ManzanRoute {
 
     @Override
     public void configure() {
-        from("timer://foo?synchronous=true&period=" + 5)
+        from("timer://foo?synchronous=true&period=" + m_interval)
         .routeId("manzan_msg:"+m_name)
         .process(exchange -> {
             // Reset the list of ordinal positions at the start of each execution
