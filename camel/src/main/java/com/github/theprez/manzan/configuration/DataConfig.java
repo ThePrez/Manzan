@@ -16,6 +16,7 @@ import com.github.theprez.manzan.WatchStarter;
 import com.github.theprez.manzan.routes.ManzanRoute;
 import com.github.theprez.manzan.routes.event.FileEvent;
 import com.github.theprez.manzan.routes.event.WatchMsgEvent;
+import com.github.theprez.manzan.routes.event.WatchMsgEventSql;
 import com.ibm.as400.access.AS400SecurityException;
 import com.ibm.as400.access.ErrorCompletingRequestException;
 import com.ibm.as400.access.ObjectDoesNotExistException;
@@ -72,6 +73,7 @@ public class DataConfig extends Config {
                         WatchStarter ws = new WatchStarter(id, strwch);
                         ws.strwch();
                     }
+                    ret.put(name, new WatchMsgEventSql(name, id, format, destinations, schema, interval, numToProcess));
                     break;
                 case "file":
                     ret.put(name, new FileEvent(name, getRequiredString(name, "file"), format, destinations, getOptionalString(name, "filter")));
