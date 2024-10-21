@@ -15,7 +15,7 @@ import com.github.theprez.jcmdutils.StringUtils;
 import com.github.theprez.manzan.WatchStarter;
 import com.github.theprez.manzan.routes.ManzanRoute;
 import com.github.theprez.manzan.routes.event.FileEvent;
-import com.github.theprez.manzan.routes.event.WatchMsgEvent;
+import com.github.theprez.manzan.routes.event.WatchMsgEventSockets;
 import com.github.theprez.manzan.routes.event.WatchMsgEventSql;
 import com.ibm.as400.access.AS400SecurityException;
 import com.ibm.as400.access.ErrorCompletingRequestException;
@@ -74,13 +74,16 @@ public class DataConfig extends Config {
             switch (type) {
                 case "watch":
                     String id = getRequiredString(name, "id");
-                    ret.put(name, new WatchMsgEvent(name, id, format, destinations, schema, interval, numToProcess));
+                    String sqlRouteName = name + "sql";
+                    String socketRouteName = name + "socket";
+
+                    ret.put(sqlRouteName, new WatchMsgEventSql(sqlRouteName, id, format, destinations, schema, interval, numToProcess));
                     String strwch = getOptionalString(name, "strwch");
                     if (StringUtils.isNonEmpty(strwch)) {
                         WatchStarter ws = new WatchStarter(id, strwch);
                         ws.strwch();
                     }
-                    ret.put(name, new WatchMsgEventSql(name, id, format, destinations, schema, interval, numToProcess));
+                    ret.put(socketRouteName, new WatchMsgEventSockets(socketRouteName, format, destinations, schema, interval, numToProcess));
                     break;
                 case "file":
                     String file = getRequiredString(name, "file");
