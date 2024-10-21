@@ -18,8 +18,11 @@ import com.github.theprez.manzan.routes.dest.DirDestination;
 import com.github.theprez.manzan.routes.dest.EmailDestination;
 import com.github.theprez.manzan.routes.dest.FileDestination;
 import com.github.theprez.manzan.routes.dest.FluentDDestination;
+import com.github.theprez.manzan.routes.dest.GooglePubSubDestination;
+import com.github.theprez.manzan.routes.dest.GrafanaLokiDestination;
 import com.github.theprez.manzan.routes.dest.HttpDestination;
 import com.github.theprez.manzan.routes.dest.KafkaDestination;
+import com.github.theprez.manzan.routes.dest.ActiveMqDestination;
 import com.github.theprez.manzan.routes.dest.SentryDestination;
 import com.github.theprez.manzan.routes.dest.SlackDestination;
 import com.github.theprez.manzan.routes.dest.StreamDestination;
@@ -52,9 +55,10 @@ public class DestinationConfig extends Config {
             final String name = section;
             final Section sectionObj = getIni().get(name);
             final String format = getOptionalString(name, "format");
+            final Map<String, String> componentOptions = getComponentOptions(name);
             switch (type) {
                 case "stdout":
-                    ret.put(name, new StreamDestination(name, getOptionalString(name, "format")));
+                    ret.put(name, new StreamDestination(context, name, format, componentOptions));
                     break;
                 case "slack": {
                     final String webhook = getRequiredString(name, "webhook");
@@ -64,15 +68,26 @@ public class DestinationConfig extends Config {
                     break;
                 case "kafka":
                     final String topic = getRequiredString(name, "topic");
-                    ret.put(name, new KafkaDestination(name, topic, format, getUriAndHeaderParameters(name, sectionObj, "topic")));
+                    ret.put(name, new KafkaDestination(context, name, topic, format, componentOptions, getUriAndHeaderParameters(name, sectionObj, "topic")));
+                    break;
+                case "activemq":
+                    final String destName = getRequiredString(name, "destinationName");
+                    String destType = getOptionalString(name, "destinationType");
+                    destType = (destType != null && destType.equals("topic")) ? "topic" : "queue";
+                    ret.put(name, new ActiveMqDestination(context, name, destType, destName, format, componentOptions, getUriAndHeaderParameters(name, sectionObj, "destinationName", "destinationType")));
+                    break;
+                case "google-pubsub":
+                    final String projectId = getRequiredString(name, "projectId");
+                    final String topicName = getRequiredString(name, "topicName");
+                    ret.put(name, new GooglePubSubDestination(context, name, projectId, topicName, format, componentOptions, getUriAndHeaderParameters(name, sectionObj, "projectId", "topicName")));
                     break;
                 case "file":
                     final String file = getRequiredString(name, "file");
-                    ret.put(name, new FileDestination(name, file, format, getUriAndHeaderParameters(name, sectionObj, "file")));
+                    ret.put(name, new FileDestination(context, name, file, format, componentOptions, getUriAndHeaderParameters(name, sectionObj, "file")));
                     break;
                 case "dir":
                     final String dir = getRequiredString(name, "dir");
-                    ret.put(name, new DirDestination(name, dir, format, getUriAndHeaderParameters(name, sectionObj, "dir")));
+                    ret.put(name, new DirDestination(context, name, dir, format, componentOptions, getUriAndHeaderParameters(name, sectionObj, "dir")));
                     break;
                 case "sentry":
                     final String dsn = getRequiredString(name, "dsn");
@@ -84,23 +99,29 @@ public class DestinationConfig extends Config {
                     final int port = getRequiredInt(name, "port");
                     ret.put(name, new FluentDDestination(name, tag, host, port));
                 }
+                case "loki": {
+                    final String url = getRequiredString(name, "url");
+                    final String username = getRequiredString(name, "username");
+                    final String password = getRequiredString(name, "password");
+                    ret.put(name, new GrafanaLokiDestination(name, url, username, password, format));
+                }
                     break;
                 case "smtp":
                 case "smtps":
                     final String server = getRequiredString(name, "server");
                     final int port = getOptionalInt(name, "port");
-                    final EmailDestination d = new EmailDestination(name, type, server, format, port, getUriAndHeaderParameters(name, sectionObj, "server", "port"), null);
+                    final EmailDestination d = new EmailDestination(context, name, type, server, format, port, componentOptions, getUriAndHeaderParameters(name, sectionObj, "server", "port"), null);
                     ret.put(name, d);
                     break;
                 case "twilio":
-                    final String sid = getRequiredString(name, "sid");
-                    final String token = getRequiredString(name, "token");
-                    ret.put(name, new TwilioDestination(context, name, format, sid, token, 
+                    ret.put(name, new TwilioDestination(context, name, format,
+                    componentOptions,
                     getUriAndHeaderParameters(name, sectionObj, "sid", "token")));
                     break;
                 case "http":
+                case "https":
                     final String url = getRequiredString(name, "url");
-                    ret.put(name, HttpDestination.get(name, url, format, getUriAndHeaderParameters(name, sectionObj, "url")));
+                    ret.put(name, HttpDestination.get(context, name, type, url, format, componentOptions, getUriAndHeaderParameters(name, sectionObj, "url")));
                     break;
                 default:
                     throw new RuntimeException("Unknown destination type: " + type);
@@ -114,7 +135,7 @@ public class DestinationConfig extends Config {
         List<String> exclusions = new LinkedList<>(Arrays.asList(_exclusions));
         exclusions.addAll(Arrays.asList("type", "filter", "format"));
         for (final String sectionKey : sectionObj.keySet()) {
-            if (exclusions.contains(sectionKey)) {
+            if (exclusions.contains(sectionKey) || sectionKey.startsWith(Config.COMPONENT_OPTIONS_PREFIX)) {
                 continue;
             }
             pathParameters.put(sectionKey, getRequiredString(_name, sectionKey));

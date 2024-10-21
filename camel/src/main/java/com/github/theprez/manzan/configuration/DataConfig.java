@@ -23,6 +23,9 @@ import com.ibm.as400.access.ObjectDoesNotExistException;
 
 public class DataConfig extends Config {
 
+    private final static int DEFAULT_INTERVAL = 5;
+    private final static int DEFAULT_NUM_TO_PROCESS = 1000;
+
     public static DataConfig get(final Set<String> _destinations) throws InvalidFileFormatException, IOException {
         return new DataConfig(getConfigFile("data.ini"), _destinations);
     }
@@ -36,7 +39,8 @@ public class DataConfig extends Config {
         m_destinations = _destinations;
     }
 
-    public synchronized Map<String, ManzanRoute> getRoutes() throws IOException, AS400SecurityException, ErrorCompletingRequestException, InterruptedException, PropertyVetoException, ObjectDoesNotExistException {
+    public synchronized Map<String, ManzanRoute> getRoutes() throws IOException, AS400SecurityException,
+            ErrorCompletingRequestException, InterruptedException, PropertyVetoException, ObjectDoesNotExistException {
         if (null != m_routes) {
             return m_routes;
         }
@@ -52,13 +56,16 @@ public class DataConfig extends Config {
             final String name = section;
             final String schema = ApplicationConfig.get().getLibrary();
             final String format = getOptionalString(name, "format");
-            final int interval = 5; // TODO: get from configuration
-            final int numToProcess = 1000; // TODO: get from configuration
+            int userInterval = getOptionalInt(name, "interval");
+            final int interval = userInterval != -1 ? userInterval : DEFAULT_INTERVAL;
+            int userNumToProcess = getOptionalInt(name, "numToProcess");
+            final int numToProcess = userNumToProcess != -1 ? userNumToProcess : DEFAULT_NUM_TO_PROCESS;
             final List<String> destinations = new LinkedList<String>();
             for (String d : getRequiredString(name, "destinations").split("\\s*,\\s*")) {
                 d = d.trim();
                 if (!m_destinations.contains(d)) {
-                    throw new RuntimeException("no destination configured named '" + d + "' for data source '" + name + "'");
+                    throw new RuntimeException(
+                            "no destination configured named '" + d + "' for data source '" + name + "'");
                 }
                 if (StringUtils.isNonEmpty(d)) {
                     destinations.add(d);
@@ -69,14 +76,16 @@ public class DataConfig extends Config {
                     String id = getRequiredString(name, "id");
                     ret.put(name, new WatchMsgEvent(name, id, format, destinations, schema, interval, numToProcess));
                     String strwch = getOptionalString(name, "strwch");
-                    if(StringUtils.isNonEmpty(strwch)) {
+                    if (StringUtils.isNonEmpty(strwch)) {
                         WatchStarter ws = new WatchStarter(id, strwch);
                         ws.strwch();
                     }
                     ret.put(name, new WatchMsgEventSql(name, id, format, destinations, schema, interval, numToProcess));
                     break;
                 case "file":
-                    ret.put(name, new FileEvent(name, getRequiredString(name, "file"), format, destinations, getOptionalString(name, "filter")));
+                    String file = getRequiredString(name, "file");
+                    String filter = getOptionalString(name, "filter");
+                    ret.put(name, new FileEvent(name, file, format, destinations, filter, interval));
                     break;
                 default:
                     throw new RuntimeException("Unknown destination type: " + type);
