@@ -70,7 +70,7 @@ public class WatchMsgEvent extends ManzanRoute {
                 .process(exchange -> {
                     // Constructing the WHERE clause for ORDINAL_POSITIONs
                     StringBuilder deleteQuery = new StringBuilder("DELETE FROM " + m_schema
-                            + ".mAnZaNmSg WHERE SESSION_ID = '" + m_sessionId + "' AND ORDINAL_POSITION IN (");
+                            + ".MANZANMSG WHERE SESSION_ID = '" + m_sessionId + "' AND ORDINAL_POSITION IN (");
                     @SuppressWarnings("unchecked")
                     List<Integer> ordinalPositions = exchange.getProperty("ordinalPositions", List.class);
                     if (ordinalPositions != null && !ordinalPositions.isEmpty()) {
