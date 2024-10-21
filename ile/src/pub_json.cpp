@@ -147,31 +147,31 @@ int json_publish(const char *_session_id, std::string &_json)
 
 std::string construct_json_message(PUBLISH_MESSAGE_FUNCTION_SIGNATURE)
 {
-  std::string jsonStr;
+std::string jsonStr;
   jsonStr += "{\n    ";
-  append_json_element(jsonStr, "event_type", "message");
+  append_json_element(jsonStr, "EVENT_TYPE", "message");
   jsonStr += ",\n    ";
-  append_json_element(jsonStr, "session_id", _session_id);
+  append_json_element(jsonStr, "SESSION_ID", _session_id);
   jsonStr += ",\n    "; 
-  append_json_element(jsonStr, "job", _job);
+  append_json_element(jsonStr, "JOB", _job);
   jsonStr += ",\n    ";
-  append_json_element(jsonStr, "message_id", _msgid);
+  append_json_element(jsonStr, "MESSAGE_ID", _msgid);
   jsonStr += ",\n    ";
-  append_json_element(jsonStr, "message_type", _msg_type);
+  append_json_element(jsonStr, "MESSAGE_TYPE", _msg_type);
   jsonStr += ",\n    ";
-  append_json_element(jsonStr, "severity", _msg_severity);
+  append_json_element(jsonStr, "SEVERITY", _msg_severity);
   jsonStr += ",\n    ";
-  append_json_element(jsonStr, "message_timestamp", _msg_timestamp);
+  append_json_element(jsonStr, "MESSAGE_TIMESTAMP", _msg_timestamp);
   jsonStr += ",\n    ";
-  append_json_element(jsonStr, "sending_usrprf", _sending_usrprf);
+  append_json_element(jsonStr, "SENDING_USRPRF", _sending_usrprf);
   jsonStr += ",\n    ";
-  append_json_element(jsonStr, "message", _message);
+  append_json_element(jsonStr, "MESSAGE", _message);
   jsonStr += ",\n    ";
-  append_json_element(jsonStr, "sending_program_name", _sending_program_name);
+  append_json_element(jsonStr, "SENDING_PROGRAM_NAME", _sending_program_name);
   jsonStr += ",\n    ";
-  append_json_element(jsonStr, "sending_module_name", _sending_module_name);
+  append_json_element(jsonStr, "SENDING_MODULE_NAME", _sending_module_name);
   jsonStr += ",\n    ";
-  append_json_element(jsonStr, "sending_procedure_name", _sending_procedure_name);
+  append_json_element(jsonStr, "SENDING_PROCEDURE_NAME", _sending_procedure_name);
   jsonStr += "\n}";
   return jsonStr;
 }
