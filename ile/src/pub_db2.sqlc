@@ -18,6 +18,8 @@
 
 const int PORT = 8080;
 const std::string SERVER = "127.0.0.1";
+char* MSG_PREF_SOCKETS = "SOCKETS";
+char* MSG_PREF_SQL = "SQL";
 
 void check_sql_error(int sqlcode, const char *sqlstate)
 {
@@ -25,12 +27,28 @@ void check_sql_error(int sqlcode, const char *sqlstate)
   {
     DEBUG_ERROR("SQL Code: %d\n", sqlcode);
     DEBUG_ERROR("SQL State: %s\n", sqlstate);
+    throw std::runtime_error("SQL did not execute successfully");
+
   }
   else
   {
     DEBUG_INFO("SQL statement executed succesfully!\n");
   }
 }
+
+struct messageParams {
+    const char* session_id;
+    const char* msgid;
+    const char* msg_type;
+    const int msg_severity;
+    const char* msg_timestamp;
+    const char* job;
+    const char* sending_usrprf;
+    const char* message;
+    const char* sending_program_name;
+    const char* sending_module_name;
+    const char* sending_procedure_name;
+};
 
 bool send_message(std::string message){
     // Create a SocketClient instance
@@ -54,6 +72,99 @@ bool send_message(std::string message){
     return true;
 }
 
+/**
+ * Return the messaging preference between the ile and camel components. If the messaging preference is 
+ * sockets, then we will use socket communication, otherwise we will use sql communication.
+ */
+char* get_messaging_preference(){
+    char *msg_pref = getenv("MANZAN_MESSAGING_PREFERENCE");
+    if (msg_pref == NULL || strcmp(msg_pref, MSG_PREF_SQL) != 0){
+      msg_pref = MSG_PREF_SOCKETS; 
+    } 
+    DEBUG_INFO("MESSAGING_PREFERENCE: %s\n", msg_pref);
+    return msg_pref;
+}
+
+/**
+ * Try func1(params). If it throws an exception, then try func2(params).
+ */
+template <typename Func1, typename Func2, typename Params>
+int tryFuncWithFallback(Func1 func1, Func2 func2, Params params) {
+    try {
+        return func1(params); 
+    } catch (const std::exception& e) {
+        DEBUG_ERROR("Error: %s. Trying fallback function.\n", e.what());
+        return func2(params); 
+    }
+}
+
+int send_socket_message(const messageParams& params){
+    std::string json_message = construct_json_message(
+      params.session_id,
+      params.msgid,
+      params.msg_type,
+      params.msg_severity,
+      params.msg_timestamp,
+      params.job,
+      params.sending_usrprf,
+      params.message,
+      params.sending_program_name,
+      params.sending_module_name,
+      params.sending_procedure_name);
+
+    DEBUG_INFO("Sending message %s", const_cast<char *>(json_message.c_str()));
+
+    // Allocate memory for the utf-8 encoded json message
+    char *json_utf8 = get_utf8_output_buf(json_message);
+
+    to_utf8(json_utf8, get_utf8_output_buf_length(json_message), json_message.c_str());
+
+    // Send the message to the socket
+    bool res = send_message(json_utf8);
+    free(json_utf8);
+
+    if (!res){
+      throw std::runtime_error("Failed to send message");
+    }
+    return 0;
+}
+
+int send_sql_message(const messageParams& params){
+  exec sql include sqlca;
+  EXEC SQL BEGIN DECLARE SECTION;
+  char msg_session_id[11];
+  char msg_msg_id[8];
+  char msg_msg_type[11];
+  char msg_severity[32];
+  char msg_timestamp[32];
+  char msg_job[32];
+  char msg_sending_usrprf[11];
+  char msg_message[2048];
+  char msg_sending_program_name[257];
+  char msg_sending_module_name[11];
+  char msg_sending_procedure_name[2048];
+  EXEC SQL END DECLARE SECTION;
+
+  COPY_PARM(msg_session_id, params.session_id);
+  COPY_PARM(msg_msg_id, params.msgid);
+  COPY_PARM(msg_msg_type, params.msg_type);
+  sprintf(msg_severity, "%d", params.msg_severity);
+  COPY_PARM(msg_timestamp, params.msg_timestamp);
+  COPY_PARM(msg_job, params.job);
+  COPY_PARM(msg_sending_usrprf, params.sending_usrprf);
+  COPY_PARM(msg_message, params.message);
+  COPY_PARM(msg_sending_program_name, params.sending_program_name);
+  COPY_PARM(msg_sending_module_name, params.sending_module_name);
+  COPY_PARM(msg_sending_procedure_name, params.sending_procedure_name);
+
+  EXEC SQL
+      INSERT INTO MANZANMSG(
+          SESSION_ID, MESSAGE_ID, MESSAGE_TYPE, SEVERITY, JOB, SENDING_USRPRF, SENDING_PROGRAM_NAME, SENDING_MODULE_NAME, SENDING_PROCEDURE_NAME, MESSAGE_TIMESTAMP, MESSAGE)
+          VALUES( : msg_session_id, : msg_msg_id, : msg_msg_type, : msg_severity, : msg_job, : msg_sending_usrprf, : msg_sending_program_name, : msg_sending_module_name, : msg_sending_procedure_name, : msg_timestamp, : msg_message);
+  check_sql_error(sqlca.sqlcode, (const char *)sqlca.sqlstate);
+  return 0;
+}
+
 // TODO: implement this
 //     1. define Db2 tables
 //            // have autoincrement and autotimestamp columns
@@ -62,62 +173,29 @@ bool send_message(std::string message){
 //     4. implement!
 extern int db2_publish_message(PUBLISH_MESSAGE_FUNCTION_SIGNATURE)
 {
-  // exec sql include SQLCA;
-  // char msg_session_id[11];
-  // char msg_msg_id[8];
-  // char msg_msg_type[11];
-  // char msg_severity[32];
-  // char msg_timestamp[32];
-  // char msg_job[32];
-  // char msg_sending_usrprf[11];
-  // char msg_message[2048];
-  // char msg_sending_program_name[257];
-  // char msg_sending_module_name[11];
-  // char msg_sending_procedure_name[2048];
+     messageParams params = {
+        _session_id,               // should be a const char*
+        _msgid,                    // should be a const char*
+        _msg_type,                 // should be a const char*
+        _msg_severity,             // should be an int
+        _msg_timestamp,            // should be a const char*
+        _job,                      // should be a const char*
+        _sending_usrprf,          // should be a const char*
+        _message,                  // should be a const char*
+        _sending_program_name,     // should be a const char*
+        _sending_module_name,      // should be a const char*
+        _sending_procedure_name     // should be a const char*
+    };
 
-  // COPY_PARM(msg_session_id, _session_id);
-  // COPY_PARM(msg_msg_id, _msgid);
-  // COPY_PARM(msg_msg_type, _msg_type);
-  // sprintf(msg_severity, "%d", _msg_severity);
-  // COPY_PARM(msg_timestamp, _msg_timestamp);
-  // COPY_PARM(msg_job, _job);
-  // COPY_PARM(msg_sending_usrprf, _sending_usrprf);
-  // COPY_PARM(msg_message, _message);
-  // COPY_PARM(msg_sending_program_name, _sending_program_name);
-  // COPY_PARM(msg_sending_module_name, _sending_module_name);
-  // COPY_PARM(msg_sending_procedure_name, _sending_procedure_name);
 
-  // EXEC SQL
-  //     INSERT INTO MANZANMSG(
-  //         SESSION_ID, MESSAGE_ID, MESSAGE_TYPE, SEVERITY, JOB, SENDING_USRPRF, SENDING_PROGRAM_NAME, SENDING_MODULE_NAME, SENDING_PROCEDURE_NAME, MESSAGE_TIMESTAMP, MESSAGE)
-  //         VALUES( : msg_session_id, : msg_msg_id, : msg_msg_type, : msg_severity, : msg_job, : msg_sending_usrprf, : msg_sending_program_name, : msg_sending_module_name, : msg_sending_procedure_name, : msg_timestamp, : msg_message);
-  // check_sql_error(sqlca.sqlcode, sqlca.sqlstate);
-  
-  std::string json_message = construct_json_message(
-      _session_id,
-      _msgid,
-      _msg_type,
-      _msg_severity,
-      _msg_timestamp,
-      _job,
-      _sending_usrprf,
-      _message,
-      _sending_program_name,
-      _sending_module_name,
-      _sending_procedure_name);
+  const char* msg_pref = get_messaging_preference();
+  int res = tryFuncWithFallback(
+      msg_pref == MSG_PREF_SOCKETS ? send_socket_message : send_sql_message,
+      msg_pref == MSG_PREF_SOCKETS ? send_sql_message : send_socket_message,
+      params
+    );
 
-  DEBUG_INFO("Sending message %s", const_cast<char *>(json_message.c_str()));
-
-  // Allocate memory for the utf-8 encoded json message
-  char *json_utf8 = get_utf8_output_buf(json_message);
-
-  to_utf8(json_utf8, get_utf8_output_buf_length(json_message), json_message.c_str());
-
-  // Send the message to the socket
-  bool res = send_message(json_utf8);
-
-  free(json_utf8);
-  return res ? 0 : -1;
+  return res != NULL ? 0 : -1;
 }
 
 extern int db2_publish_vlog(PUBLISH_VLOG_FUNCTION_SIGNATURE)
