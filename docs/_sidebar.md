@@ -6,6 +6,7 @@
    * [Data Sources](config/data.md)
    * [Destinations](config/dests.md)
    * [Logging](config/logging.md)
+   * [Messaging](config/messaging.md)
    * Examples
       * [File](config/examples/file.md)
       * [Twilio](config/examples/twilio.md)

@@ -10,7 +10,7 @@ import com.github.theprez.manzan.ManzanEventType;
 import com.github.theprez.manzan.ManzanMessageFormatter;
 import com.github.theprez.manzan.routes.ManzanRoute;
 
-public class WatchMsgEvent extends ManzanRoute {
+public class WatchMsgEventSql extends ManzanRoute {
 
     private final int m_interval;
     private final int m_numToProcess;
@@ -18,7 +18,7 @@ public class WatchMsgEvent extends ManzanRoute {
     private final String m_sessionId;
     private final ManzanMessageFormatter m_formatter;
 
-    public WatchMsgEvent(final String _name, final String _session_id, final String _format,
+    public WatchMsgEventSql(final String _name, final String _session_id, final String _format,
             final List<String> _destinations, final String _schema, final int _interval, final int _numToProcess)
             throws IOException {
         super(_name);

@@ -11,6 +11,7 @@ SEVERITY:=80
 
 setup: /qsys.lib/${TESTLIB}.lib/msgs.msgq
 	echo "\nstrwch=WCHMSG((*ALL)) WCHMSGQ((${TESTLIB}/MSGS))" >> data.ini
+	rm -f ${OUTPUT_FILE}
 
 cleanup:
 	system -kKv "ENDWCH SSNID(TESTING)"
