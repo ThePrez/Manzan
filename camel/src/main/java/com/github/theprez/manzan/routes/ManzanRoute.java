@@ -14,6 +14,9 @@ public abstract class ManzanRoute extends RouteBuilder {
     protected static final String EVENT_TYPE = "event_type";
 
     protected static final String SESSION_ID = "SESSION_ID";
+    protected static final String MSG_ORDINAL_POSITION = "ORDINAL_POSITION";
+    protected static final String HANDLED_TIMESTAMP = "HANDLED_TIMESTAMP";
+
     protected static final String MSG_MESSAGE_ID = "MESSAGE_ID";
     protected static final String MSG_MESSAGE_TYPE = "MESSAGE_TYPE";
     protected static final String MSG_SEVERITY = "SEVERITY";
@@ -22,9 +25,33 @@ public abstract class ManzanRoute extends RouteBuilder {
     protected static final String MSG_SENDING_PROGRAM_NAME = "SENDING_PROGRAM_NAME";
     protected static final String MSG_SENDING_MODULE_NAME = "SENDING_MODULE_NAME";
     protected static final String MSG_SENDING_PROCEDURE_NAME = "SENDING_PROCEDURE_NAME";
-    protected static final String MSG_ORDINAL_POSITION = "ORDINAL_POSITION";
     protected static final String MSG_MESSAGE_TIMESTAMP = "MESSAGE_TIMESTAMP";
     protected static final String MSG_MESSAGE = "MESSAGE";
+
+    protected static final String MAJOR_CODE = "MAJOR_CODE";
+    protected static final String MINOR_CODE = "MINOR_CODE";
+    protected static final String LOG_ID = "LOG_ID";
+    protected static final String LOG_TIMESTAMP = "LOG_TIMESTAMP";
+    protected static final String TDE_NUM = "TDE_NUM";
+    protected static final String TASK_NAME = "TASK_NAME";
+    protected static final String SERVER_TYPE = "SERVER_TYPE";
+    protected static final String EXCEPTION_ID = "EXCEPTION_ID";
+    protected static final String THREAD_ID = "THREAD_ID";
+    protected static final String MODULE_OFFSET = "MODULE_OFFSET";
+    protected static final String MODULE_RU_NAME = "MODULE_RU_NAME";
+    protected static final String MODULE_NAME = "MODULE_NAME";
+    protected static final String MODULE_ENTRY_POINT_NAME = "MODULE_ENTRY_POINT_NAME";
+
+    protected static final String SYSTEM_REFERENCE_CODE = "SYSTEM_REFERENCE_CODE";
+    protected static final String DEVICE_NAME = "DEVICE_NAME";
+    protected static final String MODEL = "MODEL";
+    protected static final String SERIAL_NUMBER = "SERIAL_NUMBER";
+    protected static final String RESOURCE_NAME = "RESOURCE_NAME";
+    protected static final String PAL_TIMESTAMP = "PAL_TIMESTAMP";
+    protected static final String REFERENCE_CODE = "REFERENCE_CODE";
+    protected static final String SECONDARY_CODE = "SECONDARY_CODE";
+    protected static final String TABLE_ID = "TABLE_ID";
+    protected static final String SEQUENCE_NUM = "SEQUENCE_NUM";
 
     protected static final int SEVERITY_LIMIT = 29;
 
@@ -90,5 +117,4 @@ public abstract class ManzanRoute extends RouteBuilder {
             throw new IOException("Message watch for '" + m_name + "' has no valid destinations");
         }
     }
-
 }

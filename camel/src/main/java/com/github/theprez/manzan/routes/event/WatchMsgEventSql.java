@@ -12,22 +12,33 @@ import com.github.theprez.manzan.routes.ManzanRoute;
 
 public class WatchMsgEventSql extends ManzanRoute {
 
-    private final int m_interval;
-    private final int m_numToProcess;
     private final String m_schema;
     private final String m_sessionId;
+    private final ManzanEventType m_eventType;
+    private final String m_table;
+    private final int m_interval;
+    private final int m_numToProcess;
     private final ManzanMessageFormatter m_formatter;
 
     public WatchMsgEventSql(final String _name, final String _session_id, final String _format,
-            final List<String> _destinations, final String _schema, final int _interval, final int _numToProcess)
+            final List<String> _destinations, final String _schema, final ManzanEventType _eventType,
+            final int _interval, final int _numToProcess)
             throws IOException {
         super(_name);
+        m_schema = _schema;
+        m_sessionId = _session_id.trim().toUpperCase();
+        m_eventType = _eventType;
         m_interval = _interval;
         m_numToProcess = _numToProcess;
-        m_schema = _schema;
         m_formatter = StringUtils.isEmpty(_format) ? null : new ManzanMessageFormatter(_format);
+        if (m_eventType == ManzanEventType.WATCH_MSG) {
+            m_table = "MANZANMSG";
+        } else if (m_eventType == ManzanEventType.WATCH_VLOG) {
+            m_table = "MANZANVLOG";
+        } else {
+            m_table = "MANZANPAL";
+        }
         super.setRecipientList(_destinations);
-        m_sessionId = _session_id.trim().toUpperCase();
     }
 
     @Override
@@ -38,9 +49,9 @@ public class WatchMsgEventSql extends ManzanRoute {
                     // Reset the list of ordinal positions at the start of each execution
                     exchange.setProperty("ordinalPositions", new ArrayList<Integer>());
                 })
-                .setHeader(EVENT_TYPE, constant(ManzanEventType.WATCH_MSG))
-                .setBody(constant("SeLeCt * fRoM " + m_schema + ".mAnZaNmSg wHeRe SESSION_ID = '" + m_sessionId
-                        + "' limit " + m_numToProcess))
+                .setHeader(EVENT_TYPE, constant(m_eventType))
+                .setBody(constant("SELECT * FROM " + m_schema + "." + m_table + " WHERE SESSION_ID = '" + m_sessionId
+                        + "' LIMIT " + m_numToProcess))
                 .to("jdbc:jt400?outputType=StreamList")
                 .split(body()).streaming().parallelProcessing()
                 .setHeader("id", simple("${body[ORDINAL_POSITION]}"))
@@ -69,8 +80,8 @@ public class WatchMsgEventSql extends ManzanRoute {
                 .end()
                 .process(exchange -> {
                     // Constructing the WHERE clause for ORDINAL_POSITIONs
-                    StringBuilder deleteQuery = new StringBuilder("DELETE FROM " + m_schema
-                            + ".MANZANMSG WHERE SESSION_ID = '" + m_sessionId + "' AND ORDINAL_POSITION IN (");
+                    StringBuilder deleteQuery = new StringBuilder("DELETE FROM " + m_schema + "." + m_table
+                            + " WHERE SESSION_ID = '" + m_sessionId + "' AND ORDINAL_POSITION IN (");
                     @SuppressWarnings("unchecked")
                     List<Integer> ordinalPositions = exchange.getProperty("ordinalPositions", List.class);
                     if (ordinalPositions != null && !ordinalPositions.isEmpty()) {
