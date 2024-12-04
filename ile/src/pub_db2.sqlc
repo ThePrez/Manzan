@@ -201,6 +201,7 @@ extern int db2_publish_message(PUBLISH_MESSAGE_FUNCTION_SIGNATURE)
 extern int db2_publish_vlog(PUBLISH_VLOG_FUNCTION_SIGNATURE)
 {
   exec sql include SQLCA;
+  EXEC SQL BEGIN DECLARE SECTION;
   char vlog_session_id[11];
   char vlog_major_code[11];
   char vlog_minor_code[11];
@@ -216,6 +217,7 @@ extern int db2_publish_vlog(PUBLISH_VLOG_FUNCTION_SIGNATURE)
   char vlog_module_ru_name[11];
   char vlog_module_name[11];
   char vlog_module_entry_point_name[11];
+  EXEC SQL END DECLARE SECTION;
 
   COPY_PARM(vlog_session_id, _session_id);
   COPY_PARM(vlog_major_code, _major_code);
@@ -235,7 +237,7 @@ extern int db2_publish_vlog(PUBLISH_VLOG_FUNCTION_SIGNATURE)
 
   EXEC SQL
       INSERT INTO MANZANVLOG(SESSION_ID, MAJOR_CODE, MINOR_CODE, LOG_ID, LOG_TIMESTAMP, TDE_NUM, TASK_NAME, SERVER_TYPE, EXCEPTION_ID, JOB, THREAD_ID, MODULE_OFFSET, MODULE_RU_NAME, MODULE_NAME, MODULE_ENTRY_POINT_NAME)
-          VALUES( : vlog_session_id, : vlog_major_code, : vlog_minor_code, : vlog_log_id, : vlog_log_timestamp, : vlog_tde_num, : vlog_task_name, : vlog_server_type, : vlog_exception_id, : vlog_job, : vlog_thread_id, : vlog_module_offset, : vlog_module_ru_name, : vlog_module_name, : vlog_module_entry_point_name:);
+          VALUES( : vlog_session_id, : vlog_major_code, : vlog_minor_code, : vlog_log_id, : vlog_log_timestamp, : vlog_tde_num, : vlog_task_name, : vlog_server_type, : vlog_exception_id, : vlog_job, : vlog_thread_id, : vlog_module_offset, : vlog_module_ru_name, : vlog_module_name, : vlog_module_entry_point_name);
   check_sql_error(sqlca.sqlcode, sqlca.sqlstate);
   return 0;
 }
