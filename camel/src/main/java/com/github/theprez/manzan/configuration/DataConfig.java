@@ -58,6 +58,7 @@ public class DataConfig extends Config {
             if ("false".equalsIgnoreCase(getIni().get(section, "enabled"))) {
                 continue;
             } else if ( type.equals("watch")){
+                // We will handle the watch events separately as the logic is a bit more complicated
                 watchEvents.add(section);
                 continue;
             }
@@ -87,6 +88,8 @@ public class DataConfig extends Config {
             }
         }
 
+        // We will create a formatMap to store the format for each watch session, as well
+        // as a destMap to store the destinations for each watch session
         final Map<String, String> formatMap = new HashMap<>();
         final Map<String, String> destMap = new HashMap<>();
 
@@ -112,6 +115,8 @@ public class DataConfig extends Config {
                     destinations.add(d);
                 }
             }
+
+            // Build the maps
             String destString = createRecipientList(destinations);
             formatMap.put(id.toUpperCase(), format);
             destMap.put(id.toUpperCase(), destString);
@@ -126,7 +131,7 @@ public class DataConfig extends Config {
             }
 
             if (i == watchEvents.size() - 1){
-                // This is the last watch event, so we've built the whole map
+                // This is the last watch event, so we've built the whole map. Now create the route
                 final String routeName = "socketWatcher";
                 ret.put(routeName, new WatchMsgEventSockets(routeName, formatMap, destMap));
             }
