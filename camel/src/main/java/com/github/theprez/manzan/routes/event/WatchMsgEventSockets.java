@@ -26,7 +26,6 @@ public class WatchMsgEventSockets extends ManzanRoute {
 //@formatter:off
     @Override
     public void configure() {
-        getContext().getRegistry().bind("manzanSocketBean", this);
         from(String.format("netty:tcp://%s:%s?sync=false", m_socketIp, m_socketPort))
             .unmarshal().json(JsonLibrary.Jackson, Map.class)
             .routeId("manzan_msg:"+m_name)
