@@ -77,6 +77,13 @@ public abstract class ManzanRoute extends RouteBuilder {
     }
 
     protected void setRecipientList(final List<String> _destinations) throws IOException {
+        m_recipientList = createRecipientList(_destinations);
+        if (StringUtils.isEmpty(m_recipientList)) {
+            throw new IOException("Message watch for '" + m_name + "' has no valid destinations");
+        }
+    }
+
+    public static String createRecipientList(final List<String> _destinations) throws IOException {
         String destinationsStr = "";
         for (final String dest : _destinations) {
             if (StringUtils.isEmpty(dest)) {
@@ -84,11 +91,6 @@ public abstract class ManzanRoute extends RouteBuilder {
             }
             destinationsStr += "direct:" + dest.toLowerCase().trim() + ",";
         }
-        m_recipientList = destinationsStr.replaceFirst(",$", "").trim();
-
-        if (StringUtils.isEmpty(m_recipientList)) {
-            throw new IOException("Message watch for '" + m_name + "' has no valid destinations");
-        }
+        return destinationsStr.replaceFirst(",$", "").trim();
     }
-
 }

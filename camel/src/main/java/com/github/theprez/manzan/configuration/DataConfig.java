@@ -4,6 +4,8 @@ import java.beans.PropertyVetoException;
 import java.io.File;
 import java.io.IOException;
 import java.util.LinkedHashMap;
+import java.util.HashMap;
+import java.util.ArrayList;
 import java.util.LinkedList;
 import java.util.List;
 import java.util.Map;
@@ -20,6 +22,8 @@ import com.github.theprez.manzan.routes.event.WatchMsgEventSql;
 import com.ibm.as400.access.AS400SecurityException;
 import com.ibm.as400.access.ErrorCompletingRequestException;
 import com.ibm.as400.access.ObjectDoesNotExistException;
+
+import static com.github.theprez.manzan.routes.ManzanRoute.createRecipientList;
 
 public class DataConfig extends Config {
 
@@ -45,6 +49,7 @@ public class DataConfig extends Config {
             return m_routes;
         }
         final Map<String, ManzanRoute> ret = new LinkedHashMap<String, ManzanRoute>();
+        final List<String> watchEvents = new ArrayList<>();
         for (final String section : getIni().keySet()) {
             final String type = getIni().get(section, "type");
             if (StringUtils.isEmpty(type)) {
@@ -52,10 +57,46 @@ public class DataConfig extends Config {
             }
             if ("false".equalsIgnoreCase(getIni().get(section, "enabled"))) {
                 continue;
+            } else if ( type.equals("watch")){
+                watchEvents.add(section);
+                continue;
             }
+            final String name = section;
+            final String format = getOptionalString(name, "format");
+            int userInterval = getOptionalInt(name, "interval");
+            final int interval = userInterval != -1 ? userInterval : DEFAULT_INTERVAL;
+            final List<String> destinations = new LinkedList<String>();
+            for (String d : getRequiredString(name, "destinations").split("\\s*,\\s*")) {
+                d = d.trim();
+                if (!m_destinations.contains(d)) {
+                    throw new RuntimeException(
+                            "no destination configured named '" + d + "' for data source '" + name + "'");
+                }
+                if (StringUtils.isNonEmpty(d)) {
+                    destinations.add(d);
+                }
+            }
+            switch (type) {
+                case "file":
+                    String file = getRequiredString(name, "file");
+                    String filter = getOptionalString(name, "filter");
+                    ret.put(name, new FileEvent(name, file, format, destinations, filter, interval));
+                    break;
+                default:
+                    throw new RuntimeException("Unknown destination type: " + type);
+            }
+        }
+
+        final Map<String, String> formatMap = new HashMap<>();
+        final Map<String, String> destMap = new HashMap<>();
+
+        for (int i = 0; i < watchEvents.size(); i++) {
+            final String section = watchEvents.get(i);
             final String name = section;
             final String schema = ApplicationConfig.get().getLibrary();
             final String format = getOptionalString(name, "format");
+            String id = getRequiredString(name, "id");
+
             int userInterval = getOptionalInt(name, "interval");
             final int interval = userInterval != -1 ? userInterval : DEFAULT_INTERVAL;
             int userNumToProcess = getOptionalInt(name, "numToProcess");
@@ -71,29 +112,26 @@ public class DataConfig extends Config {
                     destinations.add(d);
                 }
             }
-            switch (type) {
-                case "watch":
-                    String id = getRequiredString(name, "id");
-                    String sqlRouteName = name + "sql";
-                    String socketRouteName = name + "socket";
+            String destString = createRecipientList(destinations);
+            formatMap.put(id.toUpperCase(), format);
+            destMap.put(id.toUpperCase(), destString);
 
-                    ret.put(sqlRouteName, new WatchMsgEventSql(sqlRouteName, id, format, destinations, schema, interval, numToProcess));
-                    String strwch = getOptionalString(name, "strwch");
-                    if (StringUtils.isNonEmpty(strwch)) {
-                        WatchStarter ws = new WatchStarter(id, strwch);
-                        ws.strwch();
-                    }
-                    ret.put(socketRouteName, new WatchMsgEventSockets(socketRouteName, format, destinations, schema, interval, numToProcess));
-                    break;
-                case "file":
-                    String file = getRequiredString(name, "file");
-                    String filter = getOptionalString(name, "filter");
-                    ret.put(name, new FileEvent(name, file, format, destinations, filter, interval));
-                    break;
-                default:
-                    throw new RuntimeException("Unknown destination type: " + type);
+            String sqlRouteName = name + "sql";
+
+            ret.put(sqlRouteName, new WatchMsgEventSql(sqlRouteName, id, format, destinations, schema, interval, numToProcess));
+            String strwch = getOptionalString(name, "strwch");
+            if (StringUtils.isNonEmpty(strwch)) {
+                WatchStarter ws = new WatchStarter(id, strwch);
+                ws.strwch();
+            }
+
+            if (i == watchEvents.size() - 1){
+                // This is the last watch event, so we've built the whole map
+                final String routeName = "socketWatcher";
+                ret.put(routeName, new WatchMsgEventSockets(routeName, formatMap, destMap));
             }
         }
+
         return m_routes = ret;
     }
 
