@@ -15,7 +15,7 @@ public abstract class Config {
     public static final String DIRECTORY_OVERRIDE_PROPERTY = "manzan.configdir";
     public static final String COMPONENT_OPTIONS_PREFIX = "componentOptions.";
 
-    protected static boolean isIBMi() {
+    public static boolean isIBMi() {
         final String osName = System.getProperty("os.name", "Misty");
         return "os400".equalsIgnoreCase(osName) || "os/400".equalsIgnoreCase(osName);
     }
