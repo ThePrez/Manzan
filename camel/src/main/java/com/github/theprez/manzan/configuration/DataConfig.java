@@ -140,12 +140,12 @@ public class DataConfig extends Config {
             ret.put(sqlRouteName, new WatchMsgEventSql(sqlRouteName, id, format, destinations, schema, eventType, interval, numToProcess));
             WatchStarter ws = new WatchStarter(id, strwch);
             ws.strwch();
+        }
 
-            if (i == watchEvents.size() - 1){
-                // This is the last watch event, so we've built the whole map. Now create the route
-                final String routeName = "socketWatcher";
-                ret.put(routeName, new WatchMsgEventSockets(routeName, formatMap, destMap));
-            }
+        if (watchEvents.size() > 0){
+            // After iterating over the loop, the formatMap and destMap are complete. Now create the route.
+            final String routeName = "socketWatcher";
+            ret.put(routeName, new WatchMsgEventSockets(routeName, formatMap, destMap));
         }
         return m_routes = ret;
     }
