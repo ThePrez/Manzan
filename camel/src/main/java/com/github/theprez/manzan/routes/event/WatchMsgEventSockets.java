@@ -40,12 +40,12 @@ public class WatchMsgEventSockets extends ManzanRoute {
                 if (format != null) {
                     ManzanMessageFormatter m_formatter = new ManzanMessageFormatter(format);
                     exchange.getIn().setBody(m_formatter.format(getDataMap(exchange)));
-                    String destinations = m_destMap.get(sessionId); // Get destinations from m_destMap
-                    exchange.getIn().setHeader("destinations", destinations);
                 }
+                String destinations = m_destMap.get(sessionId); // Get destinations from m_destMap
+                exchange.getIn().setHeader("destinations", destinations);
             })
                 .recipientList(header("destinations"))
-                .parallelProcessing().stopOnException();
+                .parallelProcessing().stopOnException().end();
     }
     //@formatter:on
 }
