@@ -15,6 +15,7 @@ import org.ini4j.InvalidFileFormatException;
 
 import com.github.theprez.jcmdutils.StringUtils;
 import com.github.theprez.manzan.ManzanEventType;
+import com.github.theprez.manzan.ManzanEventType;
 import com.github.theprez.manzan.WatchStarter;
 import com.github.theprez.manzan.routes.ManzanRoute;
 import com.github.theprez.manzan.routes.event.FileEvent;
@@ -57,6 +58,7 @@ public class DataConfig extends Config {
             final String type = getIni().get(section, "type");
             if (StringUtils.isEmpty(type)) {
                 throw new RuntimeException("Type not specified for data source [" + section + "]");
+                throw new RuntimeException("Type not specified for data source [" + section + "]");
             }
             if ("false".equalsIgnoreCase(getIni().get(section, "enabled"))) {
                 continue;
@@ -74,7 +76,7 @@ public class DataConfig extends Config {
                 d = d.trim();
                 if (!m_destinations.contains(d)) {
                     throw new RuntimeException(
-                            "no destination configured named '" + d + "' for data source '" + name + "'");
+                            "No destination configured named '" + d + "' for data source '" + name + "'");
                 }
                 if (StringUtils.isNonEmpty(d)) {
                     destinations.add(d);
