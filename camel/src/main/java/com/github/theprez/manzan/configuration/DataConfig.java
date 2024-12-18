@@ -58,7 +58,6 @@ public class DataConfig extends Config {
             final String type = getIni().get(section, "type");
             if (StringUtils.isEmpty(type)) {
                 throw new RuntimeException("Type not specified for data source [" + section + "]");
-                throw new RuntimeException("Type not specified for data source [" + section + "]");
             }
             if ("false".equalsIgnoreCase(getIni().get(section, "enabled"))) {
                 continue;
