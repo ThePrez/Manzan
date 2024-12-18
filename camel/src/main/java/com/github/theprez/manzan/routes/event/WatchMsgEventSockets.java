@@ -10,9 +10,8 @@ import com.github.theprez.manzan.routes.ManzanRoute;
 
 public class WatchMsgEventSockets extends ManzanRoute {
 
-//    private final ManzanMessageFormatter m_formatter;
     private final Map<String, String> m_formatMap;
-    final Map<String, String> m_destMap;
+    private final Map<String, String> m_destMap;
     private final String m_socketIp = "0.0.0.0";
     private final String m_socketPort = "8080";
 
