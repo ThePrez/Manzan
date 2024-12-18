@@ -4,7 +4,7 @@ Building Manzan is easy for IBM i and we provide makefiles to simplify the entir
 
 ## Which Java to use
 Use a Java version provided by IBM, which is at least version 8. When running the `java -version` command, the output 
-should contain the string `IBM Semeru Runtime Certified Edition`. Otherwise, Manzan may not function properly.
+should contain the string `IBM`. Ex. `IBM Semeru Runtime Certified Edition`. Otherwise, Manzan may not function properly.
 
 ## Install from GitHub release 
 
