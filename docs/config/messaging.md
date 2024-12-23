@@ -14,6 +14,13 @@ Socket communication is recommended, because by providing a fallback option to S
 * `MANZAN_MESSAGING_PREFERENCE = SQL`: Prefer SQL based communication
 * `MANZAN_MESSAGING_PREFERENCE != SQL`: Prefer socket based communication
 
+### Messaging port
+By default, Manzan will try to use port 8080 for socket communication, but this can be changed by setting the environment variable `MANZAN_SOCKET_PORT`. Ex. 
+```cl
+ADDENVVAR ENVVAR(MANZAN_SOCKET_PORT) VALUE(8096) LEVEL(*SYS) REPLACE(*YES)
+```
+
+
 ### Setting the MANZAN_MESSAGING_PREFERENCE
 
 The `MANZAN_MESSAGING_PREFERENCE` environment variable can be set with the `ADDENVVAR` command. For example, to set the messaging preference to prefer SQL based communication run the command:
