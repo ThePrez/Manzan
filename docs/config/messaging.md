@@ -20,7 +20,6 @@ By default, Manzan will try to use port 8080 for socket communication, but this 
 ADDENVVAR ENVVAR(MANZAN_SOCKET_PORT) VALUE(8096) LEVEL(*SYS) REPLACE(*YES)
 ```
 
-
 ### Setting the MANZAN_MESSAGING_PREFERENCE
 
 The `MANZAN_MESSAGING_PREFERENCE` environment variable can be set with the `ADDENVVAR` command. For example, to set the messaging preference to prefer SQL based communication run the command:
