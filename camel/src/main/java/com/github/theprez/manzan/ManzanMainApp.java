@@ -32,6 +32,18 @@ public class ManzanMainApp {
             return;
         }
 
+        // Check to make sure we use right java version on IBM i
+        if (Config.isIBMi()){
+            // Get the Java vendor property
+            String javaVendor = System.getProperty("java.vendor");
+            // Check if the vendor is IBM
+            if (!javaVendor.toLowerCase().contains("ibm")) {
+                System.out.println("Java vendor: " + javaVendor);
+                System.err.println("Error: This application requires Java provided by IBM");
+                System.exit(1);
+            }
+        }
+
         for(final String arg:_args) {
             if(arg.startsWith("--configdir=")) {
                 System.setProperty(Config.DIRECTORY_OVERRIDE_PROPERTY, arg.replaceFirst("^[^=]+=", ""));
