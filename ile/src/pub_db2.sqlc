@@ -16,7 +16,6 @@
   memset(dest, 0, sizeof(dest)); \
   strncpy(dest, parm ? parm : "", -1 + sizeof(dest));
 
-const int PORT = 8080;
 const std::string SERVER = "127.0.0.1";
 char* MSG_PREF_SOCKETS = "SOCKETS";
 char* MSG_PREF_SQL = "SQL";
@@ -50,14 +49,31 @@ struct messageParams {
     const char* sending_procedure_name;
 };
 
+// Function to get the MANZAN_SOCKET_PORT value or return default 8080
+int get_socket_port() {
+    const char *port_env = getenv("MANZAN_SOCKET_PORT");
+    DEBUG_INFO("Socket port: %s\n", port_env);
+    printf("Socket port: %s\n", port_env);
+    if (port_env != NULL) {
+        char *endptr;
+        errno = 0; // Reset errno before calling strtol
+        long port = strtol(port_env, &endptr, 10);
+        if (errno == 0 && *endptr == '\0' && port > 0 && port <= 65535) {
+            return (int)port;
+        }
+    }
+    return 8080; // Default port
+}
+
 bool send_message(std::string message){
     // Create a SocketClient instance
     SockClient client;
+    int port = get_socket_port();
 
     // Open a socket and connect to server
-    if (!client.openSocket(SERVER, PORT)) {
+    if (!client.openSocket(SERVER, port)) {
         // TODO: How do we want to handle this error? Drop the message, insert into table?
-        DEBUG_ERROR("Failed to connect to socket: %s:%d\n", SERVER.c_str(), PORT);
+        DEBUG_ERROR("Failed to connect to socket: %s:%d\n", SERVER.c_str(), port);
         return false;
     }
 
