@@ -12,6 +12,10 @@ extern "C" void STRDBG()
 {
 #ifdef DEBUG_ENABLED
   debug_fd = fopen("/tmp/manzan_debug.txt", "a");
+    if (!debug_fd) {
+        perror("Failed to open debug file");
+    }
+
 #endif
 }
 
@@ -35,6 +39,7 @@ extern "C" void DEBUG_LOG(const char *level, const char *label, const char *form
     if (env_level == NULL){
       env_level = "2"; // Show errors and warnings only
     }
+    env_level = "3";
     if (strcmp(env_level, level) >= 0 && debug_fd != NULL) {
         fprintf(debug_fd, "%s ", label); // Prepend the log level
         vfprintf(debug_fd, format, args);
