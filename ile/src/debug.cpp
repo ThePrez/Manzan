@@ -12,6 +12,10 @@ extern "C" void STRDBG()
 {
 #ifdef DEBUG_ENABLED
   debug_fd = fopen("/tmp/manzan_debug.txt", "a");
+    if (!debug_fd) {
+        perror("Failed to open debug file");
+    }
+
 #endif
 }
 

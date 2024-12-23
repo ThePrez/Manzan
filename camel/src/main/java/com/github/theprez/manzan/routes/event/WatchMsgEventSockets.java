@@ -13,13 +13,22 @@ public class WatchMsgEventSockets extends ManzanRoute {
     private final Map<String, String> m_formatMap;
     private final Map<String, String> m_destMap;
     private final String m_socketIp = "0.0.0.0";
-    private final String m_socketPort = "8080";
+    private final String m_socketPort;
 
     public WatchMsgEventSockets(final String _name, final Map<String, String> _formatMap,
             final Map<String, String> _destMap) {
         super(_name);
         m_formatMap = _formatMap;
         m_destMap = _destMap;
+        m_socketPort = getSocketPort();
+    }
+
+    private String getSocketPort() {
+        String portEnv = System.getenv("MANZAN_SOCKET_PORT");
+        if (portEnv != null && portEnv.matches("\\d+")) {
+            return portEnv;
+        }
+        return "8080";
     }
 
 //@formatter:off
