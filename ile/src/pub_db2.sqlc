@@ -53,7 +53,6 @@ struct messageParams {
 int get_socket_port() {
     const char *port_env = getenv("MANZAN_SOCKET_PORT");
     DEBUG_INFO("Socket port: %s\n", port_env);
-    printf("Socket port: %s\n", port_env);
     if (port_env != NULL) {
         char *endptr;
         errno = 0; // Reset errno before calling strtol
