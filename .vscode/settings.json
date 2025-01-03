@@ -103,5 +103,6 @@
         "compare": "cpp",
         "concepts": "cpp",
         "algorithm": "cpp"
-    }
+    },
+    "java.configuration.updateBuildConfiguration": "automatic"
 }

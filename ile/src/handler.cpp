@@ -12,6 +12,8 @@
 #include "event_data.h"
 #include "userconf.h"
 #include "mzversion.h"
+#include "pub_json.h"
+#include "SockClient.h"
 
 static FILE *fd = NULL;
 

@@ -39,6 +39,22 @@
       <version>3.14.6</version>
     </dependency>
     <dependency>
+      <groupId>com.google.guava</groupId>
+      <artifactId>guava</artifactId>
+      <version>30.1-android</version>
+    </dependency>
+    <dependency>
+      <groupId>org.apache.camel</groupId>
+      <artifactId>camel-google-pubsub</artifactId>
+      <version>3.14.6</version>
+    </dependency>
+    <dependency>
+      <groupId>org.apache.camel</groupId>
+      <artifactId>camel-activemq</artifactId>
+      <version>3.14.6</version>
+      <!-- use the same version as your Camel core version -->
+  </dependency>
+    <dependency>
       <groupId>org.apache.camel</groupId>
       <artifactId>camel-twilio</artifactId>
       <version>3.14.7</version>
@@ -59,6 +75,10 @@
       <groupId>org.apache.camel</groupId>
       <artifactId>camel-stream</artifactId>
       <version>3.14.7</version>
+    </dependency>
+    <dependency>
+      <groupId>org.apache.camel</groupId>
+      <artifactId>camel-netty</artifactId>
     </dependency>
     <dependency>
       <groupId>org.apache.camel</groupId>
@@ -124,7 +144,7 @@
     <dependency>
       <groupId>io.github.theprez</groupId>
       <artifactId>jfiletail</artifactId>
-      <version>0.0.3</version>
+      <version>0.0.4</version>
     </dependency>
 
     <!-- logging -->
@@ -154,7 +174,11 @@
       <artifactId>fluent-logger</artifactId>
       <version>0.3.4</version>
     </dependency>
-
+    <dependency>
+      <groupId>io.github.mjfryc</groupId>
+      <artifactId>mjaron-tinyloki-java</artifactId>
+      <version>0.3.11</version>
+    </dependency>
 
     <!-- testing -->
     <dependency>
@@ -222,6 +246,18 @@
           <mainClass>com.github.theprez.manzan.ManzanMainApp</mainClass>
           <includePluginDependencies>false</includePluginDependencies>
         </configuration>
+      </plugin>
+      <plugin>
+        <groupId>org.apache.camel</groupId>
+        <artifactId>camel-maven-plugin</artifactId>
+        <version>3.14.8</version>
+        <executions>
+          <execution>
+            <goals>
+              <goal>prepare-fatjar</goal>
+            </goals>
+          </execution>
+        </executions>
       </plugin>
       <plugin>
         <artifactId>maven-assembly-plugin</artifactId>

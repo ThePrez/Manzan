@@ -9,7 +9,8 @@ on:
     branches: [ "main" ]
 
 env:
-  remote_build_dir: /home/${{ secrets.IBMI_USER }}/testbuild/
+  remote_home_dir: /home/${{ secrets.IBMI_USER }}/
+  remote_build_dir: /home/${{ secrets.IBMI_USER }}/manzan/test/${{ github.sha }}/
   BUILDLIB: MZNTEST
 
 jobs:
@@ -38,13 +39,12 @@ jobs:
       - name: Install NPM Dependencies
         run: npm i -g @ibm/ibmi-ci
 
-      - name: Run ILE Tests
-        working-directory: scripts
-        run: bash ./testIle.sh
-
       - name: Install Manzan
         run: | 
           ici \
+            --rcwd "${{ env.remote_home_dir }}" \
+            --ignore --cmd "rm -rf ${{ env.remote_build_dir }}" \
+            --cmd "mkdir -p ${{ env.remote_build_dir }}" \
             --rcwd "${{ env.remote_build_dir }}" \
             --push "." \
             --cmd "/QOpenSys/pkgs/bin/gmake BUILDLIB=${{ env.BUILDLIB }} install" \
@@ -66,12 +66,18 @@ jobs:
           IBMI_PASSWORD: ${{ secrets.IBMI_PASSWORD }}
           IBMI_SSH_PORT: ${{ secrets.IBMI_SSH_PORT }}
 
+      - name: Run ILE Tests
+        working-directory: scripts
+        run: bash ./testIle.sh
+
       - name: Cleanup
         if: always()
         run: | 
           ici \
             --rcwd "${{ env.remote_build_dir }}" \
             --cmd "/QOpenSys/pkgs/bin/gmake BUILDLIB=${{ env.BUILDLIB }} uninstall" \
+            --rcwd "${{ env.remote_home_dir }}" \
+            --cmd "rm -rf ${{ env.remote_build_dir }}" \
         env:
           IBMI_HOST: ${{ secrets.IBMI_HOST }}
           IBMI_USER: ${{ secrets.IBMI_USER }}

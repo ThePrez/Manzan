@@ -2,6 +2,8 @@ package com.github.theprez.manzan.configuration;
 
 import java.io.File;
 import java.io.IOException;
+import java.util.HashMap;
+import java.util.Map;
 
 import org.ini4j.Ini;
 import org.ini4j.InvalidFileFormatException;
@@ -11,6 +13,7 @@ import com.github.theprez.jcmdutils.StringUtils;
 public abstract class Config {
 
     public static final String DIRECTORY_OVERRIDE_PROPERTY = "manzan.configdir";
+    public static final String COMPONENT_OPTIONS_PREFIX = "componentOptions.";
 
     protected static boolean isIBMi() {
         final String osName = System.getProperty("os.name", "Misty");
@@ -68,6 +71,27 @@ public abstract class Config {
             throw new RuntimeException("Required value for '" + _key + "' in [" + _name + "] not found");
         }
         return ret;
+    }
+
+    protected Map<String, String> getComponentOptions(final String _name) {
+            Map<String, String> section = m_ini.get(_name);
+
+            // Map to store key-value pairs
+            Map<String, String> componentOptionsMap = new HashMap<>();
+            if (section != null) {
+                // Iterate through the section's keys and values
+                for (Map.Entry<String, String> entry : section.entrySet()) {
+                    String key = entry.getKey();
+                    String value = entry.getValue();
+
+                    // Check if the key starts with "componentOptions."
+                    if (key.startsWith(COMPONENT_OPTIONS_PREFIX)) {
+                        // Store it in the map
+                        componentOptionsMap.put(key.substring(COMPONENT_OPTIONS_PREFIX.length()), value);
+                    }
+                }
+            }
+            return componentOptionsMap;
     }
 
     protected int getOptionalInt(final String _name, final String _key) {

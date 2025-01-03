@@ -17,7 +17,8 @@ int to_utf8(char *out, size_t out_len, const char *in)
   memset(&tocode, 0, sizeof(tocode));
   tocode.CCSID = 1208;
   QtqCode_T fromcode;
-  fromcode.CCSID = 37;
+
+  // Setting to 0 allows the system to automatically detect ccsid (hopefully)
   memset(&fromcode, 0, sizeof(fromcode));
   iconv_t cd = QtqIconvOpen(&tocode, &fromcode);
 
@@ -29,9 +30,10 @@ int to_utf8(char *out, size_t out_len, const char *in)
   int rc = iconv(cd, &input, &inleft, &output, &outleft);
   if (rc == -1)
   {
-    DEBUG_ERROR("Error in converting characters\n");
+    DEBUG_ERROR("Error in converting characters. %d: %s\n", errno, strerror(errno));
     return 9;
   }
+  DEBUG_INFO("Conversion to UTF-8 successful.\n");
   return iconv_close(cd);
 }
 
@@ -91,12 +93,34 @@ void append_json_element(std::string &_str, const char *_key, const int _value)
   _str += value;
 }
 
+size_t get_utf8_output_buf_length(std::string str){
+  // Each UTF-8 encoded byte can be up to 4 bytes, and add one for the null terminator.
+  return str.length() * 4 + 1;
+}
+
+/*
+* Return an output buffer containing enough space for the utf-8 encoded message.
+* Return NULL if there is no space remaining on the heap.
+* Remember to free the buffer after use.
+*/
+char* get_utf8_output_buf(std::string str){
+  char *buf = (char *)malloc(get_utf8_output_buf_length(str));
+    if (buf == NULL) {
+        DEBUG_ERROR("No heap space available to allocate buffer for %s\n", str.c_str());
+        return NULL;
+    }
+    return buf;
+}
+
 int json_publish(const char *_session_id, std::string &_json)
 {
-  int json_len = 1 + _json.length();
-  char *utf8 = (char *)malloc(56 + _json.length() * 2);
+  char *utf8 = get_utf8_output_buf(_json);
+  if (utf8 == NULL){
+    DEBUG_ERROR("No heap space available. Aborting publishing message %s\n", utf8);
+    return -1;
+  }
 
-  to_utf8(utf8, json_len, _json.c_str());
+  to_utf8(utf8, get_utf8_output_buf_length(_json), _json.c_str());
   DEBUG_INFO("Publishing JSON\n");
   DEBUG_INFO("%s\n", _json.c_str());
 
@@ -121,35 +145,45 @@ int json_publish(const char *_session_id, std::string &_json)
   return 0;
 }
 
+std::string construct_json_message(PUBLISH_MESSAGE_FUNCTION_SIGNATURE)
+{
+std::string jsonStr;
+  jsonStr += "{\n    ";
+  append_json_element(jsonStr, "EVENT_TYPE", "message");
+  jsonStr += ",\n    ";
+  append_json_element(jsonStr, "SESSION_ID", _session_id);
+  jsonStr += ",\n    "; 
+  append_json_element(jsonStr, "JOB", _job);
+  jsonStr += ",\n    ";
+  append_json_element(jsonStr, "MESSAGE_ID", _msgid);
+  jsonStr += ",\n    ";
+  append_json_element(jsonStr, "MESSAGE_TYPE", _msg_type);
+  jsonStr += ",\n    ";
+  append_json_element(jsonStr, "SEVERITY", _msg_severity);
+  jsonStr += ",\n    ";
+  append_json_element(jsonStr, "MESSAGE_TIMESTAMP", _msg_timestamp);
+  jsonStr += ",\n    ";
+  append_json_element(jsonStr, "SENDING_USRPRF", _sending_usrprf);
+  jsonStr += ",\n    ";
+  append_json_element(jsonStr, "MESSAGE", _message);
+  jsonStr += ",\n    ";
+  append_json_element(jsonStr, "SENDING_PROGRAM_NAME", _sending_program_name);
+  jsonStr += ",\n    ";
+  append_json_element(jsonStr, "SENDING_MODULE_NAME", _sending_module_name);
+  jsonStr += ",\n    ";
+  append_json_element(jsonStr, "SENDING_PROCEDURE_NAME", _sending_procedure_name);
+  jsonStr += "\n}";
+  return jsonStr;
+}
+
+/**
+ * Publish json message to DTAQ
+ */
 extern "C" int json_publish_message(PUBLISH_MESSAGE_FUNCTION_SIGNATURE)
 {
-  std::string jsonStr;
-  jsonStr += "{\n    ";
-  append_json_element(jsonStr, "event_type", "message");
-  jsonStr += ",\n    ";
-  append_json_element(jsonStr, "session_id", _session_id);
-  jsonStr += ",\n    "; 
-  append_json_element(jsonStr, "job", _job);
-  jsonStr += ",\n    ";
-  append_json_element(jsonStr, "msgid", _msgid);
-  jsonStr += ",\n    ";
-  append_json_element(jsonStr, "msgtype", _msg_type);
-  jsonStr += ",\n    ";
-  append_json_element(jsonStr, "severity", _msg_severity);
-  jsonStr += ",\n    ";
-  append_json_element(jsonStr, "message_timestamp", _msg_timestamp);
-  jsonStr += ",\n    ";
-  append_json_element(jsonStr, "sending_usrprf", _sending_usrprf);
-  jsonStr += ",\n    ";
-  append_json_element(jsonStr, "message", _message);
-  jsonStr += ",\n    ";
-  append_json_element(jsonStr, "sending_program_name", _sending_program_name);
-  jsonStr += ",\n    ";
-  append_json_element(jsonStr, "sending_module_name", _sending_module_name);
-  jsonStr += ",\n    ";
-  append_json_element(jsonStr, "sending_procedure_name", _sending_procedure_name);
-
-  jsonStr += "\n}";
+  std::string jsonStr = construct_json_message(_session_id, _msgid, _msg_type, _msg_severity, _msg_timestamp, _job, _sending_usrprf,
+  _message, _sending_program_name, _sending_module_name, _sending_procedure_name);
+  
   return json_publish(_session_id, jsonStr);
 }
 
