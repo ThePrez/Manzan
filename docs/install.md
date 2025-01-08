@@ -19,6 +19,7 @@ Use a Java version provided by IBM, which is at least version 8. When running th
 3. If you did not download to IBM i directly, transfer the `.jar` file to IBM i using technique of your choice.
 
 4. Run the installer using:
+
     ```sh
     java -jar <name of jar file>
     ```
@@ -26,6 +27,8 @@ Use a Java version provided by IBM, which is at least version 8. When running th
 For instance, to install version `0.0.6`, the steps from an IBM i (using open source `wget`) would look like:
 
 ```bash
+mkdir -p /opt/download
+cd /opt/download
 wget https://github.com/ThePrez/Manzan/releases/download/v0.0.6/manzan-installer-v0.0.6.jar
 java -jar manzan-installer-v0.0.6.jar
 ```
