@@ -2,6 +2,10 @@
 
 This document will outline how to install Manzan on to IBM i. Manzan is installed through a pase shell. We do not recommend using `qsh` or `qp2term`, and instead using SSH and a bash shell.
 
+## Which Java to Use
+
+Use a Java version provided by IBM, which is at least version 8. When running the `java -version` command, the output should contain the string `IBM`. Ex. `IBM Semeru Runtime Certified Edition`. Otherwise, Manzan may not function properly.
+
 ## Install from GitHub
 
 1. Make a "download" directory on IBM i by running the following from an SSH terminal:
