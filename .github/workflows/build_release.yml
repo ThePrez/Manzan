@@ -66,7 +66,7 @@ jobs:
         run: | 
           ici \
             --rcwd "${{ env.remote_build_dir }}" \
-            --cmd "/QOpenSys/pkgs/bin/gmake BUILDLIB=${{ env.BUILDLIB }} uninstall"
+            --cmd "/QOpenSys/pkgs/bin/gmake BUILDLIB=${{ env.BUILDLIB }} uninstall" \
             --rcwd "${{ env.remote_home_dir }}" \
             --cmd "rm -fr ${{ env.remote_build_dir }}"
         env:
