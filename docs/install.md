@@ -24,13 +24,13 @@ Use a Java version provided by IBM, which is at least version 8. When running th
     java -jar <name of jar file>
     ```
 
-For instance, to install version `0.0.6`, the steps from an IBM i (using open source `wget`) would look like:
+For instance, to install version `0.0.8`, the steps from an IBM i (using open source `wget`) would look like:
 
 ```bash
 mkdir -p /opt/download
 cd /opt/download
-wget https://github.com/ThePrez/Manzan/releases/download/v0.0.6/manzan-installer-v0.0.6.jar
-java -jar manzan-installer-v0.0.6.jar
+wget https://github.com/ThePrez/Manzan/releases/download/v0.0.8/manzan-installer-v0.0.8.jar
+java -jar manzan-installer-v0.0.8.jar
 ```
 
 ## Configuration
