@@ -10,6 +10,15 @@ Provide a gateway for publishing IBM i events to a variety of endpoints, which m
 
 In short, this project aims to make IBM i more integrated with infrastructure monitoring of a heterogeneous IT infrastructure, whether on-prem or cloud.
 
+## Why the name "Manzan"?
+Manzan, the open source project designed to simplify IBM i system operations and monitoring, owes its name to a
+tranquil haven that brings solace to its creator, Jesse Gorzinski. Just as the gentle lapping of waves against the
+shore can calm the mind, Manzan aims to soothe the stresses that come with managing complex systems. By streamlining
+tasks and making the mundane effortless, Manzan helps IT professionals find their own peaceful haven amidst the chaos
+of their daily work. With Manzan, the ebb and flow of system administration becomes a breeze, allowing users to focus
+on more important things – just as Jesse's favorite retreat helps him clear his mind and recharge. By harnessing the
+power of Manzan, users can let their worries wash away, leaving them feeling refreshed and in control.
+
 ## Architecture
 
 ![image](https://user-images.githubusercontent.com/17914061/208200501-d0c14907-ed47-4248-ab89-9728e197ddb6.png)
