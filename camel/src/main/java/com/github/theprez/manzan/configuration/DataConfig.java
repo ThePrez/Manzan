@@ -20,6 +20,7 @@ import com.github.theprez.manzan.routes.ManzanRoute;
 import com.github.theprez.manzan.routes.event.FileEvent;
 import com.github.theprez.manzan.routes.event.WatchMsgEventSockets;
 import com.github.theprez.manzan.routes.event.WatchMsgEventSql;
+import com.github.theprez.manzan.routes.event.WatchTableEvent;
 import com.ibm.as400.access.AS400SecurityException;
 import com.ibm.as400.access.ErrorCompletingRequestException;
 import com.ibm.as400.access.ObjectDoesNotExistException;
@@ -85,6 +86,13 @@ public class DataConfig extends Config {
                     String file = getRequiredString(name, "file");
                     String filter = getOptionalString(name, "filter");
                     ret.put(name, new FileEvent(name, file, format, destinations, filter, interval));
+                    break;
+                case "table":
+                    final String table = getRequiredString(name, "table");
+                    final String tableSchema = getRequiredString(name, "schema");
+                    int userNumToProcess = getOptionalInt(name, "numToProcess");
+                    final int numToProcess = userNumToProcess != -1 ? userNumToProcess : DEFAULT_NUM_TO_PROCESS;
+                    ret.put(name, new WatchTableEvent(name, format, destinations, tableSchema, table, interval, numToProcess));
                     break;
                 default:
                     throw new RuntimeException("Unknown destination type: " + type);
