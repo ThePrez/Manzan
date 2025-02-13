@@ -1,4 +1,4 @@
-`data.ini` is made up of many sections that define data sources. For example, a Manzan data source might be a `file` or `watch`. In the future, there will be many more.
+`data.ini` is made up of many sections that define data sources. A Manzan data source might be a `file`, `watch`, or `table`. In the future, there will be many more.
 
 ## Schema
 
@@ -39,8 +39,13 @@ Some types have additional properties that they required.
 | id      | Description                                 | Required properties            | Optional properties                                                                                                        |
 |---------|---------------------------------------------|--------------------------------|-----------------------------------------------------------------------------------------------------------------------|
 | `file`  | Triggered when a file changes               | `file` path of file to watch   | * `filter` only listen for lines that include this value                                                                |
-| `watch` | Triggered when the Manzan handler is called | `id` of the watch (session ID) | * `strwch` is part of the `STRWCH` CL command that can be used to describe how to start the watch when Manzan starts up <br> * * `numToProcess` can be used to configure how many messages are queried for by the distributor (default `5000`) |
+| `watch` | Triggered when the Manzan handler is called | `id` of the watch (session ID) | * `strwch` is part of the `STRWCH` CL command that can be used to describe how to start the watch when Manzan starts up <br> * `numToProcess` can be used to configure how many messages are queried for by the distributor (default `1000`) <br> * `interval` the interval at which to query for new messages|
+| `table` | Triggered when data is inserted into the specified table | `table` name of the table to watch  <br> `schema` the schema in which the table resides | * `numToProcess` can be used to configure how many messages are queried for by the distributor (default `1000`) <br> * `interval` the interval at which to query for new messages|
 
+### Special event types
+The table event type is primarily used as a mechanism to transport arbitrary data to a chosen destination. This data can be programmatically inserted into the table, or it can be inserted manually. Note that this data will be deleted from the table after it is processed. In the case that you want to persist the data in the database, consider using a different event type such as `file` or `watch`.
+
+If using the table event type, this needs to be a specially crafted table with a primary key column named `ID`. `ID` must be an integer data type. The data in this table will be removed after it is processed. 
 
 ### Example
 
@@ -72,4 +77,12 @@ format=$MESSAGE_ID$ (severity $SEVERITY$): $MESSAGE$
 strwch=WCHMSG((*ALL)) WCHMSGQ((*HSTLOG))
 interval=10
 numToProcess=10000
+
+# This will write messages to slack and kafka destinations whenever data is inserted into the foo.announcements table
+[tab1]
+type=table
+table=announcements
+schema=foo
+destinations=slack, kafka
+format=$DATA$ 
 ```
