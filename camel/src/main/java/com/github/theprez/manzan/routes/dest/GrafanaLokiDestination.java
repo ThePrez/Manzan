@@ -49,13 +49,12 @@ public class GrafanaLokiDestination extends ManzanRoute {
                             .l(appLabelName, appLabelValue)
                             .l(SESSION_ID, getWatchName(exchange));
                     String timestamp;
+                    String severity;
                     String[] keys;
 
                     final ManzanEventType type = (ManzanEventType) exchange.getIn().getHeader(EVENT_TYPE);
                     if (type == ManzanEventType.WATCH_MSG) {
-                        builder
-                                .l(Labels.LEVEL, ((Integer) get(exchange, MSG_SEVERITY)) > SEVERITY_LIMIT ? Labels.FATAL
-                                        : Labels.INFO);
+                        severity = ((Integer) get(exchange, MSG_SEVERITY)) > SEVERITY_LIMIT ? Labels.FATAL : Labels.INFO;
 
                         timestamp = MSG_MESSAGE_TIMESTAMP;
                         keys = new String[] {
@@ -69,7 +68,7 @@ public class GrafanaLokiDestination extends ManzanRoute {
                                 MSG_SENDING_PROCEDURE_NAME
                         };
                     } else if (type == ManzanEventType.WATCH_VLOG) {
-                        // TODO: Set log level
+                        severity = Labels.INFO;
 
                         timestamp = LOG_TIMESTAMP;
                         keys = new String[] {
@@ -88,7 +87,7 @@ public class GrafanaLokiDestination extends ManzanRoute {
                                 MODULE_ENTRY_POINT_NAME
                         };
                     } else if (type == ManzanEventType.WATCH_PAL) {
-                        // TODO: Set log level
+                        severity = Labels.INFO;
 
                         timestamp = PAL_TIMESTAMP;
                         keys = new String[] {
@@ -113,6 +112,8 @@ public class GrafanaLokiDestination extends ManzanRoute {
                             builder.l(key, value);
                         }
                     }
+
+                    builder.l(Labels.LEVEL, severity);
 
                     ILogStream stream = builder.build();
                     stream.log(Timestamp.valueOf(getString(exchange, timestamp)).getTime(),
