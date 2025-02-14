@@ -25,6 +25,7 @@ import com.github.theprez.manzan.routes.dest.KafkaDestination;
 import com.github.theprez.manzan.routes.dest.ActiveMqDestination;
 import com.github.theprez.manzan.routes.dest.SentryDestination;
 import com.github.theprez.manzan.routes.dest.SlackDestination;
+import com.github.theprez.manzan.routes.dest.SplunkDestination;
 import com.github.theprez.manzan.routes.dest.StreamDestination;
 import com.github.theprez.manzan.routes.dest.TwilioDestination;
 
@@ -69,6 +70,12 @@ public class DestinationConfig extends Config {
                 case "kafka":
                     final String topic = getRequiredString(name, "topic");
                     ret.put(name, new KafkaDestination(context, name, topic, format, componentOptions, getUriAndHeaderParameters(name, sectionObj, "topic")));
+                    break;
+                case "splunk-hec":
+                    final String splunkUrl = getRequiredString(name, "splunkUrl");
+                    final String token = getRequiredString(name, "token");
+                    getRequiredString(name, "index");
+                    ret.put(name, new SplunkDestination(context, name, splunkUrl, token, format, componentOptions, getUriAndHeaderParameters(name, sectionObj, "splunkUrl", "token")));
                     break;
                 case "activemq":
                     final String destName = getRequiredString(name, "destinationName");
