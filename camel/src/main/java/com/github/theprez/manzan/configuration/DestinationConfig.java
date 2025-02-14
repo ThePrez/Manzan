@@ -15,6 +15,7 @@ import org.ini4j.Profile.Section;
 import com.github.theprez.jcmdutils.StringUtils;
 import com.github.theprez.manzan.routes.ManzanRoute;
 import com.github.theprez.manzan.routes.dest.DirDestination;
+import com.github.theprez.manzan.routes.dest.ElasticsearchDestination;
 import com.github.theprez.manzan.routes.dest.EmailDestination;
 import com.github.theprez.manzan.routes.dest.FileDestination;
 import com.github.theprez.manzan.routes.dest.FluentDDestination;
@@ -69,6 +70,13 @@ public class DestinationConfig extends Config {
                 case "kafka":
                     final String topic = getRequiredString(name, "topic");
                     ret.put(name, new KafkaDestination(context, name, topic, format, componentOptions, getUriAndHeaderParameters(name, sectionObj, "topic")));
+                    break;
+                case "elasticsearch":
+                    final String clusterName = getRequiredString(name, "clusterName");
+                    final String hostAddresses = getRequiredString(name, "hostAddresses");
+                    final String user = getRequiredString(name, "user");
+                    final String pass = getRequiredString(name, "password");
+                    ret.put(name, new ElasticsearchDestination(context, name, clusterName, hostAddresses, user, pass, format, componentOptions, getUriAndHeaderParameters(name, sectionObj, "clusterName", "hostAddresses", "user", "password")));
                     break;
                 case "activemq":
                     final String destName = getRequiredString(name, "destinationName");
