@@ -68,7 +68,7 @@ public class GrafanaLokiDestination extends ManzanRoute {
                                 MSG_SENDING_PROCEDURE_NAME
                         };
                     } else if (type == ManzanEventType.WATCH_VLOG) {
-                        severity = Labels.INFO;
+                        severity = Labels.FATAL;
 
                         timestamp = LOG_TIMESTAMP;
                         keys = new String[] {
@@ -87,7 +87,7 @@ public class GrafanaLokiDestination extends ManzanRoute {
                                 MODULE_ENTRY_POINT_NAME
                         };
                     } else if (type == ManzanEventType.WATCH_PAL) {
-                        severity = Labels.INFO;
+                        severity = Labels.FATAL;
 
                         timestamp = PAL_TIMESTAMP;
                         keys = new String[] {

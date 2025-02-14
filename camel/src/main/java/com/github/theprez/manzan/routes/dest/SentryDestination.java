@@ -69,12 +69,12 @@ public class SentryDestination extends ManzanRoute {
                         fingerprints.add(getString(exchange, MSG_SENDING_MODULE_NAME));
                         fingerprints.add(getString(exchange, MSG_SENDING_PROGRAM_NAME));
                     } else if (type == ManzanEventType.WATCH_VLOG) {
-                        severity = SentryLevel.INFO;
+                        severity = SentryLevel.ERROR;
                         timestamp = LOG_TIMESTAMP;
                         fingerprints.add(getString(exchange, MAJOR_CODE));
                         fingerprints.add(getString(exchange, MINOR_CODE));
                     } else if (type == ManzanEventType.WATCH_PAL) {
-                        severity = SentryLevel.INFO;
+                        severity = SentryLevel.ERROR;
                         timestamp = PAL_TIMESTAMP;
                         fingerprints.add(getString(exchange, SYSTEM_REFERENCE_CODE));
                     } else {
