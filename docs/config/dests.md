@@ -23,18 +23,19 @@ you need to prefix the property with `componentOptions.` in your dest.ini config
 for ActiveMQ, you should write the option as `componentOptions.brokerURL=<yourActiveMQUrl>`
 
 | id               | Description                     | Required properties                                        | Commonly used properties                                 | All properties
-|------------------|---------------------------------|------------------------------------------------------------| -------------------------------------------------------- |--------------------------------------------------------------------|
-| `stdout`         | Write all data to standard out. | None.                                                      |                                                          | https://camel.apache.org/components/3.22.x/stream-component.html   |  
-| `slack`          | Send data to a Slack channel    | * `webhook` <br> * `channel`                               |                                                          | https://camel.apache.org/components/3.22.x/slack-component.html    |
-| `fluentd`        | Send data to FluentD            | * `tag` <br> * `host` <br> * `port`                        |                                                          |                                                                    |
-| `file`           | Send data to a file             | * `file`                                                   |                                                          | https://camel.apache.org/components/3.22.x/stream-component.html   |
-| `dir`            | Send data to a directory        | * `dir`                                                    |                                                          | https://camel.apache.org/components/3.22.x/file-component.html                                                                   |    
-| `smtp`/`smtps`   | Sent data via email             | * `server` <br> * `subject` <br> * `to` <br> * `from`      | * `port`                                                 | https://camel.apache.org/components/3.22.x/mail-component.html     |
-| `sentry`         | Send data into Sentry           | * `dsn`                                                    |                                                          |                                                                    |
-| `twilio`         | Send via SMS                    | * `sid` <br> * `token` <br> * `to` <br> * `from`           |                                                          | https://camel.apache.org/components/3.22.x/twilio-component.html   |
-| `loki`           | Send data into Grafana Loki     | * `url` <br> * `username` <br> * `password` <br>           |                                                          |                                                                    |
-| `http`/`https`   | Send data via http/https        | * `url`                                                    | * `httpMethod` <br> * `x` where x is any query parameter | https://camel.apache.org/components/3.22.x/http-component.html     |
-| `activemq`       | Send data to activemq           | * `destinationName`                                        | * `destinationType` <br> * `brokerURL`                    | https://camel.apache.org/components/3.22.x/activemq-component.html |
+|------------------|---------------------------------|------------------------------------------------------------| -------------------------------------------------------- |----------------------------------------------------------------------|
+| `stdout`         | Write all data to standard out. | None.                                                      |                                                          | https://camel.apache.org/components/3.22.x/stream-component.html     |  
+| `slack`          | Send data to a Slack channel    | * `webhook` <br> * `channel`                               |                                                          | https://camel.apache.org/components/3.22.x/slack-component.html      |
+| `fluentd`        | Send data to FluentD            | * `tag` <br> * `host` <br> * `port`                        |                                                          |                                                                      |
+| `file`           | Send data to a file             | * `file`                                                   |                                                          | https://camel.apache.org/components/3.22.x/stream-component.html     |
+| `dir`            | Send data to a directory        | * `dir`                                                    |                                                          | https://camel.apache.org/components/3.22.x/file-component.html                                                                     |    
+| `smtp`/`smtps`   | Sent data via email             | * `server` <br> * `subject` <br> * `to` <br> * `from`      | * `port`                                                 | https://camel.apache.org/components/3.22.x/mail-component.html       |
+| `sentry`         | Send data into Sentry           | * `dsn`                                                    |                                                          |                                                                      |
+| `twilio`         | Send via SMS                    | * `sid` <br> * `token` <br> * `to` <br> * `from`           |                                                          | https://camel.apache.org/components/3.22.x/twilio-component.html     |
+| `loki`           | Send data into Grafana Loki     | * `url` <br> * `username` <br> * `password` <br>           |                                                          |                                                                      |
+| `http`/`https`   | Send data via http/https        | * `url`                                                    | * `httpMethod` <br> * `x` where x is any query parameter | https://camel.apache.org/components/3.22.x/http-component.html       |
+| `activemq`       | Send data to ActiveMQ           | * `destinationName`                                        | * `destinationType` <br> * `brokerURL`                   | https://camel.apache.org/components/3.22.x/activemq-component.html   |
+| `splunk-hec`     | Send data to Splunk             | * `splunkUrl` <br> * `token` <br> * `index`                | * `skipTlsVerify`                                        | https://camel.apache.org/components/3.22.x/splunk-hec-component.html |
 
 
 ### Example
@@ -101,4 +102,9 @@ destName=TEST.QUEUE
 format=This is the $FILE_DATA$
 componentOptions.brokerURL=tcp://myactivemq:61616
 
+[splunk]
+type=splunk-hec
+splunkUrl=<splunk_host>:<splunk_port>
+token=<splunk_token>
+index=<splunk_index>
 ```
