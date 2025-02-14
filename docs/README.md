@@ -40,7 +40,7 @@ Events can be consumed by your own custom ILE code (documentation forthcoming) b
 
 Many other destinations will be available. Examples include:
 
-- [ActiveMQ](http://activemq.apache.org/) ⏳
+- [ActiveMQ](http://activemq.apache.org/) ✅
 - [AWS Simple Email Service (SES)](https://aws.amazon.com/ses/) ⏳
 - [AWS Simple Notification System (SNS)](https://aws.amazon.com/sns/) ⏳
 - [ElasticSearch](http://elastic.co) ⏳
