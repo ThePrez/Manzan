@@ -56,31 +56,32 @@ public class SentryDestination extends ManzanRoute {
                     message.setMessage(getBody(exchange, String.class));
                     event.setMessage(message);
 
+                    SentryLevel severity;
                     String timestamp;
                     final List<String> fingerprints = new LinkedList<String>();
 
                     final ManzanEventType type = (ManzanEventType) exchange.getIn().getHeader(EVENT_TYPE);
                     if (ManzanEventType.WATCH_MSG == type) {
-                        event.setLevel(((Integer) get(exchange, MSG_SEVERITY)) > SEVERITY_LIMIT ? SentryLevel.ERROR
-                                : SentryLevel.INFO);
+                        severity = ((Integer) get(exchange, MSG_SEVERITY)) > SEVERITY_LIMIT ? SentryLevel.ERROR : SentryLevel.INFO;
                         timestamp = MSG_MESSAGE_TIMESTAMP;
                         fingerprints.add(getString(exchange, MSG_MESSAGE_ID));
                         fingerprints.add(getString(exchange, MSG_SENDING_PROCEDURE_NAME));
                         fingerprints.add(getString(exchange, MSG_SENDING_MODULE_NAME));
                         fingerprints.add(getString(exchange, MSG_SENDING_PROGRAM_NAME));
                     } else if (type == ManzanEventType.WATCH_VLOG) {
-                        // TODO: Set log level
+                        severity = SentryLevel.ERROR;
                         timestamp = LOG_TIMESTAMP;
                         fingerprints.add(getString(exchange, MAJOR_CODE));
                         fingerprints.add(getString(exchange, MINOR_CODE));
                     } else if (type == ManzanEventType.WATCH_PAL) {
-                        // TODO: Set log level
+                        severity = SentryLevel.ERROR;
                         timestamp = PAL_TIMESTAMP;
                         fingerprints.add(getString(exchange, SYSTEM_REFERENCE_CODE));
                     } else {
                         throw new RuntimeException("Sentry route doesn't know how to process type " + type);
                     }
 
+                    event.setLevel(severity);
                     event.setTimestamp(Date.valueOf(getString(exchange, timestamp))); // TODO: Verify date is valid
                     event.setFingerprints(fingerprints);
                     Sentry.captureEvent(event);
