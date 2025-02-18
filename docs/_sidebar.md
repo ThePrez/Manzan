@@ -14,4 +14,5 @@
       * [Grafana Loki](config/examples/grafanaLoki.md)
       * [Google Pub/Sub](config/examples/googlePubSub.md)
       * [ActiveMQ](config/examples/activeMQ.md)
+      * [Splunk](config/examples/splunk.md)
 * [Contributing](contributing.md)
