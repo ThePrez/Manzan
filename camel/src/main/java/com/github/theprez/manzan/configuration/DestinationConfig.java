@@ -74,7 +74,7 @@ public class DestinationConfig extends Config {
                 case "splunk-hec":
                     final String splunkUrl = getRequiredString(name, "splunkUrl");
                     final String token = getRequiredString(name, "token");
-                    getRequiredString(name, "index");
+                    getRequiredString(name, "index"); // This ensures that the user sets the index query parameter
                     ret.put(name, new SplunkDestination(context, name, splunkUrl, token, format, componentOptions, getUriAndHeaderParameters(name, sectionObj, "splunkUrl", "token")));
                     break;
                 case "activemq":
