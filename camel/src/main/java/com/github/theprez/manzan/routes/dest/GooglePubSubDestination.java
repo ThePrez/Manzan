@@ -7,6 +7,7 @@ import org.apache.camel.CamelContext;
 import org.apache.camel.Exchange;
 import org.apache.camel.component.google.pubsub.GooglePubsubComponent;
 import org.apache.camel.component.google.pubsub.GooglePubsubConstants;
+import org.apache.camel.model.RouteDefinition;
 
 import com.github.theprez.manzan.ManzanEventType;
 import com.github.theprez.manzan.routes.ManzanGenericCamelRoute;
@@ -35,5 +36,9 @@ public class GooglePubSubDestination extends ManzanGenericCamelRoute {
             map.put(entry.getKey(), entry.getValue().toString());
         }
         exchange.getIn().setHeader(GooglePubsubConstants.ATTRIBUTES, map);
+    }
+
+    @Override
+    protected void customRouteDefinition(RouteDefinition routeDefinition) {
     }
 }

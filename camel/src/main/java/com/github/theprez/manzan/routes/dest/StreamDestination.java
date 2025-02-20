@@ -2,6 +2,7 @@ package com.github.theprez.manzan.routes.dest;
 
 import org.apache.camel.CamelContext;
 import org.apache.camel.Exchange;
+import org.apache.camel.model.RouteDefinition;
 
 import com.github.theprez.manzan.routes.ManzanGenericCamelRoute;
 
@@ -14,5 +15,9 @@ public class StreamDestination extends ManzanGenericCamelRoute {
 
     @Override
     protected void customPostProcess(Exchange exchange) {
+    }
+
+    @Override
+    protected void customRouteDefinition(RouteDefinition routeDefinition) {
     }
 }
