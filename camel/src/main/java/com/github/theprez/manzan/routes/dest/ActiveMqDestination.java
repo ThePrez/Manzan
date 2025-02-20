@@ -4,6 +4,8 @@ import java.util.Map;
 
 import org.apache.camel.CamelContext;
 import org.apache.camel.Exchange;
+import org.apache.camel.model.RouteDefinition;
+
 import com.github.theprez.manzan.routes.ManzanGenericCamelRoute;
 
 public class ActiveMqDestination extends ManzanGenericCamelRoute {
@@ -13,5 +15,9 @@ public class ActiveMqDestination extends ManzanGenericCamelRoute {
 
     @Override
     protected void customPostProcess(Exchange exchange) {
+    }
+
+    @Override
+    protected void customRouteDefinition(RouteDefinition routeDefinition) {
     }
 }

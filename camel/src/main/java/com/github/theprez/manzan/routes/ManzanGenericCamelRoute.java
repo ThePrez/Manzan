@@ -7,6 +7,7 @@ import java.util.Map.Entry;
 import org.apache.camel.CamelContext;
 import org.apache.camel.Component;
 import org.apache.camel.Exchange;
+import org.apache.camel.model.RouteDefinition;
 
 import com.github.theprez.jcmdutils.StringUtils;
 import com.github.theprez.manzan.ManzanMessageFormatter;
@@ -16,8 +17,8 @@ import org.apache.camel.spi.PropertyConfigurer;
 public abstract class ManzanGenericCamelRoute extends ManzanRoute {
 
     private final String m_camelComponent;
-    private final ManzanMessageFormatter m_formatter;
-    private final Map<String, Object> m_headerParams;
+    protected final ManzanMessageFormatter m_formatter;
+    protected final Map<String, Object> m_headerParams;
     private final String m_path;
     protected final Map<String, String> m_uriParams;
 
@@ -31,19 +32,22 @@ public abstract class ManzanGenericCamelRoute extends ManzanRoute {
         m_path = _path;
         m_formatter = StringUtils.isEmpty(_format) ? null : new ManzanMessageFormatter(_format);
 
-        Component component = _context.getComponent(_camelComponent, true, false);
-        PropertyConfigurer configurer = component.getComponentPropertyConfigurer();
-        componentOptions.forEach((key, value) -> {
-            configurer.configure(_context, component, key, value,  true);
-        });
-
+        if(componentOptions != null) {
+            Component component = _context.getComponent(_camelComponent, true, false);
+            PropertyConfigurer configurer = component.getComponentPropertyConfigurer();
+            componentOptions.forEach((key, value) -> {
+                configurer.configure(_context, component, key, value,  true);
+            });
+        }
     }
 
     protected abstract void customPostProcess(Exchange exchange);
 
+    protected abstract void customRouteDefinition(RouteDefinition routeDefinition);
+
     @Override
     public void configure() {
-        from(getInUri())
+        RouteDefinition routeDefinition = from(getInUri())
                 .process(exchange -> {
                     if (null != m_formatter) {
                         exchange.getIn().setBody(m_formatter.format(getDataMap(exchange)));
@@ -56,8 +60,9 @@ public abstract class ManzanGenericCamelRoute extends ManzanRoute {
                 // .wireTap("stream:out")
                 .process(exchange -> {
                     customPostProcess(exchange);
-                })
-                .to(getTargetUri());
+                });
+        customRouteDefinition(routeDefinition);
+        routeDefinition.to(getTargetUri());
     }
 
     private String getTargetUri() {

@@ -4,6 +4,8 @@ import java.util.Map;
 
 import org.apache.camel.CamelContext;
 import org.apache.camel.Exchange;
+import org.apache.camel.model.RouteDefinition;
+
 import com.github.theprez.manzan.routes.ManzanGenericCamelRoute;
 
 public class EmailDestination extends ManzanGenericCamelRoute {
@@ -20,5 +22,9 @@ public class EmailDestination extends ManzanGenericCamelRoute {
     protected void customPostProcess(Exchange exchange) {
         exchange.getIn().removeHeaders("*");
         exchange.getIn().setHeader("contentType", "text/plain");
+    }
+
+    @Override
+    protected void customRouteDefinition(RouteDefinition routeDefinition) {
     }
 }
