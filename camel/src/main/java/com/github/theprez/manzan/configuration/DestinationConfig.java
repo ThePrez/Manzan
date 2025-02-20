@@ -22,6 +22,7 @@ import com.github.theprez.manzan.routes.dest.GooglePubSubDestination;
 import com.github.theprez.manzan.routes.dest.GrafanaLokiDestination;
 import com.github.theprez.manzan.routes.dest.HttpDestination;
 import com.github.theprez.manzan.routes.dest.KafkaDestination;
+import com.github.theprez.manzan.routes.dest.PagerDutyDestination;
 import com.github.theprez.manzan.routes.dest.ActiveMqDestination;
 import com.github.theprez.manzan.routes.dest.SentryDestination;
 import com.github.theprez.manzan.routes.dest.SlackDestination;
@@ -124,6 +125,13 @@ public class DestinationConfig extends Config {
                     ret.put(name, new TwilioDestination(context, name, format,
                     componentOptions,
                     getUriAndHeaderParameters(name, sectionObj, "sid", "token")));
+                    break;
+                case "pagerduty":
+                    final String routingKey = getRequiredString(name, "routingKey");
+                    final String component = getOptionalString(name, "component");
+                    final String group = getOptionalString(name, "group");
+                    final String classType = getOptionalString(name, "class");
+                    ret.put(name, new PagerDutyDestination(context, name, routingKey, component, group, classType, format));
                     break;
                 case "http":
                 case "https":
