@@ -16,9 +16,9 @@ import io.github.theprez.jfiletail.FileNewContentsReader;
 
 public class FileEvent extends ManzanRoute {
 
-    private static final String FILE_DATA = "FILE_DATA";
-    private static final String FILE_NAME = "FILE_NAME";
-    private static final String FILE_PATH = "FILE_PATH";
+    public static final String FILE_DATA = "FILE_DATA";
+    public static final String FILE_NAME = "FILE_NAME";
+    public static final String FILE_PATH = "FILE_PATH";
     private final File m_file;
     private final int m_interval;
     private final ManzanMessageFilter m_filter;
