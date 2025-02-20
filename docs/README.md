@@ -55,7 +55,7 @@ Many other destinations will be available. Examples include:
 - [Kafka](http://kafka.apache.org) ✅
 - [Mezmo](http://mezmo.com) ⏳
 - [Microsoft Teams](http://teams.microsoft.com) ⏳
-- [PagerDuty](http://pagerduty.com) ⏳
+- [PagerDuty](http://pagerduty.com) ✅
 - [Sentry](http://sentry.io) ✅
 - [Slack](http://slack.com) ✅
 - SMS (via [Twilio](http://www.twilio.com)) ✅

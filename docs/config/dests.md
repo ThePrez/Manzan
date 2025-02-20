@@ -36,6 +36,7 @@ for ActiveMQ, you should write the option as `componentOptions.brokerURL=<yourAc
 | `http`/`https`   | Send data via http/https        | * `url`                                                    | * `httpMethod` <br> * `x` where x is any query parameter | https://camel.apache.org/components/3.22.x/http-component.html       |
 | `activemq`       | Send data to ActiveMQ           | * `destinationName`                                        | * `destinationType` <br> * `brokerURL`                   | https://camel.apache.org/components/3.22.x/activemq-component.html   |
 | `splunk-hec`     | Send data to Splunk             | * `splunkUrl` <br> * `token` <br> * `index`                | * `skipTlsVerify`                                        | https://camel.apache.org/components/3.22.x/splunk-hec-component.html |
+| `pagerduty`      | Send data to PagerDuty          | * `routingKey`                                             | * `component` <br> * `group` <br> * `class`              |                                                                      |
 
 
 ### Example
@@ -107,4 +108,11 @@ type=splunk-hec
 splunkUrl=<splunk_host>:<splunk_port>
 token=<splunk_token>
 index=<splunk_index>
+
+[pagerduty]
+type=pagerduty
+routingKey=<routing_key>
+component=Jetty Web Server
+group=My Cool Application
+class=Server Error
 ```

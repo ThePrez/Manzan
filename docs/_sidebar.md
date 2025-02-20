@@ -15,4 +15,5 @@
       * [Google Pub/Sub](config/examples/googlePubSub.md)
       * [ActiveMQ](config/examples/activeMQ.md)
       * [Splunk](config/examples/splunk.md)
+      * [PagerDuty](config/examples/pagerDuty.md)
 * [Contributing](contributing.md)

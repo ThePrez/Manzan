@@ -32,7 +32,7 @@ token=<splunk_token>
 # Set your Splunk index to write to
 index=<splunk_index>
 
-# Disable Splunk HEC TLS verification (optional)
+# (Optional) Disable Splunk HEC TLS verification
 skipTlsVerify=true
 ```
 
