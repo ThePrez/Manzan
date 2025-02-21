@@ -7,7 +7,6 @@ import java.util.Map.Entry;
 import org.apache.camel.CamelContext;
 import org.apache.camel.Component;
 import org.apache.camel.Exchange;
-import org.apache.camel.model.RouteDefinition;
 
 import com.github.theprez.jcmdutils.StringUtils;
 import com.github.theprez.manzan.ManzanMessageFormatter;
@@ -41,13 +40,11 @@ public abstract class ManzanGenericCamelRoute extends ManzanRoute {
         }
     }
 
-    protected abstract void customPostProcess(Exchange exchange);
-
-    protected abstract void customRouteDefinition(RouteDefinition routeDefinition);
+    protected abstract void customPostProcess(Exchange exchange) throws Exception;
 
     @Override
     public void configure() {
-        RouteDefinition routeDefinition = from(getInUri())
+        from(getInUri())
                 .process(exchange -> {
                     if (null != m_formatter) {
                         exchange.getIn().setBody(m_formatter.format(getDataMap(exchange)));
@@ -60,9 +57,8 @@ public abstract class ManzanGenericCamelRoute extends ManzanRoute {
                 // .wireTap("stream:out")
                 .process(exchange -> {
                     customPostProcess(exchange);
-                });
-        customRouteDefinition(routeDefinition);
-        routeDefinition.to(getTargetUri());
+                })
+                .to(getTargetUri());
     }
 
     private String getTargetUri() {

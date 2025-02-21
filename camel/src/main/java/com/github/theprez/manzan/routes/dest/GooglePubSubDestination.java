@@ -37,8 +37,4 @@ public class GooglePubSubDestination extends ManzanGenericCamelRoute {
         }
         exchange.getIn().setHeader(GooglePubsubConstants.ATTRIBUTES, map);
     }
-
-    @Override
-    protected void customRouteDefinition(RouteDefinition routeDefinition) {
-    }
 }
