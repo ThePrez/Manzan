@@ -17,8 +17,4 @@ public class TwilioDestination extends ManzanGenericCamelRoute {
     protected void customPostProcess(Exchange exchange) {
         exchange.getIn().setHeader("CamelTwilio.body", getBody(exchange, String.class));
     }
-
-    @Override
-    protected void customRouteDefinition(RouteDefinition routeDefinition) {
-    }
 }

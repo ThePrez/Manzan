@@ -16,8 +16,4 @@ public class SplunkDestination extends ManzanGenericCamelRoute {
     @Override
     protected void customPostProcess(Exchange exchange) {
     }
-
-    @Override
-    protected void customRouteDefinition(RouteDefinition routeDefinition) {
-    }
 }

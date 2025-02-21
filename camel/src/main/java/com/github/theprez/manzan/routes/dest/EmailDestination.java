@@ -23,8 +23,4 @@ public class EmailDestination extends ManzanGenericCamelRoute {
         exchange.getIn().removeHeaders("*");
         exchange.getIn().setHeader("contentType", "text/plain");
     }
-
-    @Override
-    protected void customRouteDefinition(RouteDefinition routeDefinition) {
-    }
 }

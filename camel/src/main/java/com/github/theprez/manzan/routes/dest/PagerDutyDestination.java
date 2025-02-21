@@ -7,6 +7,8 @@ import org.apache.camel.CamelContext;
 import org.apache.camel.Exchange;
 import org.apache.camel.model.RouteDefinition;
 
+import com.fasterxml.jackson.core.JsonProcessingException;
+import com.fasterxml.jackson.databind.ObjectMapper;
 import com.github.theprez.manzan.LocalHostResolver;
 import com.github.theprez.manzan.ManzanEventType;
 import com.github.theprez.manzan.routes.ManzanGenericCamelRoute;
@@ -30,7 +32,7 @@ public class PagerDutyDestination extends ManzanGenericCamelRoute {
     }
 
     @Override
-    protected void customPostProcess(Exchange exchange) {
+    protected void customPostProcess(Exchange exchange) throws JsonProcessingException {
         Map<String, Object> dataMap = getDataMap(exchange);
 
         String defaultSummary;
@@ -55,7 +57,7 @@ public class PagerDutyDestination extends ManzanGenericCamelRoute {
             timestamp = null;
         }
 
-        // required fields to payload
+        // Add required fields to payload
         Map<String, Object> payload = new HashMap<>();
         payload.put("summary", this.m_formatter != null ? this.m_formatter.format(getDataMap(exchange)) : defaultSummary);
         payload.put("severity", severity);
@@ -69,9 +71,15 @@ public class PagerDutyDestination extends ManzanGenericCamelRoute {
         if(timestamp != null) {
             payload.put("timestamp", timestamp);
         }
-        payload.put("component", m_component);
-        payload.put("group", m_group);
-        payload.put("class", m_classType);
+        if(this.m_component != null) {
+            payload.put("component", this.m_component);
+        }
+        if(this.m_group != null) {
+            payload.put("group", this.m_group);
+        }
+        if(this.m_classType != null) {
+            payload.put("class", this.m_classType);
+        }
         payload.put("custom_details", dataMap);
 
         // Construct request data
@@ -81,11 +89,9 @@ public class PagerDutyDestination extends ManzanGenericCamelRoute {
         requestData.put("event_action", "trigger");
         requestData.put("client", "Manzan");
 
-        exchange.getIn().setBody(requestData);
-    }
-
-    @Override
-    protected void customRouteDefinition(RouteDefinition routeDefinition) {
-        routeDefinition.marshal().json(true);
+        // Convert map to JSON and set as body
+        ObjectMapper objectMapper = new ObjectMapper();
+        String jsonBody = objectMapper.writeValueAsString(requestData);
+        exchange.getIn().setBody(jsonBody);
     }
 }
