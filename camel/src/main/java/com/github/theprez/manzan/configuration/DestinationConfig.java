@@ -22,6 +22,7 @@ import com.github.theprez.manzan.routes.dest.GooglePubSubDestination;
 import com.github.theprez.manzan.routes.dest.GrafanaLokiDestination;
 import com.github.theprez.manzan.routes.dest.HttpDestination;
 import com.github.theprez.manzan.routes.dest.KafkaDestination;
+import com.github.theprez.manzan.routes.dest.MezmoDestination;
 import com.github.theprez.manzan.routes.dest.PagerDutyDestination;
 import com.github.theprez.manzan.routes.dest.ActiveMqDestination;
 import com.github.theprez.manzan.routes.dest.SentryDestination;
@@ -132,6 +133,12 @@ public class DestinationConfig extends Config {
                     final String group = getOptionalString(name, "group");
                     final String classType = getOptionalString(name, "class");
                     ret.put(name, new PagerDutyDestination(context, name, routingKey, component, group, classType, format));
+                    break;
+                case "mezmo":
+                    final String apiKey = getRequiredString(name, "apiKey");
+                    final String tags = getOptionalString(name, "tags");
+                    final String app = getOptionalString(name, "app");
+                    ret.put(name, new MezmoDestination(context, name, apiKey, tags, app, format));
                     break;
                 case "http":
                 case "https":

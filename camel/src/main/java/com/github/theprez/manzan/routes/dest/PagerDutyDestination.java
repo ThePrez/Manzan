@@ -27,7 +27,8 @@ public class PagerDutyDestination extends ManzanGenericCamelRoute {
         this.m_group = _group;
         this.m_classType = _classType;
         this.m_headerParams.put("Accept", "application/json");
-        this.m_headerParams.put("Content-Type", "application/json");
+        this.m_headerParams.put(Exchange.CONTENT_TYPE, "application/json");
+        this.m_headerParams.put(Exchange.HTTP_METHOD, "POST");
     }
 
     @Override
