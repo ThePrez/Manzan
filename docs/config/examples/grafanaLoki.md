@@ -22,8 +22,14 @@ strwch=WCHMSG((*ALL)) WCHMSGQ((*HSTLOG))
 ```ini
 [loki_out]
 type=loki
+
+# Set your Grafana Loki url (ie. https://logs-prod-002.grafana.net)
 url=<loki_url>
+
+# Set your Grafana Loki username (ie. 994212)
 username=<loki_username>
+
+# Set your Grafana Loki password (ie. glc_ycBaPyajPJUdKLK2UIO...)
 password=<loki_password>
 ```
 
