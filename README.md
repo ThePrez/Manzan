@@ -39,7 +39,7 @@ Many other destinations will be available. Examples include:
 - [Grafana Loki](https://grafana.com/oss/loki/)
 - [Google Pub/Sub](https://cloud.google.com/pubsub)
 - [Mezmo](http://mezmo.com)
-- [ElasticSearch](http://elastic.co)
+- [Elasticsearch](http://elastic.co)
 - [PagerDuty](http://pagerduty.com)
 
 # Why the name "Manzan"?

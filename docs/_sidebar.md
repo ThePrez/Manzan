@@ -16,4 +16,5 @@
       * [ActiveMQ](config/examples/activeMQ.md)
       * [Splunk](config/examples/splunk.md)
       * [PagerDuty](config/examples/pagerDuty.md)
+      * [Elasticsearch](config/examples/elasticsearch.md)
 * [Contributing](contributing.md)
