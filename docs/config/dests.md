@@ -28,7 +28,7 @@ for ActiveMQ, you should write the option as `componentOptions.brokerURL=<yourAc
 | `slack`          | Send data to a Slack channel    | * `webhook` <br> * `channel`                               |                                                          | https://camel.apache.org/components/3.22.x/slack-component.html      |
 | `fluentd`        | Send data to FluentD            | * `tag` <br> * `host` <br> * `port`                        |                                                          |                                                                      |
 | `file`           | Send data to a file             | * `file`                                                   |                                                          | https://camel.apache.org/components/3.22.x/stream-component.html     |
-| `dir`            | Send data to a directory        | * `dir`                                                    |                                                          | https://camel.apache.org/components/3.22.x/file-component.html                                                                     |    
+| `dir`            | Send data to a directory        | * `dir`                                                    |                                                          | https://camel.apache.org/components/3.22.x/file-component.html       |    
 | `smtp`/`smtps`   | Sent data via email             | * `server` <br> * `subject` <br> * `to` <br> * `from`      | * `port`                                                 | https://camel.apache.org/components/3.22.x/mail-component.html       |
 | `sentry`         | Send data into Sentry           | * `dsn`                                                    |                                                          |                                                                      |
 | `twilio`         | Send via SMS                    | * `sid` <br> * `token` <br> * `to` <br> * `from`           |                                                          | https://camel.apache.org/components/3.22.x/twilio-component.html     |
@@ -37,7 +37,7 @@ for ActiveMQ, you should write the option as `componentOptions.brokerURL=<yourAc
 | `activemq`       | Send data to ActiveMQ           | * `destinationName`                                        | * `destinationType` <br> * `brokerURL`                   | https://camel.apache.org/components/3.22.x/activemq-component.html   |
 | `splunk-hec`     | Send data to Splunk             | * `splunkUrl` <br> * `token` <br> * `index`                | * `skipTlsVerify`                                        | https://camel.apache.org/components/3.22.x/splunk-hec-component.html |
 | `pagerduty`      | Send data to PagerDuty          | * `routingKey`                                             | * `component` <br> * `group` <br> * `class`              |                                                                      |
-
+| `elasticsearch`  | Send data to Elasticsearch      | * `endpoint` <br> * `apiKey` <br> * `index`                |                                                          |                                                                      |
 
 ### Example
 
@@ -103,16 +103,22 @@ destName=TEST.QUEUE
 format=This is the $FILE_DATA$
 componentOptions.brokerURL=tcp://myactivemq:61616
 
-[splunk]
+[splunk_out]
 type=splunk-hec
 splunkUrl=<splunk_host>:<splunk_port>
 token=<splunk_token>
 index=<splunk_index>
 
-[pagerduty]
+[pagerduty_out]
 type=pagerduty
 routingKey=<routing_key>
 component=Jetty Web Server
 group=My Cool Application
 class=Server Error
+
+[elasticsearch_out]
+type=elasticsearch
+endpoint=<endpoint>
+apiKey=<api_key>
+index=manzan
 ```
