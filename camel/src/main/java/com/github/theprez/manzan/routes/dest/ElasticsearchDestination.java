@@ -32,7 +32,7 @@ public class ElasticsearchDestination extends ManzanRoute {
         ElasticsearchTransport transport = new RestClientTransport(
             restClient, new JacksonJsonpMapper());
 
-        // And create the API client
+        // Create the API client
         this.esClient = new ElasticsearchClient(transport);
 
         Runtime.getRuntime().addShutdownHook(new Thread() {
