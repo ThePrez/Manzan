@@ -12,7 +12,7 @@ Be sure to have read up on [Manzan configuration](/config/index.md) to understan
 [watcher1]
 type=watch
 id=sanjula
-destinations=splunk
+destinations=splunk_out
 format=$MESSAGE_ID$ (severity $SEVERITY$): $MESSAGE$
 strwch=WCHMSG((*ALL)) WCHMSGQ((*HSTLOG))
 ```
@@ -20,7 +20,7 @@ strwch=WCHMSG((*ALL)) WCHMSGQ((*HSTLOG))
 ### `dests.ini`
 
 ```ini
-[splunk]
+[splunk_out]
 type=splunk-hec
 
 # Set your Splunk host and port (ie. my_splunk_server:8089)

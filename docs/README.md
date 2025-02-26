@@ -53,7 +53,7 @@ Many other destinations will be available. Examples include:
 - HTTPS endpoints (REST, etc) ✅
 - [Internet of Things (mqtt)](https://www.eclipse.org/paho/) ⏳
 - [Kafka](http://kafka.apache.org) ✅
-- [Mezmo](http://mezmo.com) ⏳
+- [Mezmo](http://mezmo.com) ✅
 - [Microsoft Teams](http://teams.microsoft.com) ⏳
 - [PagerDuty](http://pagerduty.com) ✅
 - [Sentry](http://sentry.io) ✅
