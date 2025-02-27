@@ -37,6 +37,7 @@ for ActiveMQ, you should write the option as `componentOptions.brokerURL=<yourAc
 | `activemq`       | Send data to ActiveMQ           | * `destinationName`                                        | * `destinationType` <br> * `brokerURL`                   | https://camel.apache.org/components/3.22.x/activemq-component.html   |
 | `splunk-hec`     | Send data to Splunk             | * `splunkUrl` <br> * `token` <br> * `index`                | * `skipTlsVerify`                                        | https://camel.apache.org/components/3.22.x/splunk-hec-component.html |
 | `pagerduty`      | Send data to PagerDuty          | * `routingKey`                                             | * `component` <br> * `group` <br> * `class`              |                                                                      |
+| `mezmo`          | Send data to Mezmo              | * `apiKey`                                                 | * `tags` <br> * `app`                                    |                                                                      |
 | `elasticsearch`  | Send data to Elasticsearch      | * `endpoint` <br> * `apiKey` <br> * `index`                |                                                          |                                                                      |
 
 ### Example
@@ -115,6 +116,12 @@ routingKey=<routing_key>
 component=Jetty Web Server
 group=My Cool Application
 class=Server Error
+
+[mezmo]
+type=mezmo
+apiKey=<api_key>
+tags=IBM i
+app=Jetty Web Server
 
 [elasticsearch_out]
 type=elasticsearch

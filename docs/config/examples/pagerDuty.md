@@ -1,4 +1,4 @@
-# Splunk
+# PagerDuty
 
 This example shows how to use `pagerduty` as a destination for a `file` data source.
 
@@ -12,16 +12,16 @@ Be sure to have read up on [Manzan configuration](/config/index.md) to understan
 [serverLogFile]
 type=file
 file=/home/GITHUBADM/my-cool-application/server/server.log
-destinations=pagerduty
+destinations=pagerduty_out
 ```
 
 ### `dests.ini`
 
 ```ini
-[pagerduty]
+[pagerduty_out]
 type=pagerduty
 
-# Set your PagerDuty Events API v2 integration key as the routing key
+# Set your PagerDuty Events API v2 integration key as the routing key (ie. 77281jd721h99827d8w...)
 routingKey=<routing_key>
 
 # (Optional) Set the component of the source machine that is responsible for the event

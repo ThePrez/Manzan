@@ -20,10 +20,10 @@ public class HttpDestination extends ManzanGenericCamelRoute {
         for(Entry<String, String> parmEntry : _parameters.entrySet()) {
             if("Host".equalsIgnoreCase(parmEntry.getKey())) {
                 headerParameters.put("Host", parmEntry.getValue());
-            }else if("Content-Type".equalsIgnoreCase(parmEntry.getKey())) {
-                headerParameters.put("Content-Type", parmEntry.getValue());
-            } else if("Content-Encoding".equalsIgnoreCase(parmEntry.getKey())) {
-                headerParameters.put("Content-Encoding", parmEntry.getValue());
+            }else if(Exchange.CONTENT_TYPE.equalsIgnoreCase(parmEntry.getKey())) {
+                headerParameters.put(Exchange.CONTENT_TYPE, parmEntry.getValue());
+            } else if(Exchange.CONTENT_ENCODING.equalsIgnoreCase(parmEntry.getKey())) {
+                headerParameters.put(Exchange.CONTENT_ENCODING, parmEntry.getValue());
             } else if (parmEntry.getKey().startsWith("Camel")) {
                 headerParameters.put(parmEntry.getKey(), parmEntry.getValue());
             } else {
