@@ -142,10 +142,10 @@ public class DestinationConfig extends Config {
                     ret.put(name, new PagerDutyDestination(context, name, routingKey, component, group, classType, format));
                     break;
                 case "mezmo":
-                    final String apiKey = getRequiredString(name, "apiKey");
+                    final String ingestionKey = getRequiredString(name, "apiKey");
                     final String tags = getOptionalString(name, "tags");
                     final String app = getOptionalString(name, "app");
-                    ret.put(name, new MezmoDestination(context, name, apiKey, tags, app, format));
+                    ret.put(name, new MezmoDestination(context, name, ingestionKey, tags, app, format));
                     break;
                 case "http":
                 case "https":
