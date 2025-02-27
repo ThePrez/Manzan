@@ -15,6 +15,7 @@ import org.ini4j.Profile.Section;
 import com.github.theprez.jcmdutils.StringUtils;
 import com.github.theprez.manzan.routes.ManzanRoute;
 import com.github.theprez.manzan.routes.dest.DirDestination;
+import com.github.theprez.manzan.routes.dest.ElasticsearchDestination;
 import com.github.theprez.manzan.routes.dest.EmailDestination;
 import com.github.theprez.manzan.routes.dest.FileDestination;
 import com.github.theprez.manzan.routes.dest.FluentDDestination;
@@ -78,6 +79,12 @@ public class DestinationConfig extends Config {
                     final String token = getRequiredString(name, "token");
                     getRequiredString(name, "index"); // This ensures that the user sets the index query parameter
                     ret.put(name, new SplunkDestination(context, name, splunkUrl, token, format, componentOptions, getUriAndHeaderParameters(name, sectionObj, "splunkUrl", "token")));
+                    break;
+                case "elasticsearch":
+                    final String endpoint = getRequiredString(name, "endpoint");
+                    final String apiKey = getRequiredString(name, "apiKey");
+                    final String index = getRequiredString(name, "index");
+                    ret.put(name, new ElasticsearchDestination(name, endpoint, apiKey, index));
                     break;
                 case "activemq":
                     final String destName = getRequiredString(name, "destinationName");

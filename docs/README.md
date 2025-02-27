@@ -43,7 +43,7 @@ Many other destinations will be available. Examples include:
 - [ActiveMQ](http://activemq.apache.org/) ✅
 - [AWS Simple Email Service (SES)](https://aws.amazon.com/ses/) ⏳
 - [AWS Simple Notification System (SNS)](https://aws.amazon.com/sns/) ⏳
-- [ElasticSearch](http://elastic.co) ⏳
+- [Elasticsearch](http://elastic.co) ✅
 - Email (SMTP/SMTPS) ✅
 - [FluentD](http://fluentd.org) ✅
 - [Google Drive](http://drive.google.com) ⏳
