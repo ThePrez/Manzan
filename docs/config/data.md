@@ -19,6 +19,7 @@ These are optional properties available on all types:
    * **Message Queue Watch Event**: `SESSION_ID`, `MESSAGE_ID`, `MESSAGE_TYPE`, `SEVERITY`, `JOB`, `SENDING_USRPRF`, `SENDING_PROGRAM_NAME`, `SENDING_MODULE_NAME`, `SENDING_PROCEDURE_NAME`, `MESSAGE_TIMESTAMP`, `MESSAGE`
    * **Licensed Internal Code (LIC) Log Watch Event**: `SESSION_ID`, `MAJOR_CODE`, `MINOR_CODE`, `LOG_ID`, `LOG_TIMESTAMP`, `TDE_NUM`, `TASK_NAME`, `SERVER_TYPE`, `EXCEPTION_ID`, `JOB`, `THREAD_ID`, `MODULE_OFFSET`, `MODULE_RU_NAME`, `MODULE_NAME`, `MODULE_ENTRY_POINT_NAME`
    * **Product Activity Log Watch Event**: `SESSION_ID`, `SYSTEM_REFERENCE_CODE`, `DEVICE_NAME`, `MODEL`, `SERIAL_NUMBER`, `RESOURCE_NAME`, `LOG_ID`, `PAL_TIMESTAMP`, `REFERENCE_CODE`, `SECONDARY_CODE`, `TABLE_ID`, `SEQUENCE_NUM`
+   * **Audit Login Failure**:  `ENTRY_TIMESTAMP`, `SEQUENCE_NUMBER`, `USER_NAME`, `QUALIFIED_JOB_NAME`, `JOB_NAME`, `JOB_USER`, `JOB_NUMBER`, `THREAD`, `PROGRAM_LIBRARY`, `PROGRAM_NAME`, `PROGRAM_LIBRARY_ASP_DEVICE`, `PROGRAM_LIBRARY_ASP_NUMBER`, `REMOTE_PORT`, `REMOTE_ADDRESS`, `SYSTEM_NAME`, `SYSTEM_SEQUENCE_NUMBER`, `RECEIVER_LIBRARY`, `RECEIVER_NAME`, `RECEIVER_ASP_DEVICE`, `RECEIVER_ASP_NUMBER`, `ARM_NUMBER`, `VIOLATION_TYPE`, `VIOLATION_TYPE_DETAIL`, `AUDIT_USER_NAME`, `DEVICE_NAME`, `INTERFACE_NAME`, `REMOTE_LOCATION`, `LOCAL_LOCATION`, `NETWORK_ID`, `DECRYPT_HOST_VARIABLE`, `DECRYPT_OBJECT_LIBRARY`, `DECRYPT_OBJECT_NAME`, `DECRYPT_OBJECT_TYPE`, `DECRYPT_OBJECT_ASP_NAME`, `DECRYPT_OBJECT_ASP_NUMBER`
 * `interval` can be used to configure how often the distributor checks for events in milliseconds (default `5`)
 * `enabled` is a boolean (`true` or `false`) so a data source can be defined but disabled
 
@@ -34,13 +35,14 @@ destinations=<destinations>
 
 ### Available types
 
-Some types have additional properties that they required.
+Some types have additional properties that they require.
 
 | id      | Description                                 | Required properties            | Optional properties                                                                                                        |
 |---------|---------------------------------------------|--------------------------------|-----------------------------------------------------------------------------------------------------------------------|
 | `file`  | Triggered when a file changes               | `file` path of file to watch   | * `filter` only listen for lines that include this value                                                                |
 | `watch` | Triggered when the Manzan handler is called | `id` of the watch (session ID) | * `strwch` is part of the `STRWCH` CL command that can be used to describe how to start the watch when Manzan starts up <br> * `numToProcess` can be used to configure how many messages are queried for by the distributor (default `1000`) <br> * `interval` the interval at which to query for new messages|
 | `table` | Triggered when data is inserted into the specified table | `table` name of the table to watch  <br> `schema` the schema in which the table resides | * `numToProcess` can be used to configure how many messages are queried for by the distributor (default `1000`) <br> * `interval` the interval at which to query for new messages|
+| `audit` | Triggered when the specified `auditType` catches an event. | `auditType` Current options are `LOGIN_FAILURE` | * `fallbackStartTime` is the number of hours prior to the current date that we will query for audit messages, if no audit messages have been queried before <br> * `numToProcess` can be used to configure how many messages are queried for by the distributor (default `1000`) <br> * `interval` the interval at which to query for new messages|
 
 ### Special event types
 The table event type is primarily used as a mechanism to transport arbitrary data to a chosen destination. This data can be programmatically inserted into the table, or it can be inserted manually. Note that this data will be deleted from the table after it is processed. In the case that you want to persist the data in the database, consider using a different event type such as `file` or `watch`.
@@ -85,4 +87,13 @@ table=announcements
 schema=foo
 destinations=slack, kafka
 format=$DATA$ 
+
+# This will write messages to slack whenever there is a login failure on the system
+[audit1]
+type=audit
+destinations=slackme
+auditType=LOGIN_FAILURE
+fallbackStartTime=1
+format=Violation type: $VIOLATION_TYPE_DETAIL$, username: $AUDIT_USER_NAME$
+interval=5000
 ```
