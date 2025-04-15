@@ -12,7 +12,7 @@ import java.util.*;
 
 public class AuditLog extends ManzanRoute {
     final private String m_sql;
-    final private String m_auditLogType;
+    final private String m_auditType;
     final int m_interval;
     final ManzanMessageFormatter m_formatter;
 
@@ -20,22 +20,15 @@ public class AuditLog extends ManzanRoute {
                     final List<String> _destinations,
                     final int _interval,
                     final int _numToProcess,
-                    final AuditType _auditType,
+                    final String _auditType,
                     final int _fallbackStartTime) throws IOException {
         super(_name);
         super.setRecipientList(_destinations);
-
+        m_auditType = _auditType;
         m_interval = _interval;
         m_formatter = StringUtils.isEmpty(_format) ? null : new ManzanMessageFormatter(_format);
-        String audit_table = null;
-        switch (_auditType){
-            case PASSWORD:
-                audit_table = "SYSTOOLS.AUDIT_JOURNAL_PW ()";
-                m_auditLogType = "PASSWORD";
-                break;
-            default:
-                throw new RuntimeException("Invalid audit log type: " + _auditType);
-        }
+        String audit_table = AuditType.fromValue(_auditType).getValue();
+
         m_sql = String.format("SELECT * FROM TABLE ( %s" +
                 " ) as x where x.ENTRY_TIMESTAMP > (SELECT COALESCE(MAX(TIME)," +
                 " CURRENT_TIMESTAMP - %d HOURS) AS result_time FROM MANZAN.AUDJRNTS where AUDTYPE='%s')" +
@@ -61,7 +54,7 @@ public class AuditLog extends ManzanRoute {
                     maxTimestamp.ifPresent(ts -> {
                         String updateQuery = String.format(
                                 "insert into MANZAN.AUDJRNTS (AUDTYPE, TIME) values ('%s', TIMESTAMP('%s'))",
-                                m_auditLogType,
+                                m_auditType,
                                 ts
                         );
                         exchange.getIn().setBody(updateQuery);

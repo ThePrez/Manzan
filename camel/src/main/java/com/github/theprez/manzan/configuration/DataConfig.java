@@ -98,16 +98,8 @@ public class DataConfig extends Config {
                     int fallbackStartTime = getOptionalInt(name, "fallbackStartTime");
                     fallbackStartTime = fallbackStartTime != -1 ? fallbackStartTime : 24;
 
-                    AuditType auditType = null;
                     final String userAuditType = getRequiredString(name, "auditType");
-                    switch (userAuditType){
-                        case "PASSWORD":
-                            auditType = AuditType.PASSWORD;
-                            break;
-                        default:
-                            throw new RuntimeException("Unknown audit type: " + userAuditType);
-                    }
-                    ret.put(name, new AuditLog(name, format, destinations, interval, numToProcess, auditType, fallbackStartTime));
+                    ret.put(name, new AuditLog(name, format, destinations, interval, numToProcess, userAuditType, fallbackStartTime));
                     break;
                 default:
                     throw new RuntimeException("Unknown destination type: " + type);
