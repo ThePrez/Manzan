@@ -29,9 +29,9 @@ public class AuditLog extends ManzanRoute {
         m_formatter = StringUtils.isEmpty(_format) ? null : new ManzanMessageFormatter(_format);
         String audit_table = null;
         switch (_auditType){
-            case LOGIN_FAILURE:
+            case PASSWORD:
                 audit_table = "SYSTOOLS.AUDIT_JOURNAL_PW ()";
-                m_auditLogType = "LOGIN_FAILURE";
+                m_auditLogType = "PASSWORD";
                 break;
             default:
                 throw new RuntimeException("Invalid audit log type: " + _auditType);

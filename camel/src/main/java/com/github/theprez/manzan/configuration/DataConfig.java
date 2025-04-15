@@ -101,8 +101,8 @@ public class DataConfig extends Config {
                     AuditType auditType = null;
                     final String userAuditType = getRequiredString(name, "auditType");
                     switch (userAuditType){
-                        case "LOGIN_FAILURE":
-                            auditType = AuditType.LOGIN_FAILURE;
+                        case "PASSWORD":
+                            auditType = AuditType.PASSWORD;
                             break;
                         default:
                             throw new RuntimeException("Unknown audit type: " + userAuditType);
