@@ -11,16 +11,13 @@ import java.util.List;
 import java.util.Map;
 import java.util.Set;
 
+import com.github.theprez.manzan.routes.event.*;
 import org.ini4j.InvalidFileFormatException;
 
 import com.github.theprez.jcmdutils.StringUtils;
 import com.github.theprez.manzan.ManzanEventType;
 import com.github.theprez.manzan.WatchStarter;
 import com.github.theprez.manzan.routes.ManzanRoute;
-import com.github.theprez.manzan.routes.event.FileEvent;
-import com.github.theprez.manzan.routes.event.WatchMsgEventSockets;
-import com.github.theprez.manzan.routes.event.WatchMsgEventSql;
-import com.github.theprez.manzan.routes.event.WatchTableEvent;
 import com.ibm.as400.access.AS400SecurityException;
 import com.ibm.as400.access.ErrorCompletingRequestException;
 import com.ibm.as400.access.ObjectDoesNotExistException;
@@ -91,8 +88,18 @@ public class DataConfig extends Config {
                     final String table = getRequiredString(name, "table");
                     final String tableSchema = getRequiredString(name, "schema");
                     int userNumToProcess = getOptionalInt(name, "numToProcess");
-                    final int numToProcess = userNumToProcess != -1 ? userNumToProcess : DEFAULT_NUM_TO_PROCESS;
+                    int numToProcess = userNumToProcess != -1 ? userNumToProcess : DEFAULT_NUM_TO_PROCESS;
                     ret.put(name, new WatchTableEvent(name, format, destinations, tableSchema, table, interval, numToProcess));
+                    break;
+                case "audit":
+                    userNumToProcess = getOptionalInt(name, "numToProcess");
+                    numToProcess = userNumToProcess != -1 ? userNumToProcess : DEFAULT_NUM_TO_PROCESS;
+
+                    int fallbackStartTime = getOptionalInt(name, "fallbackStartTime");
+                    fallbackStartTime = fallbackStartTime != -1 ? fallbackStartTime : 24;
+
+                    final String userAuditType = getRequiredString(name, "auditType");
+                    ret.put(name, new AuditLog(name, format, destinations, interval, numToProcess, userAuditType, fallbackStartTime));
                     break;
                 default:
                     throw new RuntimeException("Unknown destination type: " + type);

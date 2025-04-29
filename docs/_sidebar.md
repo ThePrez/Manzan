@@ -4,6 +4,7 @@
 * [Configuration](config/index.md)
    * [Manzan](config/app.md)
    * [Data Sources](config/data.md)
+   * [Data Format](config/format.md)
    * [Destinations](config/dests.md)
    * [Logging](config/logging.md)
    * [Messaging](config/messaging.md)

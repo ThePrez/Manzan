@@ -1,0 +1,76 @@
+package com.github.theprez.manzan.routes.event;
+
+
+public enum AuditType {
+    AUTHORITY_FAILURE("AUDIT_JOURNAL_AF"),
+    AUTHORITY_CHANGES("AUDIT_JOURNAL_CA"),
+    COMMAND_STRING("AUDIT_JOURNAL_CD"),
+    CREATE_OBJECT("AUDIT_JOURNAL_CO"),
+    USER_PROFILE_CHANGES("AUDIT_JOURNAL_CP"),
+    DELETE_OPERATION("AUDIT_JOURNAL_DO"),
+    ENVIRONMENT_VARIABLE("AUDIT_JOURNAL_EV"),
+    GENERIC_RECORD("AUDIT_JOURNAL_GR"),
+    JOB_CHANGE("AUDIT_JOURNAL_JS"),
+    OBJECT_MANAGEMENT_CHANGE("AUDIT_JOURNAL_OM"),
+    OWNERSHIP_CHANGE("AUDIT_JOURNAL_OW"),
+    PASSWORD("AUDIT_JOURNAL_PW"),
+    SERVICE_TOOLS_ACTION("AUDIT_JOURNAL_ST"),
+    ACTION_TO_SYSTEM_VALUE("AUDIT_JOURNAL_SV"),
+    READ_OF_OBJECT("AUDIT_JOURNAL_ZR"),
+    CHANGE_TO_OBJECT("AUDIT_JOURNAL_ZC"),
+    NETWORK_PASSWORD_ERROR("AUDIT_JOURNAL_VP"),
+    SYSTEMS_MANAGEMENT_CHANGE("AUDIT_JOURNAL_SM"),
+    SOCKETS_CONNECTIONS("AUDIT_JOURNAL_SK"),
+    PRIMARY_GROUP_CHANGE_FOR_RESTORED_OBJECT("AUDIT_JOURNAL_RZ"),
+    OWNERSHIP_CHANGE_FOR_RESTORED_OBJECT("AUDIT_JOURNAL_RO"),
+    AUTHORITY_CHANGE_FOR_RESTORED_OBJECT("AUDIT_JOURNAL_RA"),
+    PTF_OBJECT_CHANGE("AUDIT_JOURNAL_PU"),
+    PROFILE_SWAP("AUDIT_JOURNAL_PS"),
+    PRIMARY_GROUP_CHANGE("AUDIT_JOURNAL_PG"),
+    PTF_OPERATIONS("AUDIT_JOURNAL_PF"),
+    PROGRAM_ADOPT("AUDIT_JOURNAL_PA"),
+    OBJECT_RESTORE("AUDIT_JOURNAL_OR"),
+    ATTRIBUTE_CHANGE("AUDIT_JOURNAL_NA"),
+    DB2_MIRROR_REPLICATION_STATE("AUDIT_JOURNAL_M9"),
+    DB2_MIRROR_PRODUCT_SERVICES("AUDIT_JOURNAL_M8"),
+    DB2_MIRROR_REPLICATION_SERVICES("AUDIT_JOURNAL_M7"),
+    DB2_MIRROR_COMMUNICATION_SERVICES("AUDIT_JOURNAL_M6"),
+    DB2_MIRROR_SETUP_TOOLS("AUDIT_JOURNAL_M0"),
+    LINK_UNLINK_SEARCH_DIRECTORY("AUDIT_JOURNAL_LD"),
+    INTRUSION_MONITOR("AUDIT_JOURNAL_IM"),
+    SERVICE_TOOLS_USER_ID_AND_ATTRIBUTE_CHANGES("AUDIT_JOURNAL_DS"),
+    ROW_AND_COLUMN_ACCESS_CONTROL("AUDIT_JOURNAL_AX"),
+    ATTRIBUTE_CHANGES("AUDIT_JOURNAL_AU"),
+    ADOPTED_AUTHORITY("AUDIT_JOURNAL_AP"),
+    AUDITING_CHANGE("AUDIT_JOURNAL_AD");
+
+    private final String value;
+
+    AuditType(String value) {
+        this.value = value;
+    }
+
+    /**
+     * Get the AuditType table for the associated type
+     *
+     * @return The audit table to watch
+     */
+    public String getValue() {
+        return String.format("SYSTOOLS.%s()", value);
+    }
+
+    /**
+     * Get the AuditType representation of a string.
+     *
+     * @param value The string representation of the AuditType
+     * @return The enum representation of the AuditType
+     */
+    public static AuditType fromValue(String value) {
+        for (AuditType type : values()) {
+            if (type.name().equals(value)) {
+                return type;
+            }
+        }
+        throw new IllegalArgumentException("Unknown value: " + value);
+    }
+}
