@@ -8,29 +8,14 @@ import java.util.LinkedList;
 import java.util.List;
 import java.util.Map;
 
+import com.github.theprez.manzan.routes.dest.*;
+
 import org.apache.camel.CamelContext;
 import org.ini4j.InvalidFileFormatException;
 import org.ini4j.Profile.Section;
 
 import com.github.theprez.jcmdutils.StringUtils;
 import com.github.theprez.manzan.routes.ManzanRoute;
-import com.github.theprez.manzan.routes.dest.DirDestination;
-import com.github.theprez.manzan.routes.dest.ElasticsearchDestination;
-import com.github.theprez.manzan.routes.dest.EmailDestination;
-import com.github.theprez.manzan.routes.dest.FileDestination;
-import com.github.theprez.manzan.routes.dest.FluentDDestination;
-import com.github.theprez.manzan.routes.dest.GooglePubSubDestination;
-import com.github.theprez.manzan.routes.dest.GrafanaLokiDestination;
-import com.github.theprez.manzan.routes.dest.HttpDestination;
-import com.github.theprez.manzan.routes.dest.KafkaDestination;
-import com.github.theprez.manzan.routes.dest.MezmoDestination;
-import com.github.theprez.manzan.routes.dest.PagerDutyDestination;
-import com.github.theprez.manzan.routes.dest.ActiveMqDestination;
-import com.github.theprez.manzan.routes.dest.SentryDestination;
-import com.github.theprez.manzan.routes.dest.SlackDestination;
-import com.github.theprez.manzan.routes.dest.SplunkDestination;
-import com.github.theprez.manzan.routes.dest.StreamDestination;
-import com.github.theprez.manzan.routes.dest.TwilioDestination;
 
 public class DestinationConfig extends Config {
     public static DestinationConfig get() throws InvalidFileFormatException, IOException {
@@ -149,8 +134,12 @@ public class DestinationConfig extends Config {
                     break;
                 case "http":
                 case "https":
-                    final String url = getRequiredString(name, "url");
+                    String url = getRequiredString(name, "url");
                     ret.put(name, HttpDestination.get(context, name, type, url, format, componentOptions, getUriAndHeaderParameters(name, sectionObj, "url")));
+                    break;
+                case "otlp":
+                    url = getRequiredString(name, "url");
+                    ret.put(name, OpenTelemetryDestination.get(context, name, url, format));
                     break;
                 default:
                     throw new RuntimeException("Unknown destination type: " + type);
