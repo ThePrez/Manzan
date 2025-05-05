@@ -52,12 +52,17 @@ public class AuditLog extends ManzanRoute {
                             .max(Comparator.naturalOrder());
 
                     maxTimestamp.ifPresent(ts -> {
-                        String updateQuery = String.format(
-                                "insert into MANZAN.AUDJRNTS (AUDTYPE, TIME) values ('%s', TIMESTAMP('%s'))",
-                                m_auditType,
-                                ts
+                        String mergeQuery = String.format(
+                                "MERGE INTO MANZAN.AUDJRNTS tgt " +
+                                        "USING (VALUES('%s')) src(AUDTYPE) " +
+                                        "ON tgt.AUDTYPE = src.AUDTYPE " +
+                                        "WHEN MATCHED THEN " +
+                                        "  UPDATE SET TIME = TIMESTAMP('%s') " +
+                                        "WHEN NOT MATCHED THEN " +
+                                        "  INSERT (AUDTYPE, TIME) VALUES('%s', TIMESTAMP('%s'))",
+                                m_auditType, ts, m_auditType, ts
                         );
-                        exchange.getIn().setBody(updateQuery);
+                        exchange.getIn().setBody(mergeQuery);
                     });
                     // If maxTimestamp is not present, set the body to null
                     if (!maxTimestamp.isPresent()) {
