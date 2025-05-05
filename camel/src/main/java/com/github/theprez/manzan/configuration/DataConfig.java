@@ -26,7 +26,7 @@ import static com.github.theprez.manzan.routes.ManzanRoute.createRecipientList;
 
 public class DataConfig extends Config {
 
-    private final static int DEFAULT_INTERVAL = 5;
+    private final static int DEFAULT_INTERVAL = 1000;
     private final static int DEFAULT_NUM_TO_PROCESS = 1000;
 
     public static DataConfig get(final Set<String> _destinations) throws InvalidFileFormatException, IOException {
