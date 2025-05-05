@@ -4,6 +4,9 @@ import java.time.Instant;
 import java.util.Base64;
 import java.util.LinkedHashMap;
 import java.util.Map;
+import java.util.regex.Matcher;
+import java.util.regex.Pattern;
+import java.util.regex.PatternSyntaxException;
 
 import com.fasterxml.jackson.core.JsonProcessingException;
 import com.github.theprez.manzan.ManzanEventType;
@@ -17,17 +20,19 @@ import org.apache.camel.Exchange;
 import com.github.theprez.manzan.routes.ManzanGenericCamelRoute;
 
 public class OpenTelemetryDestination extends ManzanGenericCamelRoute {
+    final String errorRegex;
 
-    private OpenTelemetryDestination(final CamelContext _context, final String _name, final String _url, final String _format, Map<String, Object> _headerParams) {
+    private OpenTelemetryDestination(final CamelContext _context, final String _name, final String _url, final String _format, final Map<String, Object> _headerParams, final String errorRegex) {
         super(_context, _name, _url.startsWith("https") ? "https" : "http", _url.replaceFirst("^http(s)?://", ""), _format, null, _headerParams, null);
+        this.errorRegex = errorRegex;
     }
 
-    public static OpenTelemetryDestination get(final CamelContext _context, final String _name, final String _url, final String _format) {
+    public static OpenTelemetryDestination get(final CamelContext _context, final String _name, final String _url, final String _format, final String errorRegex) {
         Map<String, Object> headerParameters = new LinkedHashMap<String, Object>();
         String hostVal = _url.replaceFirst("^http(s)?://", "").replaceAll("\\/.*", "");
         headerParameters.put("Host", hostVal);
         headerParameters.put("User-Agent", "Manzan/1.0");
-        return new OpenTelemetryDestination(_context, _name, _url, _format, headerParameters);
+        return new OpenTelemetryDestination(_context, _name, _url, _format, headerParameters, errorRegex);
     }
 
     /**
@@ -114,7 +119,7 @@ public class OpenTelemetryDestination extends ManzanGenericCamelRoute {
         return message;
     }
 
-    private SeverityInfo getSeverityInfo(Exchange exchange){
+    private SeverityInfo getSeverityInfo(Exchange exchange, String formatBody){
         int severityNumber;
         String severityText;
         long timestamp;
@@ -132,11 +137,26 @@ public class OpenTelemetryDestination extends ManzanGenericCamelRoute {
             severityText = ((Integer) get(exchange, MSG_SEVERITY)) > SEVERITY_LIMIT ? Severity.ERROR.name() : Severity.INFO.name();
             timestamp = Long.parseLong(getString(exchange, PAL_TIMESTAMP));
         } else {
-            severityNumber = Severity.INFO.getSeverityNumber();
-            severityText = Severity.INFO.name();
+            boolean errorPatternFound = isErrorRegexFoundInBody(formatBody);
+            severityNumber = errorPatternFound ?  Severity.ERROR.getSeverityNumber() : Severity.INFO.getSeverityNumber();
+            severityText = errorPatternFound ? Severity.ERROR.name() : Severity.INFO.name();
             timestamp = getNanoSecondsSinceEpoch();
         }
         return new SeverityInfo(severityNumber, severityText, timestamp);
+    }
+
+    private boolean isErrorRegexFoundInBody(String body){
+        boolean errorPatternFound = false;
+        if (this.errorRegex != null){
+            try{
+                Pattern errorPattern = Pattern.compile(this.errorRegex);
+                Matcher matcher = errorPattern.matcher(body);
+                errorPatternFound = matcher.find();
+            } catch (PatternSyntaxException e){
+                e.printStackTrace();
+            }
+        }
+        return errorPatternFound;
     }
 
     private String constructOpenTelemetryBody(Exchange exchange){
@@ -155,8 +175,8 @@ public class OpenTelemetryDestination extends ManzanGenericCamelRoute {
 
     @Override
     protected void customPostProcess(Exchange exchange) throws JsonProcessingException {
-        SeverityInfo severityInfo = getSeverityInfo(exchange);
         String formatBody = constructOpenTelemetryBody(exchange);
+        SeverityInfo severityInfo = getSeverityInfo(exchange, formatBody);
         String message = constructOpenTelemetryLogMessage(severityInfo.getTimestamp(), severityInfo.getSeverityNumber(), severityInfo.getSeverityText(), formatBody);
         exchange.getIn().setBody(message);
     }

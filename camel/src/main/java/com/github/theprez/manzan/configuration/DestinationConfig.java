@@ -139,7 +139,8 @@ public class DestinationConfig extends Config {
                     break;
                 case "otlp":
                     url = getRequiredString(name, "url");
-                    ret.put(name, OpenTelemetryDestination.get(context, name, url, format));
+                    String errorRegex = getOptionalString(name, "errorRegex");
+                    ret.put(name, OpenTelemetryDestination.get(context, name, url, format, errorRegex));
                     break;
                 default:
                     throw new RuntimeException("Unknown destination type: " + type);
