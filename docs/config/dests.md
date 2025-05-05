@@ -39,6 +39,7 @@ for ActiveMQ, you should write the option as `componentOptions.brokerURL=<yourAc
 | `pagerduty`      | Send data to PagerDuty          | * `routingKey`                                             | * `component` <br> * `group` <br> * `class`              |                                                                      |
 | `mezmo`          | Send data to Mezmo              | * `apiKey`                                                 | * `tags` <br> * `app`                                    |                                                                      |
 | `elasticsearch`  | Send data to Elasticsearch      | * `endpoint` <br> * `apiKey` <br> * `index`                |                                                          |                                                                      |
+| `oltp`  | Send data to OpenTelemetry server | * `url` | * `errorRegex`                                                         |                                                                      |
 
 ### Example
 
@@ -128,4 +129,9 @@ type=elasticsearch
 endpoint=<endpoint>
 apiKey=<api_key>
 index=manzan
+
+[myOltpServer]
+type=otlp
+url=http://127.0.0.1:4318/v1/logs
+errorRegex=hit error: [0-9]?.*
 ```
