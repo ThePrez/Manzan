@@ -133,5 +133,6 @@ index=manzan
 [myOtlpServer]
 type=otlp
 url=http://127.0.0.1:4318/v1/logs
+# If this regex is found, the log severity will be set to error. Otherwise, it will be info. 
 errorRegex=hit error: [0-9]?.*
 ```
