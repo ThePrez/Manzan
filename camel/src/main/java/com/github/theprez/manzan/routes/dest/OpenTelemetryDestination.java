@@ -91,7 +91,8 @@ public class OpenTelemetryDestination extends ManzanGenericCamelRoute {
     private String constructOpenTelemetryLogMessage(long timestamp,
                                                     int severityNumber,
                                                     String severityText,
-                                                    String formatBody) {
+                                                    String formatBody,
+                                                    ManzanEventType manzanEventType) {
         String message = String.format(
                         "{\n" +
                         "  \"resourceLogs\": [{\n" +
@@ -101,7 +102,7 @@ public class OpenTelemetryDestination extends ManzanGenericCamelRoute {
                         "      ]\n" +
                         "    },\n" +
                         "    \"scopeLogs\": [{\n" +
-                        "      \"scope\": { \"name\": \"file-watcher\" },\n" +
+                        "      \"scope\": { \"name\": \"%s\" },\n" +
                         "      \"logRecords\": [{\n" +
                         "        \"timeUnixNano\": %d,\n" +
                         "        \"severityNumber\": %d,\n" +
@@ -111,6 +112,7 @@ public class OpenTelemetryDestination extends ManzanGenericCamelRoute {
                         "  }]\n" +
                         "  }]\n" +
                         "}",
+                manzanEventType.toString(),
                 timestamp,
                 severityNumber,
                 severityText,
@@ -175,9 +177,10 @@ public class OpenTelemetryDestination extends ManzanGenericCamelRoute {
 
     @Override
     protected void customPostProcess(Exchange exchange) throws JsonProcessingException {
+        final ManzanEventType type = (ManzanEventType) exchange.getIn().getHeader(EVENT_TYPE);
         String formatBody = constructOpenTelemetryBody(exchange);
         SeverityInfo severityInfo = getSeverityInfo(exchange, formatBody);
-        String message = constructOpenTelemetryLogMessage(severityInfo.getTimestamp(), severityInfo.getSeverityNumber(), severityInfo.getSeverityText(), formatBody);
+        String message = constructOpenTelemetryLogMessage(severityInfo.getTimestamp(), severityInfo.getSeverityNumber(), severityInfo.getSeverityText(), formatBody, type);
         exchange.getIn().setBody(message);
     }
 }
