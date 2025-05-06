@@ -48,6 +48,7 @@ public class WatchMsgEventSockets extends ManzanRoute {
                 if (format != null) {
                     ManzanMessageFormatter m_formatter = new ManzanMessageFormatter(format);
                     exchange.getIn().setBody(m_formatter.format(getDataMap(exchange)));
+                    exchange.getIn().setHeader("format_applied", true);
                 }
                 String destinations = m_destMap.get(sessionId); // Get destinations from m_destMap
                 exchange.getIn().setHeader("destinations", destinations);
