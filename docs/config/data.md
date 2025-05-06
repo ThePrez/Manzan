@@ -15,7 +15,7 @@ Here are the requirements for each section.
 These are optional properties available on all types:
 
 * `format` Please see the dedication section on [Data Formatting](./config/format.md)
-* `interval` can be used to configure how often the distributor checks for events in milliseconds (default `5`)
+* `interval` can be used to configure how often the distributor checks for events in milliseconds (default `1000`)
 * `enabled` is a boolean (`true` or `false`) so a data source can be defined but disabled
 
 ```ini
