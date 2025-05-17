@@ -1,6 +1,5 @@
 package com.github.theprez.manzan.routes.event;
 
-import java.io.FileNotFoundException;
 import java.io.IOException;
 import java.io.RandomAccessFile;
 import java.nio.file.Path;
@@ -26,16 +25,38 @@ public class FileEvent extends ManzanRoute {
     private final ManzanMessageFilter m_filter;
     private final ManzanMessageFormatter m_formatter;
     private long lastPosition;
+    private RandomAccessFile raf;
 
     public FileEvent(final String _name, final String file, final String _format, final List<String> _destinations,
-            final String _filter) throws IOException {
+                     final String _filter) throws IOException {
         super(_name);
         absPath = file;
-        directory = file.substring(0, file.lastIndexOf("/"));
-        fileName = file.substring(file.lastIndexOf("/") + 1);
+        Path filePath = Paths.get(absPath);
+        directory = filePath.getParent().toString();
+        fileName = filePath.getFileName().toString();
         super.setRecipientList(_destinations);
         m_formatter = StringUtils.isEmpty(_format) ? null : new ManzanMessageFormatter(_format);
         m_filter = new ManzanMessageFilter(_filter);
+        setRandomAccessFile();
+    }
+
+    private void setRandomAccessFile() {
+        // Initialize to end of file
+        Path filePath = Paths.get(absPath);
+        try {
+            raf = new RandomAccessFile(filePath.toFile(), "r");
+            lastPosition = raf.length();
+        } catch (IOException e) {
+            throw new RuntimeException(e);
+        }
+
+        Runtime.getRuntime().addShutdownHook(new Thread(() -> {
+            try {
+                raf.close();
+            } catch (final Exception e) {
+                e.printStackTrace();
+            }
+        }));
     }
 
     @Override
@@ -44,26 +65,15 @@ public class FileEvent extends ManzanRoute {
         String ABORT = "ABORT";
         String CONTINUE = "CONTINUE";
 
-        Path file = Paths.get(absPath);
-
-        // Initialize to end of file
-        try (RandomAccessFile raf = new RandomAccessFile(file.toFile(), "r")) {
-            lastPosition = raf.length();
-        } catch (FileNotFoundException e) {
-            throw new RuntimeException(e);
-        } catch (IOException e) {
-            throw new RuntimeException(e);
-        }
-
-       from(String.format("file-watch://%s?events=MODIFY", directory, fileName))
-               .filter(exchange -> {
-                   String fName = exchange.getIn().getHeader("CamelFileAbsolutePath", String.class);
-                   return absPath.equals(fName); // or use regex for pattern matching
-               })
+        from(String.format("file-watch://%s?events=MODIFY", directory))
+                .filter(exchange -> {
+                    String fName = exchange.getIn().getHeader("CamelFileAbsolutePath", String.class);
+                    return absPath.equals(fName); // or use regex for pattern matching
+                })
                 .routeId(m_name)
                 .setHeader(EVENT_TYPE, constant(ManzanEventType.FILE))
                 .process(exchange -> {
-                    try (RandomAccessFile raf = new RandomAccessFile(file.toFile(), "r")) {
+                    try {
                         raf.seek(lastPosition);
                         StringBuilder newContent = new StringBuilder();
                         String line;
@@ -77,28 +87,30 @@ public class FileEvent extends ManzanRoute {
                         exchange.getIn().setBody(body);
 
                         exchange.getIn().setHeader(ABORT,
-                            m_filter.matches(body) && StringUtils.isNonEmpty(body) ? CONTINUE : ABORT);
-                    } catch (Exception e){
+                                m_filter.matches(body) && StringUtils.isNonEmpty(body) ? CONTINUE : ABORT);
+                    } catch (Exception e) {
                         exchange.getIn().setHeader(ABORT, ABORT);
                     }
                 })
-               .filter(exchange -> {
-                   String abortHeader = exchange.getIn().getHeader(ABORT, String.class);
-                   return abortHeader.equals(CONTINUE); // or use regex for pattern matching
-               })
+                .filter(exchange -> {
+                    String abortHeader = exchange.getIn().getHeader(ABORT, String.class);
+                    return abortHeader.equals(CONTINUE); // or use regex for pattern matching
+                })
 
                 .split(body().tokenize("\n")).streaming().parallelProcessing(false).stopOnException()
                 .convertBodyTo(String.class)
                 .process(exchange -> {
-                    final Map<String, Object> data_map = new LinkedHashMap<String, Object>();
+                    final Map<String, Object> data_map = new LinkedHashMap<>();
                     data_map.put(FILE_NAME, fileName);
-                    data_map.put(FILE_PATH, String.format("%s/%s", directory, fileName));
-                    data_map.put(FILE_DATA, getBody(exchange, String.class).replace("\r", "").replace("\n",""));
+                    data_map.put(FILE_PATH, absPath);
+                    data_map.put(FILE_DATA, getBody(exchange, String.class)
+                            .replace("\r", "")
+                            .replace("\n", ""));
                     exchange.getIn().setHeader("data_map", data_map);
                     exchange.getIn().setBody(data_map);
                 })
                 .marshal().json(true) // TODO: skip this if we are applying a format
-                .setBody(simple("${body}\n"))
+                .setBody(simple("${body}"))
                 .process(exchange -> {
                     if (null != m_formatter) {
                         exchange.getIn().setBody(m_formatter.format(getDataMap(exchange)));
