@@ -82,7 +82,7 @@ public class DataConfig extends Config {
                 case "file":
                     String file = getRequiredString(name, "file");
                     String filter = getOptionalString(name, "filter");
-                    ret.put(name, new FileEvent(name, file, format, destinations, filter, interval));
+                    ret.put(name, new FileEvent(name, file, format, destinations, filter));
                     break;
                 case "table":
                     final String table = getRequiredString(name, "table");
