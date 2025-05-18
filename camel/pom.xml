@@ -144,13 +144,6 @@
       <artifactId>gson</artifactId>
       <version>2.10.1</version>
     </dependency>
-
-    <dependency>
-      <groupId>io.github.theprez</groupId>
-      <artifactId>jfiletail</artifactId>
-      <version>0.0.4</version>
-    </dependency>
-
     <!-- logging -->
     <dependency>
       <groupId>org.apache.logging.log4j</groupId>
