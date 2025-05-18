@@ -19,24 +19,24 @@ public class FileEvent extends ManzanRoute {
     public static final String FILE_DATA = "FILE_DATA";
     public static final String FILE_NAME = "FILE_NAME";
     public static final String FILE_PATH = "FILE_PATH";
-    private final String directory;
     private final String fileName;
     private final String absPath;
     private final ManzanMessageFilter m_filter;
     private final ManzanMessageFormatter m_formatter;
+    private int m_interval;
     private long lastPosition;
     private RandomAccessFile raf;
 
     public FileEvent(final String _name, final String file, final String _format, final List<String> _destinations,
-                     final String _filter) throws IOException {
+                     final String _filter, final int _interval) throws IOException {
         super(_name);
         absPath = file;
         Path filePath = Paths.get(absPath);
-        directory = filePath.getParent().toString();
         fileName = filePath.getFileName().toString();
         super.setRecipientList(_destinations);
         m_formatter = StringUtils.isEmpty(_format) ? null : new ManzanMessageFormatter(_format);
         m_filter = new ManzanMessageFilter(_filter);
+        m_interval = _interval;
         setRandomAccessFile();
     }
 
@@ -65,11 +65,7 @@ public class FileEvent extends ManzanRoute {
         String ABORT = "ABORT";
         String CONTINUE = "CONTINUE";
 
-        from(String.format("file-watch://%s?events=MODIFY", directory))
-                .filter(exchange -> {
-                    String fName = exchange.getIn().getHeader("CamelFileAbsolutePath", String.class);
-                    return absPath.equals(fName); // or use regex for pattern matching
-                })
+       from("timer://foo?period=" + m_interval + "&synchronous=true")
                 .routeId(m_name)
                 .setHeader(EVENT_TYPE, constant(ManzanEventType.FILE))
                 .process(exchange -> {
