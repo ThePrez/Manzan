@@ -22,7 +22,7 @@ power of Manzan, users can let their worries wash away, leaving them feeling ref
 
 ## Architecture
 
-![image](https://user-images.githubusercontent.com/17914061/208200501-d0c14907-ed47-4248-ab89-9728e197ddb6.png)
+<img src="https://github.com/ThePrez/Manzan/blob/main/docs/images/architecture.png?raw=true" alt="Architecture" style="max-width: 100%;">
 
 Manzan consists of the following components:
 
