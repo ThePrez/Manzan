@@ -43,31 +43,37 @@ public class AuditLog extends ManzanRoute {
                 .to("jdbc:jt400?outputType=StreamList")
                 .process(exchange -> {
                     List<Map<String, Object>> rows = exchange.getIn().getBody(List.class);
-                    exchange.setProperty("resultSet", rows);
-
-                    // Find max ENTRY_TIMESTAMP
-                    Optional<Timestamp> maxTimestamp = rows.stream()
-                            .map(row -> (Timestamp) row.get("ENTRY_TIMESTAMP"))
-                            .filter(Objects::nonNull)
-                            .max(Comparator.naturalOrder());
-
-                    maxTimestamp.ifPresent(ts -> {
-                        String mergeQuery = String.format(
-                                "MERGE INTO MANZAN.AUDJRNTS tgt " +
-                                        "USING (VALUES('%s')) src(AUDTYPE) " +
-                                        "ON tgt.AUDTYPE = src.AUDTYPE " +
-                                        "WHEN MATCHED THEN " +
-                                        "  UPDATE SET TIME = TIMESTAMP('%s') " +
-                                        "WHEN NOT MATCHED THEN " +
-                                        "  INSERT (AUDTYPE, TIME) VALUES('%s', TIMESTAMP('%s'))",
-                                m_auditType, ts, m_auditType, ts
-                        );
-                        exchange.getIn().setBody(mergeQuery);
-                    });
-                    // If maxTimestamp is not present, set the body to null
-                    if (!maxTimestamp.isPresent()) {
+                    if (rows.isEmpty()){
                         exchange.getIn().setBody(null);
+                    } else {
+                        exchange.setProperty("resultSet", rows);
+
+                        // Find max ENTRY_TIMESTAMP
+                        Optional<Timestamp> maxTimestamp = rows.stream()
+                                .map(row -> (Timestamp) row.get("ENTRY_TIMESTAMP"))
+                                .filter(Objects::nonNull)
+                                .max(Comparator.naturalOrder());
+
+                        maxTimestamp.ifPresent(ts -> {
+                            String mergeQuery = String.format(
+                                    "MERGE INTO MANZAN.AUDJRNTS tgt " +
+                                            "USING (VALUES('%s')) src(AUDTYPE) " +
+                                            "ON tgt.AUDTYPE = src.AUDTYPE " +
+                                            "WHEN MATCHED THEN " +
+                                            "  UPDATE SET TIME = TIMESTAMP('%s') " +
+                                            "WHEN NOT MATCHED THEN " +
+                                            "  INSERT (AUDTYPE, TIME) VALUES('%s', TIMESTAMP('%s'))",
+                                    m_auditType, ts, m_auditType, ts
+                            );
+                            exchange.getIn().setBody(mergeQuery);
+                        });
+                        // If maxTimestamp is not present, set the body to null
+                        if (!maxTimestamp.isPresent()) {
+                            exchange.getIn().setBody(null);
+                        }
+
                     }
+
                 })
                 .choice()
                 .when(body().isNotNull())
