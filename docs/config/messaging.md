@@ -6,7 +6,7 @@ By default, Manzan will send messages between the Handler component and the Came
 
 ### Messaging options
 Manzan supports two options for sending messages between the Handler and the Camel component (SQL and socket communication).\
-**SOCKET COMMUNICATION:** This option provides real time communication and is faster than the sql option.\
+**SOCKET COMMUNICATION:** This option provides real time communication and is faster than the sql option. If you use this option, you must run Manzan directly on the IBM i.\
 **SQL COMMUNICATION:** Using this option works via the Handler component inserting data into a Db2 table, and then the Camel component subsequently reading from the table. This option isn't quite as fast as socket communication, however the data is more durable in the case that the Camel component is malfunctioning. 
 
 Socket communication is recommended, because by providing a fallback option to SQL in the case of socket communication malfunctioning, we guarantee data will not be lost.
