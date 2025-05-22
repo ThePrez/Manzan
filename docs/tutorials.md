@@ -7,7 +7,7 @@
 
 # Videos
 
-> If you created a video using Manzan, please let us know! We would love to share it with the community here.
+> ✨ If you created a video using Manzan, please let us know! We would love to share it with the community here.
 
 ### Event Monitoring on IBM i with Manzan and Grafana
 
