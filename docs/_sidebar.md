@@ -1,6 +1,5 @@
 <!-- docs/_sidebar.md -->
 * [Home](/)
-* [Tutorials](tutorials.md)
 * [Install](install.md)
 * [Tutorials](tutorials.md)
 * [Configuration](config/index.md)
