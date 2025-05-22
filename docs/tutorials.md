@@ -5,7 +5,7 @@
 - [Announcing Manzan: The Future of IBM i Event Monitoring](https://techchannel.com/open-source/announcing-manzan-the-future-of-ibm-i-event-monitoring/) by TechChannel
 - [IBM Unveils Manzan, A New Open Source Event Monitor For IBM i](https://www.itjungle.com/2025/05/05/ibm-unveils-manzan-a-new-open-source-event-monitor-for-ibm-i/) by IT Jungle
 
-# Videos
+## Videos
 
 > ✨ If you created a video using Manzan, please let us know! We would love to share it with the community here.
 
