@@ -48,6 +48,8 @@ jobs:
             --rcwd "${{ env.remote_build_dir }}" \
             --push "." \
             --cmd "/QOpenSys/pkgs/bin/gmake BUILDLIB=${{ env.BUILDLIB }} install" \
+            --cmd "find . -type f -name "*.ini" -exec chmod 600 {} +" \
+            --cmd "find . -type f -name "*.ini" -exec ls -l {} +" \
         env:
           IBMI_HOST: ${{ secrets.IBMI_HOST }}
           IBMI_USER: ${{ secrets.IBMI_USER }}
