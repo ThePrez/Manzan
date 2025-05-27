@@ -109,6 +109,7 @@ public class FileEvent extends ManzanRoute {
                 .setBody(simple("${body}"))
                 .process(exchange -> {
                     if (null != m_formatter) {
+                        exchange.getIn().setHeader("format_applied", true);
                         exchange.getIn().setBody(m_formatter.format(getDataMap(exchange)));
                     }
                 })
