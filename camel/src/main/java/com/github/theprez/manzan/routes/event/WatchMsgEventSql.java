@@ -71,6 +71,7 @@ public class WatchMsgEventSql extends ManzanRoute {
                 .process(exchange -> {
                     if (null != m_formatter) {
                         exchange.getIn().setBody(m_formatter.format(getDataMap(exchange)));
+                        exchange.getIn().setHeader("format_applied", true);
                     }
                 })
                 .recipientList(constant(getRecipientList()))
