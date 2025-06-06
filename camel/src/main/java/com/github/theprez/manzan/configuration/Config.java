@@ -2,8 +2,10 @@ package com.github.theprez.manzan.configuration;
 
 import java.io.File;
 import java.io.IOException;
-import java.util.HashMap;
-import java.util.Map;
+import java.nio.file.Files;
+import java.nio.file.Path;
+import java.nio.file.attribute.PosixFilePermission;
+import java.util.*;
 
 import org.ini4j.Ini;
 import org.ini4j.InvalidFileFormatException;
@@ -38,9 +40,42 @@ public abstract class Config {
         final File ret = new File(configDir, _name);
         if (!ret.isFile()) {
             ret.createNewFile();
-            // TODO: set ownership and permissions
+            setFilePermissionsTo600(ret);
         }
+        ensureOnlyOwnerCanReadAndWriteFile(ret);
         return ret;
+    }
+
+    private static void ensureOnlyOwnerCanReadAndWriteFile(File file) throws SecurityException, IOException {
+        Path path = file.toPath();
+
+        // Only works on POSIX-compliant systems (e.g., Linux, macOS)
+        Set<PosixFilePermission> perms = Files.getPosixFilePermissions(path);
+
+        Set<PosixFilePermission> expected = new HashSet<>(Arrays.asList(
+                PosixFilePermission.OWNER_READ,
+                PosixFilePermission.OWNER_WRITE
+        ));
+
+
+        if (!perms.equals(expected)) {
+            throw new SecurityException("File " + file.getAbsolutePath() +
+                    " does not have permission 600. Found: " + perms
+                    + ". Set your file permissions to 600 and retry.");
+        }
+    }
+
+    private static void setFilePermissionsTo600(File file) throws IOException {
+        Path path = file.toPath();
+
+        Set<PosixFilePermission> perms = new HashSet<>(Arrays.asList(
+                PosixFilePermission.OWNER_READ,
+                PosixFilePermission.OWNER_WRITE
+        ));
+
+
+        Files.setPosixFilePermissions(path, perms);
+        System.out.println("Permissions set to 600.");
     }
 
     private final Ini m_ini;

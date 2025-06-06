@@ -101,6 +101,10 @@ public class DataConfig extends Config {
                     final String userAuditType = getRequiredString(name, "auditType");
                     ret.put(name, new AuditLog(name, format, destinations, interval, numToProcess, userAuditType, fallbackStartTime));
                     break;
+                case "sql":
+                    final String query = getRequiredString(name, "query");
+                    ret.put(name, new WatchSql(name, query, format, destinations, interval));
+                    break;
                 default:
                     throw new RuntimeException("Unknown destination type: " + type);
             }
