@@ -2,13 +2,13 @@ package com.github.theprez.manzan.configuration;
 
 import java.io.File;
 import java.io.IOException;
-import java.util.HashMap;
-import java.util.Map;
+import java.util.*;
 
 import org.ini4j.Ini;
 import org.ini4j.InvalidFileFormatException;
 
 import com.github.theprez.jcmdutils.StringUtils;
+import org.ini4j.Profile;
 
 public abstract class Config {
 
@@ -71,6 +71,19 @@ public abstract class Config {
             throw new RuntimeException("Required value for '" + _key + "' in [" + _name + "] not found");
         }
         return ret;
+    }
+
+    public Map<String, String> getUriAndHeaderParameters(final String _name, Profile.Section sectionObj, String... _exclusions) {
+        final Map<String, String> pathParameters = new LinkedHashMap<String, String>();
+        List<String> exclusions = new LinkedList<>(Arrays.asList(_exclusions));
+        exclusions.addAll(Arrays.asList("type", "filter", "format", "id", "destinations", "interval"));
+        for (final String sectionKey : sectionObj.keySet()) {
+            if (exclusions.contains(sectionKey) || sectionKey.startsWith(Config.COMPONENT_OPTIONS_PREFIX)) {
+                continue;
+            }
+            pathParameters.put(sectionKey, getRequiredString(_name, sectionKey));
+        }
+        return pathParameters;
     }
 
     protected Map<String, String> getComponentOptions(final String _name) {
