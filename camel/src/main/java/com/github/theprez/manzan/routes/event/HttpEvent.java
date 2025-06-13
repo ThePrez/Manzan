@@ -20,33 +20,35 @@ public class HttpEvent extends ManzanRoute {
     private final ManzanMessageFilter m_filter;
     private final String m_url;
     private final ManzanMessageFormatter m_formatter;
-    private int m_interval;
+    private final int m_interval;
+    private final Map<String, String> m_headerParams;
 
     public HttpEvent(final String _name, final String _url, final String _format, final List<String> _destinations,
-                     final String _filter, final int _interval) throws IOException {
+                     final String _filter, final int _interval, Map<String, String> _headerParams) throws IOException {
         super(_name);
         super.setRecipientList(_destinations);
         m_url = _url;
         m_formatter = StringUtils.isEmpty(_format) ? null : new ManzanMessageFormatter(_format);
         m_filter = new ManzanMessageFilter(_filter);
         m_interval = _interval;
+        m_headerParams = _headerParams;
     }
 
     @Override
     public void configure() {
-
-        String ABORT = "ABORT";
-        String CONTINUE = "CONTINUE";
-
        from("timer://foo?period=" + m_interval + "&synchronous=true")
                 .routeId(m_name)
                 .setHeader(EVENT_TYPE, constant(ManzanEventType.HTTP))
+                 .process(exchange -> {
+                     for (Map.Entry<String, String> header: m_headerParams.entrySet()){
+                         exchange.getIn().setHeader(header.getKey(), header.getValue());
+                     }
+                 })
                 .to(m_url)
                 .unmarshal().json(JsonLibrary.Jackson)
                 .setHeader("data_map", simple("${body}"))
                 .marshal().json(true) // TODO: skip this if we are applying a format
                 .convertBodyTo(String.class)// Need to convert it to string, otherwise it will just be a byte sequence
-                .setBody(simple("${body}"))
                 .filter(exchange -> {
                     String body = exchange.getIn().getBody().toString();
                     return m_filter.matches(body);
