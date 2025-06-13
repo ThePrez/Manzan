@@ -47,6 +47,10 @@ public class HttpEvent extends ManzanRoute {
                 .marshal().json(true) // TODO: skip this if we are applying a format
                 .convertBodyTo(String.class)// Need to convert it to string, otherwise it will just be a byte sequence
                 .setBody(simple("${body}"))
+                .filter(exchange -> {
+                    String body = exchange.getIn().getBody().toString();
+                    return m_filter.matches(body);
+                })
                 .process(exchange -> {
                     if (null != m_formatter) {
                         exchange.getIn().setBody(m_formatter.format(getDataMap(exchange)));
