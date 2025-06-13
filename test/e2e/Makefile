@@ -10,7 +10,11 @@ TESTLIB:=MZNTEST
 
 # run before every test case
 beforeAll:
-	for dir in msg/*/; do printf "[install]\nlibrary=%s\n" "${TESTLIB}" > "$$dir/app.ini"; done
+	for dir in msg/*/; do \
+		printf "[install]\nlibrary=%s\n" "${TESTLIB}" > "$$dir/app.ini"; \
+		chmod 600 "$$dir/app.ini"; \
+	done
+
 
 # Run after every test case
 afterAll:

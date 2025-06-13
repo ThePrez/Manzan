@@ -16,8 +16,8 @@ mkdirs:
 	/QOpenSys/pkgs/bin/yum install maven
 
 install: mkdirs all scripts/manzan
-	install -m 444 -o qsys target/manzan.jar ${INSTALL_ROOT}/opt/manzan/lib/manzan.jar
-	install -m 555 -o qsys scripts/manzan ${INSTALL_ROOT}/opt/manzan/bin/manzan
+	install -m 700 -o qsys target/manzan.jar ${INSTALL_ROOT}/opt/manzan/lib/manzan.jar
+	install -m 700 -o qsys scripts/manzan ${INSTALL_ROOT}/opt/manzan/bin/manzan
 
 ${INSTALL_ROOT}/opt/manzan/bin/manzan:
 
