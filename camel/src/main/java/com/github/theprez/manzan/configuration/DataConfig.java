@@ -101,6 +101,11 @@ public class DataConfig extends Config {
                     final String userAuditType = getRequiredString(name, "auditType");
                     ret.put(name, new AuditLog(name, format, destinations, interval, numToProcess, userAuditType, fallbackStartTime));
                     break;
+                case "http":
+                    final String url = getRequiredString(name, "url");
+                    filter = getOptionalString(name, "filter");
+                    ret.put(name, new HttpEvent(name, url, format, destinations,filter,  interval));
+                    break;
                 default:
                     throw new RuntimeException("Unknown destination type: " + type);
             }
