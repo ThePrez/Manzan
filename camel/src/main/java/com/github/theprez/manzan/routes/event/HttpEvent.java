@@ -1,10 +1,6 @@
 package com.github.theprez.manzan.routes.event;
 
 import java.io.IOException;
-import java.io.RandomAccessFile;
-import java.nio.file.Path;
-import java.nio.file.Paths;
-import java.util.LinkedHashMap;
 import java.util.List;
 import java.util.Map;
 
@@ -48,7 +44,7 @@ public class HttpEvent extends ManzanRoute {
                 .unmarshal().json(JsonLibrary.Jackson)
                 .setHeader("data_map", simple("${body}"))
                 .marshal().json(true) // TODO: skip this if we are applying a format
-                .convertBodyTo(String.class)// Need to convert it to string, otherwise it will just be a byte sequence
+               .convertBodyTo(String.class, "UTF-8") // Need to convert it to string, otherwise it will just be a byte sequence
                 .filter(exchange -> {
                     String body = exchange.getIn().getBody().toString();
                     return m_filter.matches(body);
@@ -58,7 +54,6 @@ public class HttpEvent extends ManzanRoute {
                         exchange.getIn().setBody(m_formatter.format(getDataMap(exchange)));
                     }
                 })
-                .convertBodyTo(String.class, "UTF-8")
                 .recipientList(constant(getRecipientList())).stopOnException();
     }
 }

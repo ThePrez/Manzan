@@ -76,7 +76,7 @@ public abstract class Config {
     public Map<String, String> getUriAndHeaderParameters(final String _name, Profile.Section sectionObj, String... _exclusions) {
         final Map<String, String> pathParameters = new LinkedHashMap<String, String>();
         List<String> exclusions = new LinkedList<>(Arrays.asList(_exclusions));
-        exclusions.addAll(Arrays.asList("type", "filter", "format", "id", "destinations", "interval"));
+        exclusions.addAll(Arrays.asList("type", "filter", "format", "destinations", "interval"));
         for (final String sectionKey : sectionObj.keySet()) {
             if (exclusions.contains(sectionKey) || sectionKey.startsWith(Config.COMPONENT_OPTIONS_PREFIX)) {
                 continue;
