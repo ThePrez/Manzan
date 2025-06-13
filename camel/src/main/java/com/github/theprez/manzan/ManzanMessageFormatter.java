@@ -1,11 +1,10 @@
 package com.github.theprez.manzan;
 
-import java.util.Map;
-import java.util.Map.Entry;
+import java.util.*;
+import java.util.regex.Matcher;
+import java.util.regex.Pattern;
 
 import com.google.gson.Gson;
-
-import java.util.WeakHashMap;
 
 public class ManzanMessageFormatter {
 
@@ -35,16 +34,70 @@ public class ManzanMessageFormatter {
         ret = ret.replace("\r\n", "\n");
         ret = ret.replace("\r", "");
         ret = ret.replace("\\n", "\n").replace("\\t", "\t");
+        String[] replaceProperties = extractDollarPairs(ret);
 
-        for (final Entry<String, Object> repl : _mappings.entrySet()) {
-            final String key = repl.getKey();
-            ret = ret.replace("$" + key + "$", "" + repl.getValue());
-            String jsonIndicator ="$json:" + key + "$";
-            if(ret.contains(jsonIndicator)) {
-                ret = ret.replace(jsonIndicator, jsonEncode("" + repl.getValue()));
+        String jsonIndicator = "json:";
+        for (String replaceProperty: replaceProperties){
+            boolean isUsingJsonIndicator = false;
+            if (replaceProperty.contains(jsonIndicator)){
+                isUsingJsonIndicator = true;
+                replaceProperty = replaceProperty.substring(jsonIndicator.length());
+            }
+            String replaceWith = getNestedValue(_mappings, replaceProperty);
+            if(isUsingJsonIndicator) {
+                ret = ret.replace("$" + jsonIndicator + replaceProperty + "$" , jsonEncode(replaceWith));
+            } else {
+                ret = ret.replace("$" + replaceProperty + "$", replaceWith);
             }
         }
         return ret;
+    }
+
+    private String[] extractDollarPairs(String input){
+        List<String> matches = new ArrayList<>();
+        Pattern pattern = Pattern.compile("\\$(.+?)\\$");
+        Matcher matcher = pattern.matcher(input);
+
+        while (matcher.find()) {
+            matches.add(matcher.group(1)); // group(1) is the text inside the $...$
+        }
+
+        String[] result = matches.toArray(new String[0]);
+        return result;
+    }
+
+    /**
+     *
+     * @param mapping: The data map
+     * @param property: The property to search for
+     * @return The value corresponding to the (nested) property if it exists, otherwise empty string
+     */
+    private String getNestedValue(Object mapping, String property){
+        String[] propertyTokens = property.split("\\.");
+        Object currentMapping = mapping;
+        for (String propertyToken: propertyTokens){
+            while(currentMapping instanceof ArrayList){
+                if (((ArrayList<?>) currentMapping).isEmpty()){
+                    return "";
+                }
+                currentMapping = ((ArrayList<?>) currentMapping).get(0);
+            }
+            if (currentMapping instanceof LinkedHashMap){
+                if (((LinkedHashMap<?, ?>) currentMapping).containsKey(propertyToken)){
+                    currentMapping = ((LinkedHashMap<?, ?>) currentMapping).get(propertyToken);
+                } else {
+                    return "";
+                }
+            }
+            else if (currentMapping instanceof Map.Entry){
+                if (((Map.Entry<?, ?>) currentMapping).getKey() == propertyToken){
+                    currentMapping = ((Map.Entry<?, ?>) currentMapping).getValue();
+                } else {
+                    return "";
+                }
+            }
+        }
+        return currentMapping.toString();
     }
 
     private CharSequence jsonEncode(String _s) {
