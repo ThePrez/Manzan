@@ -38,6 +38,7 @@ Some types have additional properties that they require.
 | `watch` | Triggered when the Manzan handler is called | `id` of the watch (session ID) | * `strwch` is part of the `STRWCH` CL command that can be used to describe how to start the watch when Manzan starts up <br> * `numToProcess` can be used to configure how many messages are queried for by the distributor (default `1000`) <br> * `interval` the interval at which to query for new messages|
 | `table` | Triggered when data is inserted into the specified table | `table` name of the table to watch  <br> `schema` the schema in which the table resides | * `numToProcess` can be used to configure how many messages are queried for by the distributor (default `1000`) <br> * `interval` the interval at which to query for new messages|
 | `audit` | Triggered when the specified `auditType` catches an event. | `auditType` options are `AUTHORITY_FAILURE`, `AUTHORITY_CHANGES`, `COMMAND_STRING`, `CREATE_OBJECT`, `USER_PROFILE_CHANGES`, `DELETE_OPERATION`, `ENVIRONMENT_VARIABLE`, `GENERIC_RECORD`, `JOB_CHANGE`, `OBJECT_MANAGEMENT_CHANGE`, `OWNERSHIP_CHANGE`, `PASSWORD`, `SERVICE_TOOLS_ACTION`, `ACTION_TO_SYSTEM_VALUE`, `READ_OF_OBJECT`, `CHANGE_TO_OBJECT`, `NETWORK_PASSWORD_ERROR`, `SYSTEMS_MANAGEMENT_CHANGE`, `SOCKETS_CONNECTIONS`, `PRIMARY_GROUP_CHANGE_FOR_RESTORED_OBJECT`, `OWNERSHIP_CHANGE_FOR_RESTORED_OBJECT`, `AUTHORITY_CHANGE_FOR_RESTORED_OBJECT`, `PTF_OBJECT_CHANGE`, `PROFILE_SWAP`, `PRIMARY_GROUP_CHANGE`, `PTF_OPERATIONS`, `PROGRAM_ADOPT`, `OBJECT_RESTORE`, `ATTRIBUTE_CHANGE`, `DB2_MIRROR_REPLICATION_STATE`, `DB2_MIRROR_PRODUCT_SERVICES`, `DB2_MIRROR_REPLICATION_SERVICES`, `DB2_MIRROR_COMMUNICATION_SERVICES`, `DB2_MIRROR_SETUP_TOOLS`, `LINK_UNLINK_SEARCH_DIRECTORY`, `INTRUSION_MONITOR`, `SERVICE_TOOLS_USER_ID_AND_ATTRIBUTE_CHANGES`, `ROW_AND_COLUMN_ACCESS_CONTROL`, `ATTRIBUTE_CHANGES`, `ADOPTED_AUTHORITY`, `AUDITING_CHANGE`  | * `fallbackStartTime` is the number of hours prior to the current date that we will query for audit messages, if no audit messages have been queried before <br> * `numToProcess` can be used to configure how many messages are queried for by the distributor (default `1000`) <br> * `interval` the interval at which to query for new messages|
+| `http` | Fetches data from an http endpoint at the specified interval | `url` to make an http request from including any path parameters | * `interval` the interval at which to query for new messages <br> * `filter` only listen for responses that include this value <br> * \<header\> any header key value pair to be used for this http request|
 
 ### Special event types
 The `table` event type is primarily used as a mechanism to transport arbitrary data to a chosen destination. This data can be programmatically inserted into the table, or it can be inserted manually. Note that this data will be deleted from the table after it is processed. In the case that you want to persist the data in the database, consider using a different event type such as `file` or `watch`.
@@ -96,4 +97,14 @@ auditType=PASSWORD
 fallbackStartTime=1
 format=Violation type: $VIOLATION_TYPE_DETAIL$, username: $AUDIT_USER_NAME$
 interval=5000
+
+# Fetch data from https://fakeusergenerator.com every 5 minutes, with the specified 
+# authorization header
+[http1]
+type=http
+destinations=test_out
+format=Result: $results.name.first$ $results.name.last$ $json:results.location$
+url=https://fakeusergenerator.com
+interval=300000
+authorization=bearer xxxxxx
 ```
