@@ -105,6 +105,13 @@ public class DataConfig extends Config {
                     final String query = getRequiredString(name, "query");
                     ret.put(name, new WatchSql(name, query, format, destinations, interval));
                     break;
+                case "cmd":
+                    final String cmd = getRequiredString(name, "cmd");
+                    String args = getOptionalString(name, "args");
+                    if (args == null) args = "";
+
+                    ret.put(name, new WatchCmd(name, cmd, args, format, destinations, interval));
+                    break;
                 default:
                     throw new RuntimeException("Unknown destination type: " + type);
             }
