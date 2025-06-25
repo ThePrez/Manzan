@@ -17,6 +17,10 @@ interval=5000
 
 The available variables for each data type are listed below.
 
+* **SQL Events**:
+ `<column_name>`. Ex. If you use the sql to get a row back with column titled salary, it can be referenced using `SALARY`
+* **Command Events**:
+`CMD` `ARGS` `EXITVALUE` `STDERR` `STDOUT`
 * **File Events**:
 `FILE_DATA`, `FILE_NAME`, `FILE_PATH`
 * **Message Queue Watch Event**:
