@@ -39,6 +39,7 @@ Some types have additional properties that they require.
 | `table` | Triggered when data is inserted into the specified table | `table` name of the table to watch  <br> `schema` the schema in which the table resides | * `numToProcess` can be used to configure how many messages are queried for by the distributor (default `1000`) <br> * `interval` the interval in ms at which to query for new messages|
 | `audit` | Triggered when the specified `auditType` catches an event. | `auditType` options are `AUTHORITY_FAILURE`, `AUTHORITY_CHANGES`, `COMMAND_STRING`, `CREATE_OBJECT`, `USER_PROFILE_CHANGES`, `DELETE_OPERATION`, `ENVIRONMENT_VARIABLE`, `GENERIC_RECORD`, `JOB_CHANGE`, `OBJECT_MANAGEMENT_CHANGE`, `OWNERSHIP_CHANGE`, `PASSWORD`, `SERVICE_TOOLS_ACTION`, `ACTION_TO_SYSTEM_VALUE`, `READ_OF_OBJECT`, `CHANGE_TO_OBJECT`, `NETWORK_PASSWORD_ERROR`, `SYSTEMS_MANAGEMENT_CHANGE`, `SOCKETS_CONNECTIONS`, `PRIMARY_GROUP_CHANGE_FOR_RESTORED_OBJECT`, `OWNERSHIP_CHANGE_FOR_RESTORED_OBJECT`, `AUTHORITY_CHANGE_FOR_RESTORED_OBJECT`, `PTF_OBJECT_CHANGE`, `PROFILE_SWAP`, `PRIMARY_GROUP_CHANGE`, `PTF_OPERATIONS`, `PROGRAM_ADOPT`, `OBJECT_RESTORE`, `ATTRIBUTE_CHANGE`, `DB2_MIRROR_REPLICATION_STATE`, `DB2_MIRROR_PRODUCT_SERVICES`, `DB2_MIRROR_REPLICATION_SERVICES`, `DB2_MIRROR_COMMUNICATION_SERVICES`, `DB2_MIRROR_SETUP_TOOLS`, `LINK_UNLINK_SEARCH_DIRECTORY`, `INTRUSION_MONITOR`, `SERVICE_TOOLS_USER_ID_AND_ATTRIBUTE_CHANGES`, `ROW_AND_COLUMN_ACCESS_CONTROL`, `ATTRIBUTE_CHANGES`, `ADOPTED_AUTHORITY`, `AUDITING_CHANGE`  | * `fallbackStartTime` is the number of hours prior to the current date that we will query for audit messages, if no audit messages have been queried before <br> * `numToProcess` can be used to configure how many messages are queried for by the distributor (default `1000`) <br> * `interval` the interval in ms at which to query for new messages|
 | `sql`  | Executes arbitrary sql at a predefined interval    | `query` to be executed  | * `interval`  the interval in ms at which to run the sql statement |
+| `cmd`  | Executes an arbitrary command at a predefined interval  | `cmd` command to be executed  | * `args` The arguments to be passed to this command. The full command to be executed will be `<cmd> <args>`. Note. Chaining commands together will not work. In the case of needing to execute multiple commands, try putting them in a script and then executing the script. <br> * `interval`  the interval in ms at which to run the command. |
 
 ### Special event types
 The `table` event type is primarily used as a mechanism to transport arbitrary data to a chosen destination. This data can be programmatically inserted into the table, or it can be inserted manually. Note that this data will be deleted from the table after it is processed. In the case that you want to persist the data in the database, consider using a different event type such as `file` or `watch`.
@@ -101,10 +102,20 @@ fallbackStartTime=1
 format=Violation type: $VIOLATION_TYPE_DETAIL$, username: $AUDIT_USER_NAME$
 interval=5000
 
+# Get the newest data from the sample.department table every 5 minutes
 [sql1]
 type=sql
 query=SELECT * FROM sample.department WHERE time > CURRENT_TIMESTAMP - 5 MINUTES
 destinations=googpubsub, stdout
 format=department: $DEPTNAME$
 interval=300000
+
+# Display the job log of JOB(047284/QTMHHTTP/ADMIN) every minute
+[cmd1]
+type=cmd
+destinations=stdout
+cmd=system 
+args="DSPJOBLOG JOB(047284/QTMHHTTP/ADMIN)"
+format=cmd $CMD$ args $ARGS$ exitval $EXITVALUE$ stderr $STDERR$ stdout $STDOUT$
+interval=60000
 ```
