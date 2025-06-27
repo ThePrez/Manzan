@@ -133,6 +133,10 @@ int send_socket_message(const messageParams& params){
     char *json_utf8 = get_utf8_output_buf(json_message);
 
     to_utf8(json_utf8, get_utf8_output_buf_length(json_message), json_message.c_str());
+    std::string json_utf8_as_str(json_utf8);
+    // Uncomment this if you need to see the raw bytes of the message.
+    // Advanced debugging only.
+    // printHex("After utf8 conversion", json_utf8_as_str);
 
     // Send the message to the socket
     bool res = send_message(json_utf8);

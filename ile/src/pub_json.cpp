@@ -18,8 +18,8 @@ int to_utf8(char *out, size_t out_len, const char *in)
   tocode.CCSID = 1208;
   QtqCode_T fromcode;
 
-  // Setting to 0 allows the system to automatically detect ccsid (hopefully)
   memset(&fromcode, 0, sizeof(fromcode));
+  fromcode.CCSID = 37; // This is always 37 because we compile with TGTCCSID(37)
   iconv_t cd = QtqIconvOpen(&tocode, &fromcode);
 
   size_t inleft = 1 + strlen(in);
@@ -145,6 +145,19 @@ int json_publish(const char *_session_id, std::string &_json)
   return 0;
 }
 
+// Debug function to print bytes in hex
+void printHex(const std::string &label, const std::string &data) {
+    std::ostringstream oss;
+    oss << label << " (length = " << data.size() << "):\n";
+   for (size_t i = 0; i < data.size(); ++i) {
+    unsigned char c = static_cast<unsigned char>(data[i]);
+    oss << std::hex << std::uppercase
+        << std::setfill('0') << std::setw(2)
+        << static_cast<int>(c) << ' ';
+    }
+    DEBUG_INFO(oss.str().c_str());
+}
+
 std::string construct_json_message(PUBLISH_MESSAGE_FUNCTION_SIGNATURE)
 {
 std::string jsonStr;
@@ -173,6 +186,10 @@ std::string jsonStr;
   jsonStr += ",\n    ";
   append_json_element(jsonStr, "SENDING_PROCEDURE_NAME", _sending_procedure_name);
   jsonStr += "\n}";
+
+  // Uncomment this if you need to see the raw bytes of the message.
+  // Advanced debugging only.
+  // printHex("Final JSON", jsonStr);
   return jsonStr;
 }
 

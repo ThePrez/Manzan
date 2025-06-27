@@ -13,5 +13,6 @@ size_t get_utf8_output_buf_length(std::string str);
 }
 
 std::string construct_json_message(PUBLISH_MESSAGE_FUNCTION_SIGNATURE);
+void printHex(const std::string &label, const std::string &data);
 
 #endif
