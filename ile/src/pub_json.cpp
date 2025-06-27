@@ -10,6 +10,8 @@
 #include <qsnddtaq.h>
 #include <qtqiconv.h>
 #include <bcd.h>
+#include <sstream>
+#include <iomanip>
 
 int to_utf8(char *out, size_t out_len, const char *in)
 {
