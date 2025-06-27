@@ -42,6 +42,7 @@ src/mzversion.h:
 	system -kKv "CRTMSGQ MSGQ(${BUILDLIB}/$*) TEXT('Testing queue') CCSID(1208)"
 
 /qsys.lib/${BUILDLIB}.lib/%.file: install_tasks/%.sql
+	system -kKv "CHGJOB CCSID(37)"
 	system -kKv "RUNSQLSTM SRCSTMF('$(CURDIR)/$<') COMMIT(*NONE) DFTRDBCOL(${BUILDLIB})"
 	echo "Success"
 
