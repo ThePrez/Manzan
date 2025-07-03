@@ -15,7 +15,6 @@
 #include "pub_json.h"
 #include "SockClient.h"
 
-
 static FILE *fd = NULL;
 
 #pragma pack(1)

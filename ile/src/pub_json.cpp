@@ -13,35 +13,6 @@
 #include <sstream>
 #include <iomanip>
 
-// int to_utf8(char *out, size_t out_len, const char *in, int from_ccsid)
-// {
-//   QtqCode_T tocode;
-//   memset(&tocode, 0, sizeof(tocode));
-//   tocode.CCSID = 1208;
-//   QtqCode_T fromcode;
-
-//   memset(&fromcode, 0, sizeof(fromcode));
-//   fromcode.CCSID = from_ccsid;
-//   iconv_t cd = QtqIconvOpen(&tocode, &fromcode);
-
-//   size_t inleft = 1 + strlen(in);
-//   size_t outleft = out_len;
-//   char *input = (char *)in;
-//   char *output = out;
-
-//   int rc = iconv(cd, &input, &inleft, &output, &outleft);
-//   if (rc == -1)
-//   {
-//     DEBUG_ERROR("Error in converting characters. %d: %s\n", errno, strerror(errno));
-//     return 9;
-//   }
-//   *output = '\0';  // null-terminate the UTF-8 string
-
-//   DEBUG_INFO("CONVERTED %s to %s\n", in, out);
-//   DEBUG_INFO("Conversion to UTF-8 successful.\n");
-//   return iconv_close(cd);
-// }
-
 int to_utf8(char *out, size_t out_len, const char *in, int from_ccsid)
 {
   QtqCode_T tocode;
@@ -52,11 +23,7 @@ int to_utf8(char *out, size_t out_len, const char *in, int from_ccsid)
   fromcode.CCSID = from_ccsid;
 
   iconv_t cd = QtqIconvOpen(&tocode, &fromcode);
-  // if (cd == -1) {
-  //   DEBUG_ERROR("iconv open failed\n");
-  //   return 9;
-  // }
-
+  
   size_t inleft = strlen(in);  // no +1
   size_t outleft = out_len;
   char *input = (char *)in;
@@ -129,23 +96,27 @@ void json_encode(std::string &str, const char *_src)
 }
 void append_json_element(std::string &_str, const char *_key, const char *_value)
 {
+  //TODO: Currently we hardcode 37 as the source ccsid for converting the prefix and suffix
+  // which are composed of characters from the english alphabet, as well as a double quote and backslash.
+  // This will work in the overwhelming majority of cases as these characters usually share the same hex code
+  // point across different languages. Really we should add the UTF-8 bytes for this directly, but we can 
+  // implement that if users start complaining about it.
   std::string prefix;
   std::string suffix;
 
   prefix += "\"";
   prefix += _key;
   prefix += "\":\"";
+
   _str += convert_field(prefix, 37);
   _str += _value;
 
-  // std::string encoded;
-  // json_encode(encoded, _value);
-  // suffix += _value;
   suffix += "\"";
   _str += convert_field(suffix, 37);
 }
 void append_json_element(std::string &_str, const char *_key, const int _value)
 {
+  // Same comment as in the other append_json_element
   std::string toAdd;
   toAdd += "\"";
   toAdd += _key;
@@ -242,7 +213,12 @@ void printHex(const std::string &label, const std::string &data) {
 
 std::string construct_json_message(PUBLISH_MESSAGE_FUNCTION_SIGNATURE)
 {
-std::string jsonStr;
+  //TODO: Currently we hardcode 37 as the source ccsid for convert_field which is being 
+  // passed characters such as {},\n". This will work in the overwhelming majority of cases 
+  // as these characters usually share the same hex code point across different languages. 
+  // Really we should add the UTF-8 bytes for this directly, but we can implement that if 
+  // users start complaining about it.
+  std::string jsonStr;
   jsonStr += convert_field("{\n    ", 37) ;
   append_json_element(jsonStr, "EVENT_TYPE", convert_field("message", 37));
   jsonStr += convert_field(",\n    ", 37);
