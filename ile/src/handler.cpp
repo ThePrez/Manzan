@@ -14,7 +14,6 @@
 #include "mzversion.h"
 #include "pub_json.h"
 #include "SockClient.h"
-#include <qusrjobi.h>  // Ensure this header is available
 
 
 static FILE *fd = NULL;

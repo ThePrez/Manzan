@@ -137,7 +137,6 @@ int send_socket_message(const messageParams& params){
 
 int send_sql_message(const messageParams& params){
   EXEC SQL INCLUDE SQLCA;
-
   EXEC SQL BEGIN DECLARE SECTION;
     char msg_session_id[30];
     char msg_msg_id[24];
