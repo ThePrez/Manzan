@@ -113,12 +113,7 @@ int tryFuncWithFallback(Func1 func1, Func2 func2, Params params) {
     }
 }
 
-int send_socket_message(const messageParams& params){
-    DEBUG_INFO("About to print message hex bytes\n");
-    std::string message_as_str(params.message);
-    // std::string aleph = "א";
-    // printHex("string literal test: ",aleph);
-    printHex("message: ", message_as_str);
+int send_socket_message(const messageParams& params){ 
     std::string json_message = construct_json_message(
       params.session_id,
       params.msgid,
@@ -132,70 +127,8 @@ int send_socket_message(const messageParams& params){
       params.sending_module_name,
       params.sending_procedure_name);
 
-    // const char* session_id;
-    // const char* msgid;
-    // const char* msg_type;
-    // const char* msg_timestamp;
-    // const char* job;
-    // const char* sending_usrprf;
-    // const char* message;
-    // const char* sending_program_name;
-    // const char* sending_module_name;
-    // const char* sending_procedure_name;
-
-    // char *session_id_utf8 = get_utf8_output_buf(params.session_id);
-    // char *msgid_utf8 = get_utf8_output_buf(params.msgid);
-    // char *msg_type_utf8 = get_utf8_output_buf(params.msg_type);
-    // char *msg_timestamp_utf8 = get_utf8_output_buf(params.msg_timestamp);
-    // char *job_utf8 = get_utf8_output_buf(params.job);
-    // char *sending_usrprf_utf8 = get_utf8_output_buf(params.sending_usrprf);
-    // char *message_utf8 = get_utf8_output_buf(params.message);
-    // char *sending_program_name_utf8 = get_utf8_output_buf(params.sending_program_name);
-    // char *sending_module_name_utf8 = get_utf8_output_buf(params.sending_module_name);
-    // char *sending_procedure_name_utf8 = get_utf8_output_buf(params.sending_procedure_name);
-
-    // to_utf8(session_id_utf8, get_utf8_output_buf_length(params.session_id), params.session_id, from_ccsid);
-    // to_utf8(msgid_utf8, get_utf8_output_buf_length(params.session_id), params.session_id, from_ccsid);
-    // to_utf8(msg_type_utf8, get_utf8_output_buf_length(params.session_id), params.session_id, from_ccsid);
-    // to_utf8(msg_timestamp_utf8, get_utf8_output_buf_length(params.session_id), params.session_id, from_ccsid);
-    // to_utf8(job_utf8, get_utf8_output_buf_length(params.session_id), params.session_id, from_ccsid);
-    // to_utf8(sending_usrprf_utf8, get_utf8_output_buf_length(params.session_id), params.session_id, from_ccsid);
-    // to_utf8(message_utf8, get_utf8_output_buf_length(params.session_id), params.session_id, from_ccsid);
-    // to_utf8(sending_program_name_utf8, get_utf8_output_buf_length(params.session_id), params.session_id, from_ccsid);
-    // to_utf8(sending_module_name_utf8, get_utf8_output_buf_length(params.session_id), params.session_id, from_ccsid);
-    // to_utf8(sending_procedure_name_utf8, get_utf8_output_buf_length(params.session_id), params.session_id, from_ccsid);
-
-
-    // std::string json_message = construct_json_message(
-    //   params.session_id,
-    //   params.msgid,
-    //   params.msg_type,
-    //   params.msg_severity,
-    //   params.msg_timestamp,
-    //   params.job,
-    //   params.sending_usrprf,
-    //   params.message,
-    //   params.sending_program_name,
-    //   params.sending_module_name,
-    //   params.sending_procedure_name);
-
-
-
     DEBUG_INFO("Sending message %s", const_cast<char *>(json_message.c_str()));
-
-    // Allocate memory for the utf-8 encoded json message
-    // char *json_utf8 = get_utf8_output_buf(json_message);
-
-    // to_utf8(json_utf8, get_utf8_output_buf_length(json_message), json_message.c_str());
-    // std::string json_utf8_as_str(json_utf8);
-    // Uncomment this if you need to see the raw bytes of the message.
-    // Advanced debugging only.
-    // printHex("After utf8 conversion", json_utf8_as_str);
-
-    // Send the message to the socket
     bool res = send_message(json_message);
-    // free(json_utf8);
-
     if (!res){
       throw std::runtime_error("Failed to send message");
     }
@@ -203,22 +136,22 @@ int send_socket_message(const messageParams& params){
 }
 
 int send_sql_message(const messageParams& params){
-  exec sql include sqlca;
+  EXEC SQL INCLUDE SQLCA;
 
-EXEC SQL BEGIN DECLARE SECTION;
-  char msg_session_id[30];
-  char msg_msg_id[24];
-  char msg_msg_type[20];
-  char msg_severity[60];
-  char msg_timestamp[60];
-  char msg_job[60];
-  char msg_sending_usrprf[30];
-  char msg_message[2048];
-  char msg_sending_program_name[257];
-  char msg_sending_module_name[40];
-  char msg_sending_procedure_name[2048];
+  EXEC SQL BEGIN DECLARE SECTION;
+    char msg_session_id[30];
+    char msg_msg_id[24];
+    char msg_msg_type[20];
+    char msg_severity[60];
+    char msg_timestamp[60];
+    char msg_job[60];
+    char msg_sending_usrprf[30];
+    char msg_message[2048];
+    char msg_sending_program_name[257];
+    char msg_sending_module_name[40];
+    char msg_sending_procedure_name[2048];
 
-// Specify CCSID 1208 for each variable that contains UTF-8 data
+  // This lets the sql engine know that the data is already encoded in 1208
   EXEC SQL DECLARE :msg_session_id VARIABLE CCSID 1208;
   EXEC SQL DECLARE :msg_msg_id VARIABLE CCSID 1208;
   EXEC SQL DECLARE :msg_msg_type VARIABLE CCSID 1208;
@@ -229,9 +162,7 @@ EXEC SQL BEGIN DECLARE SECTION;
   EXEC SQL DECLARE :msg_sending_program_name VARIABLE CCSID 1208;
   EXEC SQL DECLARE :msg_sending_module_name VARIABLE CCSID 1208;
   EXEC SQL DECLARE :msg_sending_procedure_name VARIABLE CCSID 1208;
-EXEC SQL END DECLARE SECTION;
-
- 
+  EXEC SQL END DECLARE SECTION;
 
   COPY_PARM(msg_session_id, params.session_id);
   COPY_PARM(msg_msg_id, params.msgid);
@@ -249,44 +180,10 @@ EXEC SQL END DECLARE SECTION;
       INSERT INTO MANZANMSG(
           SESSION_ID, MESSAGE_ID, MESSAGE_TYPE, SEVERITY, JOB, SENDING_USRPRF, SENDING_PROGRAM_NAME, SENDING_MODULE_NAME, SENDING_PROCEDURE_NAME, MESSAGE_TIMESTAMP, MESSAGE)
           VALUES( : msg_session_id, : msg_msg_id, : msg_msg_type, : msg_severity, : msg_job, : msg_sending_usrprf, : msg_sending_program_name, : msg_sending_module_name, : msg_sending_procedure_name, : msg_timestamp, : msg_message);
-
-  // EXEC SQL
-  // INSERT INTO MANZANMSG (
-  //   SESSION_ID,
-  //   MESSAGE_ID,
-  //   MESSAGE_TYPE,
-  //   SEVERITY,
-  //   JOB,
-  //   SENDING_USRPRF,
-  //   SENDING_PROGRAM_NAME,
-  //   SENDING_MODULE_NAME,
-  //   SENDING_PROCEDURE_NAME,
-  //   MESSAGE_TIMESTAMP,
-  //   MESSAGE
-  // )
-  // VALUES (
-  //   CAST(:msg_session_id AS VARCHAR(10) CCSID 1208),
-  //   CAST(:msg_msg_id AS VARCHAR(7) CCSID 1208),
-  //   CAST(:msg_msg_type AS VARCHAR(10) CCSID 1208),
-  //   :msg_severity,
-  //   CAST(:msg_job AS VARCHAR(28) CCSID 1208),
-  //   CAST(:msg_sending_usrprf AS VARCHAR(10) CCSID 1208),
-  //   CAST(:msg_sending_program_name AS VARCHAR(256) CCSID 1208),
-  //   CAST(:msg_sending_module_name AS VARCHAR(10) CCSID 1208),
-  //   CAST(:msg_sending_procedure_name AS VARCHAR(1024) CCSID 1208),
-  //   :msg_timestamp, 
-  //   CAST(:msg_message AS VARCHAR(4096) CCSID 1208)
-  // );
   check_sql_error(sqlca.sqlcode, (const char *)sqlca.sqlstate);
   return 0;
 }
 
-// TODO: implement this
-//     1. define Db2 tables
-//            // have autoincrement and autotimestamp columns
-//     2. Add Db2 table creation to Makefile
-//     3. Rename this method to .rpgle (if using RPG)
-//     4. implement!
 extern int db2_publish_message(PUBLISH_MESSAGE_FUNCTION_SIGNATURE)
 {
      messageParams params = {
