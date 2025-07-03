@@ -14,6 +14,8 @@
 #include "mzversion.h"
 #include "pub_json.h"
 #include "SockClient.h"
+#include <qusrjobi.h>  // Ensure this header is available
+
 
 static FILE *fd = NULL;
 
@@ -74,6 +76,18 @@ std::string get_iso8601_timestamp(const char *_in)
   return formatted;
 }
 
+// char* convert_field(std::string field, int from_ccsid) {
+//     char* out_buf = get_utf8_output_buf(field);
+//     to_utf8(out_buf, get_utf8_output_buf_length(field), field.c_str(), from_ccsid);
+//     return out_buf;
+// }
+
+// char* convert_field(const std::string& field, int from_ccsid) {
+//     char* out_buf = get_utf8_output_buf(field);
+//     to_utf8(out_buf, get_utf8_output_buf_length(field), field.c_str(), from_ccsid);
+//     return out_buf;
+// }
+
 int main(int _argc, char **argv)
 {
   static volatile _INTRPT_Hndlr_Parms_T my_commarea;
@@ -95,6 +109,21 @@ int main(int _argc, char **argv)
   BUFSTRN(watch_option, argv[1], 10);
   BUFSTRN(session_id, argv[2], 10);
 
+    char buffer[400];
+    memset(buffer, 0x00, sizeof(buffer));
+    // Run in batch mode if we're in a non-interactive job
+    QUSRJOBI(buffer, sizeof(buffer), "JOBI0400", "*                         ",
+             "                ");
+
+    int jobCcsid = 0;
+    memcpy(&jobCcsid, buffer + 372, sizeof(int));
+
+    // Print CCSID
+    printf("Job CCSID: %d\n", jobCcsid);
+
+    DEBUG_INFO("Job CCSID: %d\n", jobCcsid);
+
+    // Extract and print the CCSID
   DEBUG_INFO("Watch program called. Watch option setting is '%s'\n", watch_option.c_str());
   publisher_info_set *publishers = conf_get_publisher_info(session_id.c_str());
   int num_publishers = publishers->num_publishers;
@@ -127,6 +156,7 @@ int main(int _argc, char **argv)
     int replacement_data_len = msg_event->length_replacement_data;
     DEBUG_INFO("Replacement data offset is '%d'\n", replacement_data_offset);
     DEBUG_INFO("REPLACEMENT DATA LENGTH IS '%d'\n", replacement_data_len);
+    DEBUG_INFO("Replacement data ccsid is%d\n",msg_event->replacement_data_ccsid );
     char message_watched[8];
     message_watched[7] = 0x00;
     memcpy(message_watched, msg_event->message_watched, 7);
@@ -181,21 +211,41 @@ int main(int _argc, char **argv)
     }
     free(replacement_data_aligned);
     DEBUG_INFO("About to publish...\n");
+    std::string message_asstr(msg_info_buf->message);
+    printHex("PRINTING HEX BYTES original ccsid: ",message_asstr );
+    std::string encoded_message;
+    json_encode(encoded_message, msg_info_buf->message);
+
+    char *session_id_utf8           = convert_field(session_id, msg_event->replacement_data_ccsid);
+    char *msgid_utf8                = convert_field(msgid, msg_event->replacement_data_ccsid);
+    char *msg_type_utf8             = convert_field(message_type, msg_event->replacement_data_ccsid);
+    char *msg_timestamp_utf8        = convert_field(message_timestamp, msg_event->replacement_data_ccsid);
+    char *job_utf8                  = convert_field(job, msg_event->replacement_data_ccsid);
+    char *sending_usrprf_utf8       = convert_field(sending_usrprf, msg_event->replacement_data_ccsid);
+    char *message_utf8              = convert_field(encoded_message, msg_event->replacement_data_ccsid);
+    DEBUG_INFO("UTF-8 length of message: %lu", strlen(message_utf8));
+    char *sending_program_name_utf8= convert_field(sending_program_name, msg_event->replacement_data_ccsid);
+    char *sending_module_name_utf8  = convert_field(sending_module_name, msg_event->replacement_data_ccsid);
+    char *sending_procedure_name_utf8 = convert_field(sending_procedure_name, msg_event->replacement_data_ccsid);
+
+    std::string message_utf8_asstr(message_utf8);
+    printHex("PRINTING HEX BYTES FOR MSG UTF8: ",  message_utf8_asstr);
+
     for (int i = 0; i < num_publishers; i++)
     {
       msg_publish_func func = publishers->array[i].msg_publish_func_ptr;
       func(
-          session_id.c_str(),
-          msgid.c_str(),
-          message_type.c_str(),
+          session_id_utf8,
+          msgid_utf8,
+          msg_type_utf8,
           message_severity,
-          message_timestamp.c_str(),
-          job.c_str(),
-          sending_usrprf.c_str(),
-          msg_info_buf->message,
-          sending_program_name.c_str(),
-          sending_module_name.c_str(),
-          sending_procedure_name.c_str());
+          msg_timestamp_utf8,
+          job_utf8,
+          sending_usrprf_utf8,
+          message_utf8,
+          sending_program_name_utf8,
+          sending_module_name_utf8,
+          sending_procedure_name_utf8);
       DEBUG_INFO("Published\n");
     }
     free(msg_info_buf);
