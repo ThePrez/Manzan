@@ -96,34 +96,26 @@ void json_encode(std::string &str, const char *_src)
 }
 void append_json_element(std::string &_str, const char *_key, const char *_value)
 {
-  // TODO: Currently we hardcode 37 as the source ccsid for converting the prefix and suffix
-  //  which are composed of characters from the english alphabet, as well as a double quote and backslash.
-  //  This will work in the overwhelming majority of cases as these characters usually share the same hex code
-  //  point across different languages. Really we should add the UTF-8 bytes for this directly, but we can
-  //  implement that if users start complaining about it.
-  std::string prefix;
-  std::string suffix;
-
-  prefix += "\"";
-  prefix += _key;
-  prefix += "\":\"";
-
-  _str += convert_field(prefix, 37);
+  // Here we append the utf-8 bytes directly to avoid ccsid issues. The exception is for the
+  // convert_field on _key which is just using English alphabet characters. Those are the same code
+  // point in every ccsid, so we just hardcode 37.
+  _str += std::string("\x22", 1); // "
+  _str += convert_field(_key, 37);
+  _str += std::string("\x22\x3A\x22", 3); // ":"
   _str += _value;
-
-  suffix += "\"";
-  _str += convert_field(suffix, 37);
+  _str += std::string("\x22", 1); // "
 }
+
 void append_json_element(std::string &_str, const char *_key, const int _value)
 {
-  // Same comment as in the other append_json_element
-  std::string toAdd;
-  toAdd += "\"";
-  toAdd += _key;
-  toAdd += "\": ";
+  // Here we append the utf-8 bytes directly to avoid ccsid issues. The exception is for the
+  // convert_field on _key and value which are just using English alphabet characters and digits. Those are the same code
+  // point in every ccsid, so we just hardcode 37.
+  _str += std::string("\x22", 1); // "
+  _str += convert_field(_key, 37);
+  _str += std::string("\x22\x3A\x20", 3); // ":\s
   ITOA(value, _value);
-  toAdd += value;
-  _str += convert_field(toAdd, 37);
+  _str += convert_field(value, 37);
 }
 
 size_t get_utf8_output_buf_length(std::string str)
@@ -223,7 +215,7 @@ std::string construct_json_message(PUBLISH_MESSAGE_FUNCTION_SIGNATURE)
 {
   std::string jsonStr;
 
-  jsonStr += std::string("\x7B\x0A\x20\x20\x20\x20", 6); // {\n\s\s\s\s   
+  jsonStr += std::string("\x7B\x0A\x20\x20\x20\x20", 6); // {\n\s\s\s\s
   append_json_element(jsonStr, "EVENT_TYPE", convert_field("message", 37));
 
   jsonStr += std::string("\x2C\x0A\x20\x20\x20\x20", 6); // ,\n\s\s\s\s
@@ -263,7 +255,7 @@ std::string construct_json_message(PUBLISH_MESSAGE_FUNCTION_SIGNATURE)
 
   // Uncomment this if you need to see the raw bytes of the message.
   // Advanced debugging only.
-  printHex("Final JSON in UTF-8 bytes: ", jsonStr);
+  // printHex("Final JSON in UTF-8 bytes: ", jsonStr);
   return jsonStr;
 }
 
