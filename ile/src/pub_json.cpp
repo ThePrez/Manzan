@@ -23,8 +23,8 @@ int to_utf8(char *out, size_t out_len, const char *in, int from_ccsid)
   fromcode.CCSID = from_ccsid;
 
   iconv_t cd = QtqIconvOpen(&tocode, &fromcode);
-  
-  size_t inleft = strlen(in);  // no +1
+
+  size_t inleft = strlen(in); // No +1. We shouldn't include the null terminator here.
   size_t outleft = out_len;
   char *input = (char *)in;
   char *output = out;
@@ -50,12 +50,12 @@ int to_utf8(char *out, size_t out_len, const char *in, int from_ccsid)
   return iconv_close(cd);
 }
 
-char* convert_field(const std::string& field, int from_ccsid) {
-    char* out_buf = get_utf8_output_buf(field);
-    to_utf8(out_buf, get_utf8_output_buf_length(field), field.c_str(), from_ccsid);
-    return out_buf;
+char *convert_field(const std::string &field, int from_ccsid)
+{
+  char *out_buf = get_utf8_output_buf(field);
+  to_utf8(out_buf, get_utf8_output_buf_length(field), field.c_str(), from_ccsid == 65535 ? 0 : from_ccsid);
+  return out_buf;
 }
-
 
 void json_encode(std::string &str, const char *_src)
 {
@@ -96,11 +96,11 @@ void json_encode(std::string &str, const char *_src)
 }
 void append_json_element(std::string &_str, const char *_key, const char *_value)
 {
-  //TODO: Currently we hardcode 37 as the source ccsid for converting the prefix and suffix
-  // which are composed of characters from the english alphabet, as well as a double quote and backslash.
-  // This will work in the overwhelming majority of cases as these characters usually share the same hex code
-  // point across different languages. Really we should add the UTF-8 bytes for this directly, but we can 
-  // implement that if users start complaining about it.
+  // TODO: Currently we hardcode 37 as the source ccsid for converting the prefix and suffix
+  //  which are composed of characters from the english alphabet, as well as a double quote and backslash.
+  //  This will work in the overwhelming majority of cases as these characters usually share the same hex code
+  //  point across different languages. Really we should add the UTF-8 bytes for this directly, but we can
+  //  implement that if users start complaining about it.
   std::string prefix;
   std::string suffix;
 
@@ -124,51 +124,57 @@ void append_json_element(std::string &_str, const char *_key, const int _value)
   ITOA(value, _value);
   toAdd += value;
   _str += convert_field(toAdd, 37);
-
 }
 
-size_t get_utf8_output_buf_length(std::string str){
+size_t get_utf8_output_buf_length(std::string str)
+{
   // Each UTF-8 encoded byte can be up to 4 bytes, and add one for the null terminator.
   return str.length() * 4 + 1;
 }
 
-size_t get_utf8_output_buf_length(const char* str){
+size_t get_utf8_output_buf_length(const char *str)
+{
   // Each UTF-8 encoded byte can be up to 4 bytes, and add one for the null terminator.
   return strlen(str) * 4 + 1;
 }
 
 /*
-* Return an output buffer containing enough space for the utf-8 encoded message.
-* Return NULL if there is no space remaining on the heap.
-* Remember to free the buffer after use.
-*/
-char* get_utf8_output_buf(std::string str){
+ * Return an output buffer containing enough space for the utf-8 encoded message.
+ * Return NULL if there is no space remaining on the heap.
+ * Remember to free the buffer after use.
+ */
+char *get_utf8_output_buf(std::string str)
+{
   char *buf = (char *)malloc(get_utf8_output_buf_length(str));
-    if (buf == NULL) {
-        DEBUG_ERROR("No heap space available to allocate buffer for %s\n", str.c_str());
-        return NULL;
-    }
-    return buf;
+  if (buf == NULL)
+  {
+    DEBUG_ERROR("No heap space available to allocate buffer for %s\n", str.c_str());
+    return NULL;
+  }
+  return buf;
 }
 
 /*
-* Return an output buffer containing enough space for the utf-8 encoded message.
-* Return NULL if there is no space remaining on the heap.
-* Remember to free the buffer after use.
-*/
-char* get_utf8_output_buf(const char* str){
+ * Return an output buffer containing enough space for the utf-8 encoded message.
+ * Return NULL if there is no space remaining on the heap.
+ * Remember to free the buffer after use.
+ */
+char *get_utf8_output_buf(const char *str)
+{
   char *buf = (char *)malloc(get_utf8_output_buf_length(str) * 4 + 1);
-    if (buf == NULL) {
-        DEBUG_ERROR("No heap space available to allocate buffer for %s\n", str);
-        return NULL;
-    }
-    return buf;
+  if (buf == NULL)
+  {
+    DEBUG_ERROR("No heap space available to allocate buffer for %s\n", str);
+    return NULL;
+  }
+  return buf;
 }
 
 int json_publish(const char *_session_id, std::string &_json)
 {
   char *utf8 = get_utf8_output_buf(_json);
-  if (utf8 == NULL){
+  if (utf8 == NULL)
+  {
     DEBUG_ERROR("No heap space available. Aborting publishing message %s\n", utf8);
     return -1;
   }
@@ -177,13 +183,13 @@ int json_publish(const char *_session_id, std::string &_json)
   DEBUG_INFO("Publishing JSON\n");
   DEBUG_INFO("%s\n", _json.c_str());
 
-  __attribute__((aligned(16))) char  dtaq_key[11];
+  __attribute__((aligned(16))) char dtaq_key[11];
   memset(dtaq_key, ' ', 11);
   memcpy(dtaq_key, _session_id, MIN(11, strlen(_session_id)));
 
-  _DecimalT<5,0> len2 = __D("0"); 
+  _DecimalT<5, 0> len2 = __D("0");
   len2 += strlen(utf8);
-  _DecimalT<3,0> keyLen = __D("10.0");
+  _DecimalT<3, 0> keyLen = __D("10.0");
 
   DEBUG_INFO("About to call QSNDDTAQ\n");
   QSNDDTAQ("MANZANDTAQ",
@@ -199,55 +205,65 @@ int json_publish(const char *_session_id, std::string &_json)
 }
 
 // Debug function to print bytes in hex
-void printHex(const std::string &label, const std::string &data) {
-    std::ostringstream oss;
-    oss << label << " (length = " << data.size() << "):\n";
-   for (size_t i = 0; i < data.size(); ++i) {
+void printHex(const std::string &label, const std::string &data)
+{
+  std::ostringstream oss;
+  oss << label << " (length = " << data.size() << "):\n";
+  for (size_t i = 0; i < data.size(); ++i)
+  {
     unsigned char c = static_cast<unsigned char>(data[i]);
     oss << std::hex << std::uppercase
         << std::setfill('0') << std::setw(2)
         << static_cast<int>(c) << ' ';
-    }
-    DEBUG_INFO(oss.str().c_str());
+  }
+  DEBUG_INFO(oss.str().c_str());
 }
 
 std::string construct_json_message(PUBLISH_MESSAGE_FUNCTION_SIGNATURE)
 {
-  //TODO: Currently we hardcode 37 as the source ccsid for convert_field which is being 
-  // passed characters such as {},\n". This will work in the overwhelming majority of cases 
-  // as these characters usually share the same hex code point across different languages. 
-  // Really we should add the UTF-8 bytes for this directly, but we can implement that if 
-  // users start complaining about it.
   std::string jsonStr;
-  jsonStr += convert_field("{\n    ", 37) ;
+
+  jsonStr += std::string("\x7B\x0A\x20\x20\x20\x20", 6); // {\n\s\s\s\s   
   append_json_element(jsonStr, "EVENT_TYPE", convert_field("message", 37));
-  jsonStr += convert_field(",\n    ", 37);
+
+  jsonStr += std::string("\x2C\x0A\x20\x20\x20\x20", 6); // ,\n\s\s\s\s
   append_json_element(jsonStr, "SESSION_ID", _session_id);
-  jsonStr += convert_field(",\n    ", 37); 
+
+  jsonStr += std::string("\x2C\x0A\x20\x20\x20\x20", 6); // ,\n\s\s\s\s
   append_json_element(jsonStr, "JOB", _job);
-  jsonStr += convert_field(",\n    ", 37);
+
+  jsonStr += std::string("\x2C\x0A\x20\x20\x20\x20", 6); // ,\n\s\s\s\s
   append_json_element(jsonStr, "MESSAGE_ID", _msgid);
-  jsonStr += convert_field(",\n    ", 37);
+
+  jsonStr += std::string("\x2C\x0A\x20\x20\x20\x20", 6); // ,\n\s\s\s\s
   append_json_element(jsonStr, "MESSAGE_TYPE", _msg_type);
-  jsonStr += convert_field(",\n    ", 37);
+
+  jsonStr += std::string("\x2C\x0A\x20\x20\x20\x20", 6); // ,\n\s\s\s\s
   append_json_element(jsonStr, "SEVERITY", _msg_severity);
-  jsonStr += convert_field(",\n    ", 37);
+
+  jsonStr += std::string("\x2C\x0A\x20\x20\x20\x20", 6); // ,\n\s\s\s\s
   append_json_element(jsonStr, "MESSAGE_TIMESTAMP", _msg_timestamp);
-  jsonStr += convert_field(",\n    ", 37);
+
+  jsonStr += std::string("\x2C\x0A\x20\x20\x20\x20", 6); // ,\n\s\s\s\s
   append_json_element(jsonStr, "SENDING_USRPRF", _sending_usrprf);
-  jsonStr += convert_field(",\n    ", 37);
+
+  jsonStr += std::string("\x2C\x0A\x20\x20\x20\x20", 6); // ,\n\s\s\s\s
   append_json_element(jsonStr, "MESSAGE", _message);
-  jsonStr += convert_field(",\n    ", 37);
+
+  jsonStr += std::string("\x2C\x0A\x20\x20\x20\x20", 6); // ,\n\s\s\s\s
   append_json_element(jsonStr, "SENDING_PROGRAM_NAME", _sending_program_name);
-  jsonStr += convert_field(",\n    ", 37);
+
+  jsonStr += std::string("\x2C\x0A\x20\x20\x20\x20", 6); // ,\n\s\s\s\s
   append_json_element(jsonStr, "SENDING_MODULE_NAME", _sending_module_name);
-  jsonStr += convert_field(",\n    ", 37);
+
+  jsonStr += std::string("\x2C\x0A\x20\x20\x20\x20", 6); // ,\n\s\s\s\s
   append_json_element(jsonStr, "SENDING_PROCEDURE_NAME", _sending_procedure_name);
-  jsonStr += convert_field("\n}", 37);
+
+  jsonStr += std::string("\x0A\x7D", 2); // \n}
 
   // Uncomment this if you need to see the raw bytes of the message.
   // Advanced debugging only.
-  // printHex("Final JSON in UTF-8 bytes: ", jsonStr);
+  printHex("Final JSON in UTF-8 bytes: ", jsonStr);
   return jsonStr;
 }
 
@@ -257,7 +273,7 @@ std::string construct_json_message(PUBLISH_MESSAGE_FUNCTION_SIGNATURE)
 extern "C" int json_publish_message(PUBLISH_MESSAGE_FUNCTION_SIGNATURE)
 {
   std::string jsonStr = construct_json_message(_session_id, _msgid, _msg_type, _msg_severity, _msg_timestamp, _job, _sending_usrprf,
-  _message, _sending_program_name, _sending_module_name, _sending_procedure_name);  
+                                               _message, _sending_program_name, _sending_module_name, _sending_procedure_name);
   return json_publish(_session_id, jsonStr);
 }
 
