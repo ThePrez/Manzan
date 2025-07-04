@@ -6,6 +6,25 @@ This document will outline how to install Manzan on to IBM i. Manzan is installe
 
 Use a Java version provided by IBM, which is at least version 8. When running the `java -version` command, the output should contain the string `IBM`. Ex. `IBM Semeru Runtime Certified Edition`. Otherwise, Manzan may not function properly.
 
+## An Important Note on CCSID's
+
+Manzan has support for all CCSIDs on IBM i. What this means is that when you decide to watch a message queue, the CCSID of that queue can be anything. Most of the time this is fine, but there are a few caveats to keep in mind:
+
+1. If the CCSID of the message queue you want to watch is `65535`, Manzan will assume the source is encoded using the **TGTCCSID** of the Manzan handler. This will be the CCSID of your user profile at the time you installed it. For this reason, it is better to **specify a CCSID on your message queues**.
+
+2. Because supporting all CCSIDs on an OS that doesn't allow specifying TGTCCSID `1208` is inherently difficult, we have come up with a few workarounds. In most cases, everything should run smoothly, but you may run into issues in the following unlikely scenario where **all** of the below are true:
+   - The CCSID of the data source is different from your JOB CCSID at install time.
+   - The JSON escape characters (characters which must be escaped in JSON, e.g., `"` and `\`) in the data source CCSID point to different hex values than those in the JOB CCSID.
+   - The data being retrieved contains characters which map to JSON escape code points in the TGTCCSID of the handler program.
+
+If this happens, Manzan may accidentally insert what it thinks is an escape character.  
+If you run into this issue, it is recommended to:
+
+- Change the CCSID of your user profile to match the data source CCSID.
+- Rebuild Manzan.
+- You can change your user profile CCSID back afterwards.
+
+
 ## Install from GitHub
 
 1. Make a "download" directory on IBM i by running the following from an SSH terminal:
