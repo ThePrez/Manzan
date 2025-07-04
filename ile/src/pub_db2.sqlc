@@ -113,7 +113,7 @@ int tryFuncWithFallback(Func1 func1, Func2 func2, Params params) {
     }
 }
 
-int send_socket_message(const messageParams& params){
+int send_socket_message(const messageParams& params){ 
     std::string json_message = construct_json_message(
       params.session_id,
       params.msgid,
@@ -128,16 +128,7 @@ int send_socket_message(const messageParams& params){
       params.sending_procedure_name);
 
     DEBUG_INFO("Sending message %s", const_cast<char *>(json_message.c_str()));
-
-    // Allocate memory for the utf-8 encoded json message
-    char *json_utf8 = get_utf8_output_buf(json_message);
-
-    to_utf8(json_utf8, get_utf8_output_buf_length(json_message), json_message.c_str());
-
-    // Send the message to the socket
-    bool res = send_message(json_utf8);
-    free(json_utf8);
-
+    bool res = send_message(json_message);
     if (!res){
       throw std::runtime_error("Failed to send message");
     }
@@ -145,19 +136,31 @@ int send_socket_message(const messageParams& params){
 }
 
 int send_sql_message(const messageParams& params){
-  exec sql include sqlca;
+  EXEC SQL INCLUDE SQLCA;
   EXEC SQL BEGIN DECLARE SECTION;
-  char msg_session_id[11];
-  char msg_msg_id[8];
-  char msg_msg_type[11];
-  char msg_severity[32];
-  char msg_timestamp[32];
-  char msg_job[32];
-  char msg_sending_usrprf[11];
-  char msg_message[2048];
-  char msg_sending_program_name[257];
-  char msg_sending_module_name[11];
-  char msg_sending_procedure_name[2048];
+    char msg_session_id[30];
+    char msg_msg_id[24];
+    char msg_msg_type[20];
+    char msg_severity[60];
+    char msg_timestamp[60];
+    char msg_job[60];
+    char msg_sending_usrprf[30];
+    char msg_message[2048];
+    char msg_sending_program_name[257];
+    char msg_sending_module_name[40];
+    char msg_sending_procedure_name[2048];
+
+  // This lets the sql engine know that the data is already encoded in 1208
+  EXEC SQL DECLARE :msg_session_id VARIABLE CCSID 1208;
+  EXEC SQL DECLARE :msg_msg_id VARIABLE CCSID 1208;
+  EXEC SQL DECLARE :msg_msg_type VARIABLE CCSID 1208;
+  EXEC SQL DECLARE :msg_timestamp VARIABLE CCSID 1208;
+  EXEC SQL DECLARE :msg_job VARIABLE CCSID 1208;
+  EXEC SQL DECLARE :msg_sending_usrprf VARIABLE CCSID 1208;
+  EXEC SQL DECLARE :msg_message VARIABLE CCSID 1208;
+  EXEC SQL DECLARE :msg_sending_program_name VARIABLE CCSID 1208;
+  EXEC SQL DECLARE :msg_sending_module_name VARIABLE CCSID 1208;
+  EXEC SQL DECLARE :msg_sending_procedure_name VARIABLE CCSID 1208;
   EXEC SQL END DECLARE SECTION;
 
   COPY_PARM(msg_session_id, params.session_id);
@@ -180,12 +183,6 @@ int send_sql_message(const messageParams& params){
   return 0;
 }
 
-// TODO: implement this
-//     1. define Db2 tables
-//            // have autoincrement and autotimestamp columns
-//     2. Add Db2 table creation to Makefile
-//     3. Rename this method to .rpgle (if using RPG)
-//     4. implement!
 extern int db2_publish_message(PUBLISH_MESSAGE_FUNCTION_SIGNATURE)
 {
      messageParams params = {
@@ -201,7 +198,6 @@ extern int db2_publish_message(PUBLISH_MESSAGE_FUNCTION_SIGNATURE)
         _sending_module_name,      // should be a const char*
         _sending_procedure_name     // should be a const char*
     };
-
 
   const char* msg_pref = get_messaging_preference();
   int res = tryFuncWithFallback(

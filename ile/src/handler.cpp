@@ -115,7 +115,7 @@ int main(int _argc, char **argv)
     std::string job = job_number + "/" + user_name + "/" + job_name;
     BUFSTR(message_type, msg_event->message_type);
     std::string message_timestamp = get_iso8601_timestamp(msg_event->message_timestamp);
-    DEBUG_INFO("Timestamp is '%s'\n", message_timestamp.c_str());
+    DEBUG_INFO("TIMESTAMP IS '%s'\n", message_timestamp.c_str());
     int message_severity = msg_event->message_severity;
     BUFSTR(sending_usrprf, msg_event->sending_user_profile);
     BUFSTRN(sending_procedure_name, (char *)msg_event + msg_event->offset_send_procedure_name, msg_event->length_send_procedure_name);
@@ -125,8 +125,9 @@ int main(int _argc, char **argv)
 
     int replacement_data_offset = msg_event->offset_replacement_data;
     int replacement_data_len = msg_event->length_replacement_data;
-    DEBUG_INFO("Replacement data offset is '%d'\n", replacement_data_offset);
+    DEBUG_INFO("REPLACEMENT DATA OFFSET IS '%d'\n", replacement_data_offset);
     DEBUG_INFO("REPLACEMENT DATA LENGTH IS '%d'\n", replacement_data_len);
+    DEBUG_INFO("REPLACEMENT DATA CCSID IS %d\n",msg_event->replacement_data_ccsid );
     char message_watched[8];
     message_watched[7] = 0x00;
     memcpy(message_watched, msg_event->message_watched, 7);
@@ -181,21 +182,50 @@ int main(int _argc, char **argv)
     }
     free(replacement_data_aligned);
     DEBUG_INFO("About to publish...\n");
+
+    // We can uncomment the next two lines if we are debugging ccsid issues
+    // std::string message_asstr(msg_info_buf->message);
+    // printHex("PRINTING HEX BYTES original ccsid: ",message_asstr );
+
+
+    // TODO: At a certain point we may want to do the json encoding after conversion to UTF-8. This is because
+    // as it stands now, each hex byte in the received string will be checked against the tgtccsid encoding to check
+    // if it needs to be escaped. This can cause issues if the characters needing escaping have different hex values
+    // in the tgtccsid than in the data ccsid. We will defer this for now because the issue is rare, and the user can recompile
+    // this code using the data ccsid if needed. Also, the task of json encoding after conversion to UTF-8 is highly complex.
+    std::string encoded_message;
+    json_encode(encoded_message, msg_info_buf->message);
+
+    char *session_id_utf8           = convert_field(session_id, msg_event->replacement_data_ccsid);
+    char *msgid_utf8                = convert_field(msgid, msg_event->replacement_data_ccsid);
+    char *msg_type_utf8             = convert_field(message_type, msg_event->replacement_data_ccsid);
+    char *msg_timestamp_utf8        = convert_field(message_timestamp, msg_event->replacement_data_ccsid);
+    char *job_utf8                  = convert_field(job, msg_event->replacement_data_ccsid);
+    char *sending_usrprf_utf8       = convert_field(sending_usrprf, msg_event->replacement_data_ccsid);
+    char *message_utf8              = convert_field(encoded_message, msg_event->replacement_data_ccsid);
+    char *sending_program_name_utf8= convert_field(sending_program_name, msg_event->replacement_data_ccsid);
+    char *sending_module_name_utf8  = convert_field(sending_module_name, msg_event->replacement_data_ccsid);
+    char *sending_procedure_name_utf8 = convert_field(sending_procedure_name, msg_event->replacement_data_ccsid);
+
+    // We can uncomment the next two lines if we are debugging ccsid issues
+    // std::string message_utf8_asstr(message_utf8);
+    // printHex("PRINTING HEX BYTES FOR MSG UTF8: ",  message_utf8_asstr);
+
     for (int i = 0; i < num_publishers; i++)
     {
       msg_publish_func func = publishers->array[i].msg_publish_func_ptr;
       func(
-          session_id.c_str(),
-          msgid.c_str(),
-          message_type.c_str(),
+          session_id_utf8,
+          msgid_utf8,
+          msg_type_utf8,
           message_severity,
-          message_timestamp.c_str(),
-          job.c_str(),
-          sending_usrprf.c_str(),
-          msg_info_buf->message,
-          sending_program_name.c_str(),
-          sending_module_name.c_str(),
-          sending_procedure_name.c_str());
+          msg_timestamp_utf8,
+          job_utf8,
+          sending_usrprf_utf8,
+          message_utf8,
+          sending_program_name_utf8,
+          sending_module_name_utf8,
+          sending_procedure_name_utf8);
       DEBUG_INFO("Published\n");
     }
     free(msg_info_buf);

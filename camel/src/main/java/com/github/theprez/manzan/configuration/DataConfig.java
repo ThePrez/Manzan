@@ -21,6 +21,7 @@ import com.github.theprez.manzan.routes.ManzanRoute;
 import com.ibm.as400.access.AS400SecurityException;
 import com.ibm.as400.access.ErrorCompletingRequestException;
 import com.ibm.as400.access.ObjectDoesNotExistException;
+import org.ini4j.Profile;
 
 import static com.github.theprez.manzan.routes.ManzanRoute.createRecipientList;
 
@@ -64,6 +65,7 @@ public class DataConfig extends Config {
                 continue;
             }
             final String name = section;
+            final Profile.Section sectionObj = getIni().get(name);
             final String format = getOptionalString(name, "format");
             int userInterval = getOptionalInt(name, "interval");
             final int interval = userInterval != -1 ? userInterval : DEFAULT_INTERVAL;
@@ -111,6 +113,12 @@ public class DataConfig extends Config {
                     if (args == null) args = "";
 
                     ret.put(name, new WatchCmd(name, cmd, args, format, destinations, interval));
+                    break;
+                case "http":
+                    final String url = getRequiredString(name, "url");
+                    filter = getOptionalString(name, "filter");
+                    Map<String, String> headerParams = getUriAndHeaderParameters(name, sectionObj, "url");
+                    ret.put(name, new HttpEvent(name, url, format, destinations,filter,  interval, headerParams));
                     break;
                 default:
                     throw new RuntimeException("Unknown destination type: " + type);
