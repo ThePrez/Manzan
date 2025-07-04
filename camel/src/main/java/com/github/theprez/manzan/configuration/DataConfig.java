@@ -107,6 +107,13 @@ public class DataConfig extends Config {
                     final String query = getRequiredString(name, "query");
                     ret.put(name, new WatchSql(name, query, format, destinations, interval));
                     break;
+                case "cmd":
+                    final String cmd = getRequiredString(name, "cmd");
+                    String args = getOptionalString(name, "args");
+                    if (args == null) args = "";
+
+                    ret.put(name, new WatchCmd(name, cmd, args, format, destinations, interval));
+                    break;
                 case "http":
                     final String url = getRequiredString(name, "url");
                     filter = getOptionalString(name, "filter");
