@@ -33,6 +33,7 @@ public abstract class ManzanRoute extends RouteBuilder {
     protected static final String MINOR_CODE = "MINOR_CODE";
     protected static final String LOG_ID = "LOG_ID";
     protected static final String LOG_TIMESTAMP = "LOG_TIMESTAMP";
+    protected static final String ENTRY_TIMESTAMP = "ENTRY_TIMESTAMP";
     protected static final String TDE_NUM = "TDE_NUM";
     protected static final String TASK_NAME = "TASK_NAME";
     protected static final String SERVER_TYPE = "SERVER_TYPE";

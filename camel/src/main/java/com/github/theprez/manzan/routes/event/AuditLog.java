@@ -92,6 +92,7 @@ public class AuditLog extends ManzanRoute {
                 .split(body()).streaming().parallelProcessing()
                 .process(exchange -> {
                     Map<String, Object> dataMap = exchange.getIn().getBody(Map.class);
+                    exchange.getIn().setHeader("data_map", dataMap);
                     if (null != m_formatter) {
                         exchange.getIn().setBody(m_formatter.format(dataMap));
                     } else {
