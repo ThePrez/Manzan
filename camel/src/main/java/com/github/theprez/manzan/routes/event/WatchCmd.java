@@ -82,6 +82,7 @@ public class WatchCmd extends ManzanRoute {
                         dataMap.put("EXITVALUE", exitValue);
                         dataMap.put("STDERR", stdErrStr);
                         dataMap.put("STDOUT", stdoutStr);
+                        exchange.getIn().setHeader("data_map", dataMap);
                         exchange.getIn().setBody(m_formatter.format(dataMap));
                     }
                 })
