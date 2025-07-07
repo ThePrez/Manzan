@@ -87,4 +87,7 @@ public class SentryDestination extends ManzanRoute {
                     Sentry.captureEvent(event);
                 });
     }
+
+    @Override
+    protected void setEventType(ManzanEventType manzanEventType) {}
 }

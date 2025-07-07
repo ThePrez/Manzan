@@ -14,7 +14,6 @@ public class WatchMsgEventSql extends ManzanRoute {
 
     private final String m_schema;
     private final String m_sessionId;
-    private final ManzanEventType m_eventType;
     private final String m_table;
     private final int m_interval;
     private final int m_numToProcess;
@@ -27,7 +26,6 @@ public class WatchMsgEventSql extends ManzanRoute {
         super(_name);
         m_schema = _schema;
         m_sessionId = _session_id.trim().toUpperCase();
-        m_eventType = _eventType;
         m_interval = _interval;
         m_numToProcess = _numToProcess;
         m_formatter = StringUtils.isEmpty(_format) ? null : new ManzanMessageFormatter(_format);
@@ -39,7 +37,13 @@ public class WatchMsgEventSql extends ManzanRoute {
             m_table = "MANZANPAL";
         }
         super.setRecipientList(_destinations);
+        setEventType(_eventType);
     }
+
+    protected void setEventType(ManzanEventType eventType){
+        m_eventType = eventType;
+    };
+
 
     @Override
     public void configure() {

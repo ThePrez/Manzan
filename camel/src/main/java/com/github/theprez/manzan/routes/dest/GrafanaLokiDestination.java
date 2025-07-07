@@ -46,8 +46,14 @@ public class GrafanaLokiDestination extends ManzanRoute {
                 .routeId(m_name).process(exchange -> {
                     StreamBuilder builder = logController
                             .stream()
-                            .l(appLabelName, appLabelValue)
-                            .l(SESSION_ID, getWatchName(exchange));
+                            .l(appLabelName, appLabelValue);
+                    try {
+                        String watchName = getWatchName(exchange);
+                        builder.l(SESSION_ID, watchName);
+                    } catch (Exception e){
+                        // This exception isn't worth logging out. It's just that some events don't have watch sessions. 
+                    }
+                    
                     String timestamp;
                     String severity;
                     String[] keys;
@@ -120,4 +126,7 @@ public class GrafanaLokiDestination extends ManzanRoute {
                             getBody(exchange, String.class));
                 });
     }
+
+    @Override
+    protected void setEventType(ManzanEventType manzanEventType) {}
 }

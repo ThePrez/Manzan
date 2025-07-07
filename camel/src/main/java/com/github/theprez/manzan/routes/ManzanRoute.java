@@ -8,6 +8,7 @@ import org.apache.camel.Exchange;
 import org.apache.camel.builder.RouteBuilder;
 
 import com.github.theprez.jcmdutils.StringUtils;
+import com.github.theprez.manzan.ManzanEventType;
 
 public abstract class ManzanRoute extends RouteBuilder {
 
@@ -55,6 +56,8 @@ public abstract class ManzanRoute extends RouteBuilder {
 
     protected static final int SEVERITY_LIMIT = 29;
 
+    protected ManzanEventType m_eventType;
+
     protected static String getWatchName(final Exchange exchange) {
         final Object watchNameObject = exchange.getIn().getHeader(SESSION_ID);
         if (null == watchNameObject) {
@@ -72,6 +75,8 @@ public abstract class ManzanRoute extends RouteBuilder {
 
     @Override
     public abstract void configure();
+
+    protected abstract void setEventType(ManzanEventType manzanEventType);
 
     protected Object get(final Exchange _exchange, final String _attr) {
         final Map<String, Object> data = getDataMap(_exchange);

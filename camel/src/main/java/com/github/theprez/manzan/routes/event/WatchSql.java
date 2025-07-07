@@ -7,6 +7,7 @@ import java.io.IOException;
 import java.util.List;
 
 import com.github.theprez.jcmdutils.StringUtils;
+import com.github.theprez.manzan.ManzanEventType;
 import com.github.theprez.manzan.ManzanMessageFormatter;
 import com.github.theprez.manzan.routes.ManzanRoute;
 
@@ -24,6 +25,11 @@ public class WatchSql extends ManzanRoute {
         m_formatter = StringUtils.isEmpty(_format) ? null : new ManzanMessageFormatter(_format);
         m_sql = _sql;
         super.setRecipientList(_destinations);
+        setEventType(ManzanEventType.SQL);
+    }
+
+    protected void setEventType(ManzanEventType eventType){
+        m_eventType = eventType;
     }
 
     @Override
@@ -34,6 +40,7 @@ public class WatchSql extends ManzanRoute {
                 .to("jdbc:jt400?outputType=StreamList")
                 .split(body()).streaming().parallelProcessing()
                 .setHeader("data_map", simple("${body}"))
+                .setHeader(EVENT_TYPE, constant(m_eventType))
                 .marshal().json(true) // TODO: skip this if we are applying a format
                 .setBody(simple("${body}\n"))
                 .process(exchange -> {
@@ -47,4 +54,5 @@ public class WatchSql extends ManzanRoute {
                 .end()
                 .end();
     }
+
 }

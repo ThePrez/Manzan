@@ -14,6 +14,7 @@ import java.util.Map;
 import java.util.stream.Collectors;
 
 import com.github.theprez.jcmdutils.StringUtils;
+import com.github.theprez.manzan.ManzanEventType;
 import com.github.theprez.manzan.ManzanMessageFormatter;
 import com.github.theprez.manzan.routes.ManzanRoute;
 import org.apache.camel.component.exec.ExecCommand;
@@ -34,7 +35,12 @@ public class WatchCmd extends ManzanRoute {
         String execArgs = _args.length() > 0 ? "?args=" + _args:"";
         m_execCmdWithArgs = _cmd + execArgs;
         super.setRecipientList(_destinations);
+        setEventType(ManzanEventType.CMD);
     }
+
+    protected void setEventType(ManzanEventType eventType){
+        m_eventType = eventType;
+    };
 
     @Override
     public void configure() {
@@ -43,6 +49,7 @@ public class WatchCmd extends ManzanRoute {
                 .to("exec:" + m_execCmdWithArgs)
                 .split(body()).streaming().parallelProcessing()
                 .setHeader("exec_result", simple("${body}"))
+                .setHeader(EVENT_TYPE, constant(m_eventType))
                 .setBody(simple("${body}\n"))
                 .process(exchange -> {
                     if (null != m_formatter) {

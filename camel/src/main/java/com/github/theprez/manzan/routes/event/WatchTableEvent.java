@@ -6,6 +6,7 @@ import java.util.List;
 import java.util.stream.Collectors;
 
 import com.github.theprez.jcmdutils.StringUtils;
+import com.github.theprez.manzan.ManzanEventType;
 import com.github.theprez.manzan.ManzanMessageFormatter;
 import com.github.theprez.manzan.routes.ManzanRoute;
 
@@ -28,7 +29,12 @@ public class WatchTableEvent extends ManzanRoute {
         m_numToProcess = _numToProcess;
         m_formatter = StringUtils.isEmpty(_format) ? null : new ManzanMessageFormatter(_format);
         super.setRecipientList(_destinations);
+        setEventType(ManzanEventType.TABLE);
     }
+
+    protected void setEventType(ManzanEventType eventType){
+        m_eventType = eventType;
+    };
 
     @Override
     public void configure() {
@@ -44,6 +50,7 @@ public class WatchTableEvent extends ManzanRoute {
                 .split(body()).streaming().parallelProcessing()
                 .setHeader("id", simple("${body[ID]}"))
                 .setHeader("data_map", simple("${body}"))
+                .setHeader(EVENT_TYPE, constant(m_eventType))
                 .process(exchange -> {
                     Integer ordinalPosition = exchange.getIn().getHeader("id", Integer.class);
                     @SuppressWarnings("unchecked")

@@ -2,6 +2,7 @@ package com.github.theprez.manzan.routes.dest;
 
 import org.fluentd.logger.FluentLogger;
 
+import com.github.theprez.manzan.ManzanEventType;
 import com.github.theprez.manzan.routes.ManzanRoute;
 
 public class FluentDDestination extends ManzanRoute {
@@ -35,5 +36,8 @@ public class FluentDDestination extends ManzanRoute {
                     m_logger.log(m_tag, getDataMap(exchange));
                 });
     }
+
+    @Override
+    protected void setEventType(ManzanEventType manzanEventType) {}
 
 }

@@ -38,7 +38,12 @@ public class FileEvent extends ManzanRoute {
         m_filter = new ManzanMessageFilter(_filter);
         m_interval = _interval;
         setRandomAccessFile();
+        setEventType(ManzanEventType.FILE);
     }
+
+    protected void setEventType(ManzanEventType eventType){
+        m_eventType = eventType;
+    };
 
     private void setRandomAccessFile() {
         // Initialize to end of file
@@ -67,7 +72,7 @@ public class FileEvent extends ManzanRoute {
 
        from("timer://foo?period=" + m_interval + "&synchronous=true")
                 .routeId(m_name)
-                .setHeader(EVENT_TYPE, constant(ManzanEventType.FILE))
+                .setHeader(EVENT_TYPE, constant(m_eventType))
                 .process(exchange -> {
                     try {
                         raf.seek(lastPosition);

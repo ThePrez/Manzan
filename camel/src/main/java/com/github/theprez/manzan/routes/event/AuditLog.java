@@ -3,6 +3,7 @@ package com.github.theprez.manzan.routes.event;
 import com.fasterxml.jackson.databind.ObjectMapper;
 import com.fasterxml.jackson.databind.SerializationFeature;
 import com.github.theprez.jcmdutils.StringUtils;
+import com.github.theprez.manzan.ManzanEventType;
 import com.github.theprez.manzan.ManzanMessageFormatter;
 import com.github.theprez.manzan.routes.ManzanRoute;
 
@@ -33,7 +34,12 @@ public class AuditLog extends ManzanRoute {
                 " ) as x where x.ENTRY_TIMESTAMP > (SELECT COALESCE(MAX(TIME)," +
                 " CURRENT_TIMESTAMP - %d HOURS) AS result_time FROM MANZAN.AUDJRNTS where AUDTYPE='%s')" +
                 " order by x.ENTRY_TIMESTAMP ASC limit %d", audit_table, _fallbackStartTime, _auditType, _numToProcess);
+        setEventType(ManzanEventType.AUDIT);
     }
+
+    protected void setEventType(ManzanEventType eventType){
+        m_eventType = eventType;
+    };
 
     @Override
     public void configure() {
@@ -96,6 +102,7 @@ public class AuditLog extends ManzanRoute {
                         exchange.getIn().setBody(json);
                     }
                 })
+                .setHeader(EVENT_TYPE, constant(m_eventType))
                 .recipientList(constant(getRecipientList()))
                 .parallelProcessing()
                 .stopOnException()
