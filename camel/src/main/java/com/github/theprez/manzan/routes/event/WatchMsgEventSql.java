@@ -29,6 +29,7 @@ public class WatchMsgEventSql extends ManzanRoute {
         m_interval = _interval;
         m_numToProcess = _numToProcess;
         m_formatter = StringUtils.isEmpty(_format) ? null : new ManzanMessageFormatter(_format);
+        setEventType(_eventType);
         if (m_eventType == ManzanEventType.WATCH_MSG) {
             m_table = "MANZANMSG";
         } else if (m_eventType == ManzanEventType.WATCH_VLOG) {
@@ -37,7 +38,6 @@ public class WatchMsgEventSql extends ManzanRoute {
             m_table = "MANZANPAL";
         }
         super.setRecipientList(_destinations);
-        setEventType(_eventType);
     }
 
     protected void setEventType(ManzanEventType eventType){
