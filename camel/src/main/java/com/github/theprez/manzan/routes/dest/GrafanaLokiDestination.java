@@ -17,10 +17,15 @@ public class GrafanaLokiDestination extends ManzanRoute {
     private final static String endpoint = "/loki/api/v1/push";
     private final static String appLabelName = "app";
     private final static String appLabelValue = "manzan";
+    private int maxLabels = 15;
 
     public GrafanaLokiDestination(final String _name, final String _url, final String _username, final String _password,
-                                  final String _format) {
+                                  final int _maxLabels) {
         super(_name);
+
+        if (_maxLabels != -1){
+            maxLabels = _maxLabels;
+        }
 
         logController = TinyLoki
                 .withUrl(_url + endpoint)
@@ -71,16 +76,21 @@ public class GrafanaLokiDestination extends ManzanRoute {
     private void addKeyValuePairsToBuilder(StreamBuilder builder, Exchange exchange) {
         Map<String, Object> dataMap = getDataMap(exchange);
         String[] keys = dataMap.keySet().toArray(new String[0]);
-
-        for (String key : keys) {
+        int labelsAdded = 0;
+        int i = 0;
+        // Subtract 1 because we've already added a label for appLabelName
+        while (labelsAdded < maxLabels - 1 && i < keys.length){
+            String key = keys[i];
             try {
                 String value = getString(exchange, key);
                 if (!value.equals("")) {
                     builder.l(key, value);
+                    labelsAdded++;
                 }
             } catch (Exception e) {
                 // Don't need to do anything here. It's expected that some keys might have null values
             }
+            i++;
         }
     }
 
