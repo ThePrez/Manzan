@@ -18,13 +18,17 @@ public class GrafanaLokiDestination extends ManzanRoute {
     private final static String appLabelName = "app";
     private final static String appLabelValue = "manzan";
     private int maxLabels = 15;
+    private String[] grafanaLabels;
 
     public GrafanaLokiDestination(final String _name, final String _url, final String _username, final String _password,
-                                  final int _maxLabels) {
+                                  final int _maxLabels, final String _grafanaLabels) {
         super(_name);
 
         if (_maxLabels != -1){
             maxLabels = _maxLabels;
+        }
+        if (_grafanaLabels != null){
+            grafanaLabels = _grafanaLabels.split(" ");
         }
 
         logController = TinyLoki
@@ -73,9 +77,12 @@ public class GrafanaLokiDestination extends ManzanRoute {
         return timestamp;
     }
 
-    private void addKeyValuePairsToBuilder(StreamBuilder builder, Exchange exchange) {
+    private void addLabels(StreamBuilder builder, Exchange exchange) {
         Map<String, Object> dataMap = getDataMap(exchange);
-        String[] keys = dataMap.keySet().toArray(new String[0]);
+        String[] keys = grafanaLabels.length == 0 ?
+                dataMap.keySet().toArray(new String[0]) :
+                grafanaLabels;
+
         int labelsAdded = 0;
         int i = 0;
         // Subtract 1 because we've already added a label for appLabelName
@@ -101,7 +108,7 @@ public class GrafanaLokiDestination extends ManzanRoute {
                     StreamBuilder builder = logController
                             .stream()
                             .l(appLabelName, appLabelValue);
-                    addKeyValuePairsToBuilder(builder, exchange);
+                    addLabels(builder, exchange);
                     ILogStream stream = builder.build();
                     long timestamp = getTimestamp(exchange);
                     stream.log(timestamp, getBody(exchange, String.class));

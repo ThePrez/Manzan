@@ -105,7 +105,8 @@ public class DestinationConfig extends Config {
                     final String username = getRequiredString(name, "username");
                     final String password = getRequiredString(name, "password");
                     final int maxLabels = getOptionalInt(name, "maxLabels");
-                    ret.put(name, new GrafanaLokiDestination(name, url, username, password, maxLabels));
+                    final String grafanaLabels = getOptionalString(name, "grafanaLabels");
+                    ret.put(name, new GrafanaLokiDestination(name, url, username, password, maxLabels, grafanaLabels));
                 }
                     break;
                 case "smtp":
