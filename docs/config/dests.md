@@ -32,7 +32,7 @@ for ActiveMQ, you should write the option as `componentOptions.brokerURL=<yourAc
 | `smtp`/`smtps`   | Sent data via email             | * `server` <br> * `subject` <br> * `to` <br> * `from`      | * `port`                                                 | https://camel.apache.org/components/3.22.x/mail-component.html       |
 | `sentry`         | Send data into Sentry           | * `dsn`                                                    |                                                          |                                                                      |
 | `twilio`         | Send via SMS                    | * `sid` <br> * `token` <br> * `to` <br> * `from`           |                                                          | https://camel.apache.org/components/3.22.x/twilio-component.html     |
-| `loki`           | Send data into Grafana Loki     | * `url` <br> * `username` <br> * `password` <br>           |                                                          |                                                                      |
+| `loki`           | Send data into Grafana Loki     | * `url` <br> * `username` <br> * `password` <br>           | * `maxLabels` The maximum number of indexed labels each log record can have. The default is 15. If you want to use more than 15 labels, you must also configure this separately on your Grafana Loki instance. However, this is not recommended as it will degrade performance. <br> * `labels` specifies the labels to be associated with each log record. Each label should be delimited by a space. I.e `labels=REMOTE_PORT SYSTEM_NAME` (In this case `REMOTE_PORT` and `SYSTEM_NAME` should be valid format options on the data source. For example if using Audit Password events).  It is strongly recommended to specify this property, because the default option is to add labels for each data attribute that is received.                                                      |                                                                      |
 | `http`/`https`   | Send data via http/https        | * `url`                                                    | * `httpMethod` <br> * `x` where x is any query parameter | https://camel.apache.org/components/3.22.x/http-component.html       |
 | `activemq`       | Send data to ActiveMQ           | * `destinationName`                                        | * `destinationType` <br> * `brokerURL`                   | https://camel.apache.org/components/3.22.x/activemq-component.html   |
 | `splunk-hec`     | Send data to Splunk             | * `splunkUrl` <br> * `token` <br> * `index`                | * `skipTlsVerify`                                        | https://camel.apache.org/components/3.22.x/splunk-hec-component.html |
@@ -71,6 +71,7 @@ type=loki
 url=<loki_url>
 username=<loki_username>
 password=<loki_password>
+labels=REMOTE_PORT SYSTEM_NAME
 
 [pubsub_out]
 type=google-pubsub

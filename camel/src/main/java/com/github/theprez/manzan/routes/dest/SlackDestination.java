@@ -2,6 +2,7 @@ package com.github.theprez.manzan.routes.dest;
 
 import org.apache.commons.lang3.StringUtils;
 
+import com.github.theprez.manzan.ManzanEventType;
 import com.github.theprez.manzan.ManzanMessageFormatter;
 import com.github.theprez.manzan.routes.ManzanRoute;
 
@@ -34,4 +35,7 @@ public class SlackDestination extends ManzanRoute {
                     .to("slack:" + m_channel + "?webhookUrl=" + m_webhook);
         }
     }
+
+    @Override
+    protected void setEventType(ManzanEventType manzanEventType) {}
 }

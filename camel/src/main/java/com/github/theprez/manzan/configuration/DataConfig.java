@@ -127,8 +127,11 @@ public class DataConfig extends Config {
 
         // We will create a formatMap to store the format for each watch session, as well
         // as a destMap to store the destinations for each watch session
+        // and an eventMap to start the eventType for each watch session
         final Map<String, String> formatMap = new HashMap<>();
         final Map<String, String> destMap = new HashMap<>();
+        final Map<String, ManzanEventType> eventMap = new HashMap<>();
+
 
         for (int i = 0; i < watchEvents.size(); i++) {
             final String section = watchEvents.get(i);
@@ -158,6 +161,7 @@ public class DataConfig extends Config {
                 } else {
                     throw new RuntimeException("Watch for message, LIC log entry, or PAL entry not specified");
                 }
+                eventMap.put(id.toUpperCase(), eventType);
 
                 // Process the destinations
                 final List<String> destinations = new LinkedList<String>();
@@ -191,7 +195,7 @@ public class DataConfig extends Config {
             // After iterating over the loop, the formatMap and destMap are complete. Now
             // create the route.
             final String routeName = "socketWatcher";
-            ret.put(routeName, new WatchMsgEventSockets(routeName, formatMap, destMap));
+            ret.put(routeName, new WatchMsgEventSockets(routeName, formatMap, destMap, eventMap));
         }
         return m_routes = ret;
     }

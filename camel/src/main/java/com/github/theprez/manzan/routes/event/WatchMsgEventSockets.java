@@ -12,16 +12,25 @@ public class WatchMsgEventSockets extends ManzanRoute {
 
     private final Map<String, String> m_formatMap;
     private final Map<String, String> m_destMap;
+    private final Map<String, ManzanEventType> m_eventMap;
+
     private final String m_socketIp = "0.0.0.0";
     private final String m_socketPort;
 
+
     public WatchMsgEventSockets(final String _name, final Map<String, String> _formatMap,
-            final Map<String, String> _destMap) {
+            final Map<String, String> _destMap, final Map<String, ManzanEventType> eventMap) {
         super(_name);
         m_formatMap = _formatMap;
         m_destMap = _destMap;
+        m_eventMap = eventMap;
+
         m_socketPort = getSocketPort();
     }
+
+    protected void setEventType(ManzanEventType eventType){
+        m_eventType = eventType;
+    };
 
     private String getSocketPort() {
         String portEnv = System.getenv("MANZAN_SOCKET_PORT");
@@ -37,7 +46,6 @@ public class WatchMsgEventSockets extends ManzanRoute {
         from(String.format("netty:tcp://%s:%s?sync=false", m_socketIp, m_socketPort))
             .unmarshal().json(JsonLibrary.Jackson, Map.class)
             .routeId("manzan_msg:"+m_name)
-            .setHeader(EVENT_TYPE, constant(ManzanEventType.WATCH_MSG))
             .setHeader("session_id", simple("${body[SESSION_ID]}"))
             .setHeader("data_map", simple("${body}"))
             .marshal().json(true) //TODO: skip this if we are applying a format
@@ -52,7 +60,12 @@ public class WatchMsgEventSockets extends ManzanRoute {
                 }
                 String destinations = m_destMap.get(sessionId); // Get destinations from m_destMap
                 exchange.getIn().setHeader("destinations", destinations);
+
+                ManzanEventType eventType = m_eventMap.get(sessionId);
+                setEventType(eventType);
+
             })
+                .setHeader(EVENT_TYPE, constant(m_eventType))
                 .recipientList(header("destinations"))
                 .parallelProcessing().stopOnException().end();
     }
