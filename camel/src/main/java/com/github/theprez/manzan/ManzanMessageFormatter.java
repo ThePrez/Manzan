@@ -97,7 +97,7 @@ public class ManzanMessageFormatter {
                 }
             }
         }
-        return currentMapping.toString();
+        return currentMapping == null ? "" : currentMapping.toString();
     }
 
     private CharSequence jsonEncode(String _s) {
