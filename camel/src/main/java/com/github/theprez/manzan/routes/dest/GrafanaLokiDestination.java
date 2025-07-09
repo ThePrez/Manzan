@@ -18,17 +18,17 @@ public class GrafanaLokiDestination extends ManzanRoute {
     private final static String appLabelName = "app";
     private final static String appLabelValue = "manzan";
     private int maxLabels = 15;
-    private String[] grafanaLabels;
+    private String[] labels = {};
 
     public GrafanaLokiDestination(final String _name, final String _url, final String _username, final String _password,
-                                  final int _maxLabels, final String _grafanaLabels) {
+                                  final int _maxLabels, final String _labels) {
         super(_name);
 
         if (_maxLabels != -1){
             maxLabels = _maxLabels;
         }
-        if (_grafanaLabels != null){
-            grafanaLabels = _grafanaLabels.split(" ");
+        if (_labels != null){
+            labels = _labels.split(" ");
         }
 
         logController = TinyLoki
@@ -79,9 +79,9 @@ public class GrafanaLokiDestination extends ManzanRoute {
 
     private void addLabels(StreamBuilder builder, Exchange exchange) {
         Map<String, Object> dataMap = getDataMap(exchange);
-        String[] keys = grafanaLabels.length == 0 ?
+        String[] keys = labels.length == 0 ?
                 dataMap.keySet().toArray(new String[0]) :
-                grafanaLabels;
+                labels;
 
         int labelsAdded = 0;
         int i = 0;
