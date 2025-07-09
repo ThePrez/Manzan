@@ -5,6 +5,7 @@ import org.apache.http.HttpHost;
 import org.apache.http.message.BasicHeader;
 import org.elasticsearch.client.RestClient;
 
+import com.github.theprez.manzan.ManzanEventType;
 import com.github.theprez.manzan.routes.ManzanRoute;
 
 import co.elastic.clients.elasticsearch.ElasticsearchClient;
@@ -57,4 +58,7 @@ public class ElasticsearchDestination extends ManzanRoute {
             );
         });
     }
+
+    @Override
+    protected void setEventType(ManzanEventType manzanEventType) {}
 }

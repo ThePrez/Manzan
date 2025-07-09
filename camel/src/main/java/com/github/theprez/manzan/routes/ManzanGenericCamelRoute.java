@@ -4,6 +4,7 @@ import java.util.HashMap;
 import java.util.Map;
 import java.util.Map.Entry;
 
+import com.github.theprez.manzan.ManzanEventType;
 import org.apache.camel.CamelContext;
 import org.apache.camel.Component;
 import org.apache.camel.Exchange;
@@ -38,6 +39,11 @@ public abstract class ManzanGenericCamelRoute extends ManzanRoute {
                 configurer.configure(_context, component, key, value,  true);
             });
         }
+    }
+
+    @Override
+    protected void setEventType(ManzanEventType manzanEventType) {
+        
     }
 
     protected abstract void customPostProcess(Exchange exchange) throws Exception;

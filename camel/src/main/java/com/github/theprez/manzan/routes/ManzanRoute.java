@@ -8,6 +8,7 @@ import org.apache.camel.Exchange;
 import org.apache.camel.builder.RouteBuilder;
 
 import com.github.theprez.jcmdutils.StringUtils;
+import com.github.theprez.manzan.ManzanEventType;
 
 public abstract class ManzanRoute extends RouteBuilder {
 
@@ -32,6 +33,7 @@ public abstract class ManzanRoute extends RouteBuilder {
     protected static final String MINOR_CODE = "MINOR_CODE";
     protected static final String LOG_ID = "LOG_ID";
     protected static final String LOG_TIMESTAMP = "LOG_TIMESTAMP";
+    protected static final String ENTRY_TIMESTAMP = "ENTRY_TIMESTAMP";
     protected static final String TDE_NUM = "TDE_NUM";
     protected static final String TASK_NAME = "TASK_NAME";
     protected static final String SERVER_TYPE = "SERVER_TYPE";
@@ -55,6 +57,8 @@ public abstract class ManzanRoute extends RouteBuilder {
 
     protected static final int SEVERITY_LIMIT = 29;
 
+    protected ManzanEventType m_eventType;
+
     protected static String getWatchName(final Exchange exchange) {
         final Object watchNameObject = exchange.getIn().getHeader(SESSION_ID);
         if (null == watchNameObject) {
@@ -72,6 +76,8 @@ public abstract class ManzanRoute extends RouteBuilder {
 
     @Override
     public abstract void configure();
+
+    protected abstract void setEventType(ManzanEventType manzanEventType);
 
     protected Object get(final Exchange _exchange, final String _attr) {
         final Map<String, Object> data = getDataMap(_exchange);
