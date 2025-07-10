@@ -3,6 +3,7 @@ package com.github.theprez.manzan.routes.event;
 import java.io.IOException;
 import java.util.ArrayList;
 import java.util.List;
+import java.util.Map;
 import java.util.stream.Collectors;
 
 import com.github.theprez.jcmdutils.StringUtils;
@@ -17,10 +18,12 @@ public class WatchTableEvent extends ManzanRoute {
     private final int m_interval;
     private final int m_numToProcess;
     private final ManzanMessageFormatter m_formatter;
+    final Map<String, String> dataMapInjection;
+
 
     public WatchTableEvent(final String _name, final String _format,
             final List<String> _destinations, final String _schema, final String _table, 
-            final int _interval, final int _numToProcess)
+            final int _interval, final int _numToProcess, final Map<String, String> _dataMapInjection)
             throws IOException {
         super(_name);
         m_schema = _schema;
@@ -28,6 +31,7 @@ public class WatchTableEvent extends ManzanRoute {
         m_interval = _interval;
         m_numToProcess = _numToProcess;
         m_formatter = StringUtils.isEmpty(_format) ? null : new ManzanMessageFormatter(_format);
+        dataMapInjection = _dataMapInjection;
         super.setRecipientList(_destinations);
         setEventType(ManzanEventType.TABLE);
     }
@@ -49,7 +53,12 @@ public class WatchTableEvent extends ManzanRoute {
                 .to("jdbc:jt400?outputType=StreamList")
                 .split(body()).streaming().parallelProcessing()
                 .setHeader("id", simple("${body[ID]}"))
-                .setHeader("data_map", simple("${body}"))
+                .process(exchange -> {
+                    Map<String, Object> dataMap = exchange.getIn().getBody(Map.class);
+                    injectIntoDataMap(dataMap, dataMapInjection);
+                    exchange.getIn().setHeader("data_map", dataMap);
+                    exchange.getIn().setBody(dataMap);
+                })
                 .setHeader(EVENT_TYPE, constant(m_eventType))
                 .process(exchange -> {
                     Integer ordinalPosition = exchange.getIn().getHeader("id", Integer.class);

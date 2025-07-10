@@ -24,16 +24,19 @@ public class WatchCmd extends ManzanRoute {
     private final int m_interval;
     private final ManzanMessageFormatter m_formatter;
     private final String m_execCmdWithArgs;
+    final Map<String, String> dataMapInjection;
+
 
     public WatchCmd(final String _name, final String _cmd, final String _args, final String _format,
                     final List<String> _destinations,
-                    final int _interval)
+                    final int _interval, final Map<String, String> _dataMapInjection)
             throws IOException {
         super(_name);
         m_interval = _interval;
         m_formatter = StringUtils.isEmpty(_format) ? null : new ManzanMessageFormatter(_format);
         String execArgs = _args.length() > 0 ? "?args=" + _args:"";
         m_execCmdWithArgs = _cmd + execArgs;
+        dataMapInjection = _dataMapInjection;
         super.setRecipientList(_destinations);
         setEventType(ManzanEventType.CMD);
     }
@@ -52,7 +55,6 @@ public class WatchCmd extends ManzanRoute {
                 .setHeader(EVENT_TYPE, constant(m_eventType))
                 .setBody(simple("${body}\n"))
                 .process(exchange -> {
-                    if (null != m_formatter) {
                         ExecResult execResult = (ExecResult) exchange.getIn().getHeader("exec_result");
                         ExecCommand command = execResult.getCommand();
                         List<String> args = command.getArgs();
@@ -75,15 +77,20 @@ public class WatchCmd extends ManzanRoute {
                             }
                         }
 
-
                         Map<String, Object> dataMap = new HashMap<>();
                         dataMap.put("CMD", executable);
                         dataMap.put("ARGS", args.toString());
                         dataMap.put("EXITVALUE", exitValue);
                         dataMap.put("STDERR", stdErrStr);
                         dataMap.put("STDOUT", stdoutStr);
+                        injectIntoDataMap(dataMap, dataMapInjection);
                         exchange.getIn().setHeader("data_map", dataMap);
-                        exchange.getIn().setBody(m_formatter.format(dataMap));
+                        exchange.getIn().setBody(dataMap);
+                })
+                .process(exchange -> {
+                    if (null != m_formatter) {
+                        exchange.getIn().setBody(m_formatter.format(getDataMap(exchange)));
+                        exchange.getIn().setHeader("format_applied", true);
                     }
                 })
                 .recipientList(constant(getRecipientList()))

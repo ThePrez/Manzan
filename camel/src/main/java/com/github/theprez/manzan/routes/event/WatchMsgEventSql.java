@@ -3,6 +3,7 @@ package com.github.theprez.manzan.routes.event;
 import java.io.IOException;
 import java.util.ArrayList;
 import java.util.List;
+import java.util.Map;
 import java.util.stream.Collectors;
 
 import com.github.theprez.jcmdutils.StringUtils;
@@ -18,10 +19,12 @@ public class WatchMsgEventSql extends ManzanRoute {
     private final int m_interval;
     private final int m_numToProcess;
     private final ManzanMessageFormatter m_formatter;
+    final Map<String, String> dataMapInjection;
+
 
     public WatchMsgEventSql(final String _name, final String _session_id, final String _format,
             final List<String> _destinations, final String _schema, final ManzanEventType _eventType,
-            final int _interval, final int _numToProcess)
+            final int _interval, final int _numToProcess, final Map<String, String> _dataMapInjection)
             throws IOException {
         super(_name);
         m_schema = _schema;
@@ -37,6 +40,7 @@ public class WatchMsgEventSql extends ManzanRoute {
         } else {
             m_table = "MANZANPAL";
         }
+        dataMapInjection = _dataMapInjection;
         super.setRecipientList(_destinations);
     }
 
@@ -60,7 +64,12 @@ public class WatchMsgEventSql extends ManzanRoute {
                 .split(body()).streaming().parallelProcessing()
                 .setHeader("id", simple("${body[ORDINAL_POSITION]}"))
                 .setHeader("session_id", simple("${body[SESSION_ID]}"))
-                .setHeader("data_map", simple("${body}"))
+                .process(exchange -> {
+                    Map<String, Object> dataMap = exchange.getIn().getBody(Map.class);
+                    injectIntoDataMap(dataMap, dataMapInjection);
+                    exchange.getIn().setHeader("data_map", dataMap);
+                    exchange.getIn().setBody(dataMap);
+                })
                 .process(exchange -> {
                     Integer ordinalPosition = exchange.getIn().getHeader("id", Integer.class);
                     @SuppressWarnings("unchecked")

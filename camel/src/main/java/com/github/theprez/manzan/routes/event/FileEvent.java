@@ -26,9 +26,10 @@ public class FileEvent extends ManzanRoute {
     private int m_interval;
     private long lastPosition;
     private RandomAccessFile raf;
+    final Map<String, String> dataMapInjection;
 
     public FileEvent(final String _name, final String file, final String _format, final List<String> _destinations,
-                     final String _filter, final int _interval) throws IOException {
+                     final String _filter, final int _interval, final Map<String, String> _dataMapInjection) throws IOException {
         super(_name);
         absPath = file;
         Path filePath = Paths.get(absPath);
@@ -37,6 +38,7 @@ public class FileEvent extends ManzanRoute {
         m_formatter = StringUtils.isEmpty(_format) ? null : new ManzanMessageFormatter(_format);
         m_filter = new ManzanMessageFilter(_filter);
         m_interval = _interval;
+        dataMapInjection = _dataMapInjection;
         setRandomAccessFile();
         setEventType(ManzanEventType.FILE);
     }
@@ -107,6 +109,8 @@ public class FileEvent extends ManzanRoute {
                     data_map.put(FILE_DATA, getBody(exchange, String.class)
                             .replace("\r", "")
                             .replace("\n", ""));
+
+                    injectIntoDataMap(data_map, dataMapInjection);
                     exchange.getIn().setHeader("data_map", data_map);
                     exchange.getIn().setBody(data_map);
                 })

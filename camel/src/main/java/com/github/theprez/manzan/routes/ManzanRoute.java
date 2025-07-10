@@ -67,6 +67,12 @@ public abstract class ManzanRoute extends RouteBuilder {
         return watchNameObject.toString().toLowerCase().trim();
     }
 
+    protected void injectIntoDataMap(Map<String, Object> data_map, Map<String, String> dataMapInjection){
+        for (Map.Entry<String, String> entry: dataMapInjection.entrySet()){
+            data_map.put(entry.getKey(), entry.getValue());
+        }
+    }
+
     protected final String m_name;
     private String m_recipientList = "";
 
