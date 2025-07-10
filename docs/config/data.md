@@ -15,6 +15,7 @@ Here are the requirements for each section.
 These are optional properties available on all types:
 
 * `format` Please see the dedication section on [Data Formatting](./config/format.md)
+* `injections.*` is a property that can be specified to inject key value pairs into the retrieved data. For example specifying `injections.HOSTNAME=abcd@myibmserver.com` would make it so `HOSTNAME=abcd@myibmserver.com` is always part of the retrieved data for the specified datasource. This property can then be used as a format option (but you don't have to) by specifying `$HOSTNAME$`. You can specify as many injections as you want, on separate lines.
 * `interval` can be used to configure how often the distributor checks for events in milliseconds (default `1000`)
 * `enabled` is a boolean (`true` or `false`) so a data source can be defined but disabled
 
@@ -100,8 +101,10 @@ type=audit
 destinations=slackme
 auditType=PASSWORD
 fallbackStartTime=1
-format=Violation type: $VIOLATION_TYPE_DETAIL$, username: $AUDIT_USER_NAME$
+format=Violation type: $VIOLATION_TYPE_DETAIL$, username: $AUDIT_USER_NAME$ hostname: $HOSTNAME$ timezone:$TIMEZONE$
 interval=5000
+injections.HOSTNAME="myhost@abc.com"
+injections.TIMEZONE="EST"
 
 # Get the newest data from the sample.department table every 5 minutes
 [sql1]
