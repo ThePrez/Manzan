@@ -17,6 +17,8 @@ public abstract class Config {
 
     public static final String DIRECTORY_OVERRIDE_PROPERTY = "manzan.configdir";
     public static final String COMPONENT_OPTIONS_PREFIX = "componentOptions.";
+    public static final String DATA_MAP_INJECTIONS_PREFIX = "injections.";
+
 
     public static boolean isIBMi() {
         final String osName = System.getProperty("os.name", "Misty");
@@ -109,15 +111,20 @@ public abstract class Config {
         return ret;
     }
 
+    private boolean isValidSectionKey(String key, List<String> exclusions){
+        return !exclusions.contains(key) 
+            && !key.startsWith(Config.COMPONENT_OPTIONS_PREFIX)
+            && !key.startsWith(Config.DATA_MAP_INJECTIONS_PREFIX);
+    }
+
     public Map<String, String> getUriAndHeaderParameters(final String _name, Profile.Section sectionObj, String... _exclusions) {
         final Map<String, String> pathParameters = new LinkedHashMap<String, String>();
         List<String> exclusions = new LinkedList<>(Arrays.asList(_exclusions));
         exclusions.addAll(Arrays.asList("type", "filter", "format", "destinations", "interval"));
         for (final String sectionKey : sectionObj.keySet()) {
-            if (exclusions.contains(sectionKey) || sectionKey.startsWith(Config.COMPONENT_OPTIONS_PREFIX)) {
-                continue;
+            if (isValidSectionKey(sectionKey, exclusions)){
+                pathParameters.put(sectionKey, getRequiredString(_name, sectionKey));
             }
-            pathParameters.put(sectionKey, getRequiredString(_name, sectionKey));
         }
         return pathParameters;
     }
@@ -141,6 +148,27 @@ public abstract class Config {
                 }
             }
             return componentOptionsMap;
+    }
+
+    protected Map<String, String> getDataMapInjections(final String _name) {
+            Map<String, String> section = m_ini.get(_name);
+
+            // Map to store key-value pairs
+            Map<String, String> dataMapInjections = new HashMap<>();
+            if (section != null) {
+                // Iterate through the section's keys and values
+                for (Map.Entry<String, String> entry : section.entrySet()) {
+                    String key = entry.getKey();
+                    String value = entry.getValue();
+
+                    // Check if the key starts with "injections."
+                    if (key.startsWith(DATA_MAP_INJECTIONS_PREFIX)) {
+                        // Store it in the map
+                        dataMapInjections.put(key.substring(DATA_MAP_INJECTIONS_PREFIX.length()), value);
+                    }
+                }
+            }
+            return dataMapInjections;
     }
 
     protected int getOptionalInt(final String _name, final String _key) {

@@ -67,6 +67,8 @@ public class DataConfig extends Config {
             final String name = section;
             final Profile.Section sectionObj = getIni().get(name);
             final String format = getOptionalString(name, "format");
+            final Map<String, String> dataMapInjections = getDataMapInjections(name);
+
             int userInterval = getOptionalInt(name, "interval");
             final int interval = userInterval != -1 ? userInterval : DEFAULT_INTERVAL;
             final List<String> destinations = new LinkedList<String>();
@@ -84,14 +86,14 @@ public class DataConfig extends Config {
                 case "file":
                     String file = getRequiredString(name, "file");
                     String filter = getOptionalString(name, "filter");
-                    ret.put(name, new FileEvent(name, file, format, destinations, filter, interval));
+                    ret.put(name, new FileEvent(name, file, format, destinations, filter, interval, dataMapInjections));
                     break;
                 case "table":
                     final String table = getRequiredString(name, "table");
                     final String tableSchema = getRequiredString(name, "schema");
                     int userNumToProcess = getOptionalInt(name, "numToProcess");
                     int numToProcess = userNumToProcess != -1 ? userNumToProcess : DEFAULT_NUM_TO_PROCESS;
-                    ret.put(name, new WatchTableEvent(name, format, destinations, tableSchema, table, interval, numToProcess));
+                    ret.put(name, new WatchTableEvent(name, format, destinations, tableSchema, table, interval, numToProcess, dataMapInjections));
                     break;
                 case "audit":
                     userNumToProcess = getOptionalInt(name, "numToProcess");
@@ -101,24 +103,24 @@ public class DataConfig extends Config {
                     fallbackStartTime = fallbackStartTime != -1 ? fallbackStartTime : 24;
 
                     final String userAuditType = getRequiredString(name, "auditType");
-                    ret.put(name, new AuditLog(name, format, destinations, interval, numToProcess, userAuditType, fallbackStartTime));
+                    ret.put(name, new AuditLog(name, format, destinations, interval, numToProcess, userAuditType, fallbackStartTime, dataMapInjections));
                     break;
                 case "sql":
                     final String query = getRequiredString(name, "query");
-                    ret.put(name, new WatchSql(name, query, format, destinations, interval));
+                    ret.put(name, new WatchSql(name, query, format, destinations, interval, dataMapInjections));
                     break;
                 case "cmd":
                     final String cmd = getRequiredString(name, "cmd");
                     String args = getOptionalString(name, "args");
                     if (args == null) args = "";
 
-                    ret.put(name, new WatchCmd(name, cmd, args, format, destinations, interval));
+                    ret.put(name, new WatchCmd(name, cmd, args, format, destinations, interval, dataMapInjections));
                     break;
                 case "http":
                     final String url = getRequiredString(name, "url");
                     filter = getOptionalString(name, "filter");
                     Map<String, String> headerParams = getUriAndHeaderParameters(name, sectionObj, "url");
-                    ret.put(name, new HttpEvent(name, url, format, destinations,filter,  interval, headerParams));
+                    ret.put(name, new HttpEvent(name, url, format, destinations,filter,  interval, headerParams, dataMapInjections));
                     break;
                 default:
                     throw new RuntimeException("Unknown destination type: " + type);
@@ -131,6 +133,8 @@ public class DataConfig extends Config {
         final Map<String, String> formatMap = new HashMap<>();
         final Map<String, String> destMap = new HashMap<>();
         final Map<String, ManzanEventType> eventMap = new HashMap<>();
+        final Map<String, Map<String, String>> dataMapInjectionsMap = new HashMap<>();
+
 
 
         for (int i = 0; i < watchEvents.size(); i++) {
@@ -149,6 +153,7 @@ public class DataConfig extends Config {
                 int userInterval = getOptionalInt(name, "interval");
                 final int interval = userInterval != -1 ? userInterval : DEFAULT_INTERVAL;
                 final String format = getOptionalString(name, "format");
+                final Map<String, String> dataMapInjections = getDataMapInjections(name);
 
                 // Determine the event type
                 ManzanEventType eventType;
@@ -180,10 +185,11 @@ public class DataConfig extends Config {
                 String destString = createRecipientList(destinations);
                 formatMap.put(id.toUpperCase(), format);
                 destMap.put(id.toUpperCase(), destString);
+                dataMapInjectionsMap.put(id.toUpperCase(), dataMapInjections);
 
                 String sqlRouteName = name + "sql";
                 ret.put(sqlRouteName, new WatchMsgEventSql(sqlRouteName, id, format, destinations, schema, eventType,
-                        interval, numToProcess));
+                        interval, numToProcess, dataMapInjections));
             }
 
             // Create the watcher
@@ -195,7 +201,7 @@ public class DataConfig extends Config {
             // After iterating over the loop, the formatMap and destMap are complete. Now
             // create the route.
             final String routeName = "socketWatcher";
-            ret.put(routeName, new WatchMsgEventSockets(routeName, formatMap, destMap, eventMap));
+            ret.put(routeName, new WatchMsgEventSockets(routeName, formatMap, destMap, eventMap, dataMapInjectionsMap));
         }
         return m_routes = ret;
     }

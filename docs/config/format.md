@@ -11,10 +11,16 @@ type=audit
 destinations=slackme
 auditType=PASSWORD
 fallbackStartTime=1
-format=Violation type: $VIOLATION_TYPE_DETAIL$, username: $AUDIT_USER_NAME$
+format=Violation type: $VIOLATION_TYPE_DETAIL$, username: $AUDIT_USER_NAME$ ip: $IP$
 interval=5000
+injections.IP=9.123.456.789
 ```
 
+### Injections
+`injections.*` is a special option that can be specified in a section in your `data.ini`. It allows you to inject key value pairs directly onto the returned data, such that it is identical to if it came from the data source itself. In the above example, specifying `injections.ip=9.123.456.789` makes it so on any returned data from the audit1 data source, will also contain the key value pair `ip=9.123.456.789`. `IP` can then be used as a property in your data source just like any other format option. I.e `format=my ip: $IP$`.
+
+
+### Format options for each data source
 The available variables for each data type are listed below.
 
 * **SQL Events**:

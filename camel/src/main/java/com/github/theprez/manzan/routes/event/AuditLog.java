@@ -16,18 +16,23 @@ public class AuditLog extends ManzanRoute {
     final private String m_auditType;
     final int m_interval;
     final ManzanMessageFormatter m_formatter;
+    final Map<String, String> dataMapInjection;
+
 
     public AuditLog(final String _name, final String _format,
                     final List<String> _destinations,
                     final int _interval,
                     final int _numToProcess,
                     final String _auditType,
-                    final int _fallbackStartTime) throws IOException {
+                    final int _fallbackStartTime,
+                    final Map<String, String> _dataMapInjection) throws IOException {
         super(_name);
         super.setRecipientList(_destinations);
         m_auditType = _auditType;
         m_interval = _interval;
         m_formatter = StringUtils.isEmpty(_format) ? null : new ManzanMessageFormatter(_format);
+        dataMapInjection = _dataMapInjection;
+
         String audit_table = AuditType.fromValue(_auditType).getValue();
 
         m_sql = String.format("SELECT * FROM TABLE ( %s" +
@@ -92,9 +97,11 @@ public class AuditLog extends ManzanRoute {
                 .split(body()).streaming().parallelProcessing()
                 .process(exchange -> {
                     Map<String, Object> dataMap = exchange.getIn().getBody(Map.class);
+                    injectIntoDataMap(dataMap, dataMapInjection);
                     exchange.getIn().setHeader("data_map", dataMap);
                     if (null != m_formatter) {
                         exchange.getIn().setBody(m_formatter.format(dataMap));
+                        exchange.getIn().setHeader("format_applied", true);
                     } else {
                         // Use Jackson for pretty-printing
                         ObjectMapper mapper = new ObjectMapper();

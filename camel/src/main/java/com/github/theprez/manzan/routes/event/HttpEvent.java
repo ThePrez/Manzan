@@ -18,9 +18,11 @@ public class HttpEvent extends ManzanRoute {
     private final ManzanMessageFormatter m_formatter;
     private final int m_interval;
     private final Map<String, String> m_headerParams;
+    final Map<String, String> dataMapInjection;
+
 
     public HttpEvent(final String _name, final String _url, final String _format, final List<String> _destinations,
-                     final String _filter, final int _interval, Map<String, String> _headerParams) throws IOException {
+                     final String _filter, final int _interval, Map<String, String> _headerParams, final Map<String, String> _dataMapInjection) throws IOException {
         super(_name);
         super.setRecipientList(_destinations);
         m_url = _url;
@@ -28,28 +30,36 @@ public class HttpEvent extends ManzanRoute {
         m_filter = new ManzanMessageFilter(_filter);
         m_interval = _interval;
         m_headerParams = _headerParams;
+        dataMapInjection = _dataMapInjection;
         setEventType(ManzanEventType.HTTP);
     }
 
-    protected void setEventType(ManzanEventType eventType){
+    protected void setEventType(ManzanEventType eventType) {
         m_eventType = eventType;
-    };
+    }
+
+    ;
 
     @Override
     public void configure() {
-       from("timer://foo?period=" + m_interval + "&synchronous=true")
+        from("timer://foo?period=" + m_interval + "&synchronous=true")
                 .routeId(m_name)
-               .setHeader(EVENT_TYPE, constant(m_eventType))
-               .process(exchange -> {
-                     for (Map.Entry<String, String> header: m_headerParams.entrySet()){
-                         exchange.getIn().setHeader(header.getKey(), header.getValue());
-                     }
-                 })
+                .setHeader(EVENT_TYPE, constant(m_eventType))
+                .process(exchange -> {
+                    for (Map.Entry<String, String> header : m_headerParams.entrySet()) {
+                        exchange.getIn().setHeader(header.getKey(), header.getValue());
+                    }
+                })
                 .to(m_url)
                 .unmarshal().json(JsonLibrary.Jackson)
-                .setHeader("data_map", simple("${body}"))
+                .process(exchange -> {
+                    Map<String, Object> dataMap = exchange.getIn().getBody(Map.class);
+                    injectIntoDataMap(dataMap, dataMapInjection);
+                    exchange.getIn().setHeader("data_map", dataMap);
+                    exchange.getIn().setBody(dataMap);
+                })
                 .marshal().json(true) // TODO: skip this if we are applying a format
-               .convertBodyTo(String.class, "UTF-8") // Need to convert it to string, otherwise it will just be a byte sequence
+                .convertBodyTo(String.class, "UTF-8") // Need to convert it to string, otherwise it will just be a byte sequence
                 .filter(exchange -> {
                     String body = exchange.getIn().getBody().toString();
                     return m_filter.matches(body);
@@ -57,6 +67,7 @@ public class HttpEvent extends ManzanRoute {
                 .process(exchange -> {
                     if (null != m_formatter) {
                         exchange.getIn().setBody(m_formatter.format(getDataMap(exchange)));
+                        exchange.getIn().setHeader("format_applied", true);
                     }
                 })
                 .recipientList(constant(getRecipientList())).stopOnException();

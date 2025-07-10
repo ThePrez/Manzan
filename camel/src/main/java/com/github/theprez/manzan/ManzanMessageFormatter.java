@@ -82,9 +82,9 @@ public class ManzanMessageFormatter {
                 }
                 currentMapping = ((ArrayList<?>) currentMapping).get(0);
             }
-            if (currentMapping instanceof LinkedHashMap){
-                if (((LinkedHashMap<?, ?>) currentMapping).containsKey(propertyToken)){
-                    currentMapping = ((LinkedHashMap<?, ?>) currentMapping).get(propertyToken);
+            if (currentMapping instanceof HashMap){
+                if (((HashMap<?, ?>)currentMapping).containsKey(propertyToken)){
+                    currentMapping = ((HashMap<?, ?>) currentMapping).get(propertyToken);
                 } else {
                     return "";
                 }
