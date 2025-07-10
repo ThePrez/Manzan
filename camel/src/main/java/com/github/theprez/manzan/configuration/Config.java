@@ -111,15 +111,20 @@ public abstract class Config {
         return ret;
     }
 
+    private boolean isValidSectionKey(String key, List<String> exclusions){
+        return !exclusions.contains(key) 
+            && !key.startsWith(Config.COMPONENT_OPTIONS_PREFIX)
+            && !key.startsWith(Config.DATA_MAP_INJECTIONS_PREFIX);
+    }
+
     public Map<String, String> getUriAndHeaderParameters(final String _name, Profile.Section sectionObj, String... _exclusions) {
         final Map<String, String> pathParameters = new LinkedHashMap<String, String>();
         List<String> exclusions = new LinkedList<>(Arrays.asList(_exclusions));
         exclusions.addAll(Arrays.asList("type", "filter", "format", "destinations", "interval"));
         for (final String sectionKey : sectionObj.keySet()) {
-            if (exclusions.contains(sectionKey) || sectionKey.startsWith(Config.COMPONENT_OPTIONS_PREFIX)) {
-                continue;
+            if (isValidSectionKey(sectionKey, exclusions)){
+                pathParameters.put(sectionKey, getRequiredString(_name, sectionKey));
             }
-            pathParameters.put(sectionKey, getRequiredString(_name, sectionKey));
         }
         return pathParameters;
     }
