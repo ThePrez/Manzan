@@ -77,9 +77,8 @@ public class WatchMsgEventSockets extends ManzanRoute {
 
                 ManzanEventType eventType = m_eventMap.get(sessionId);
                 setEventType(eventType);
-
+                exchange.getIn().setHeader(EVENT_TYPE, m_eventType);
             })
-                .setHeader(EVENT_TYPE, constant(m_eventType))
                 .recipientList(header("destinations"))
                 .parallelProcessing().stopOnException().end();
     }
