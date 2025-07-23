@@ -57,43 +57,102 @@ char *convert_field(const std::string &field, int from_ccsid)
   return out_buf;
 }
 
-void json_encode(std::string &str, const char *_src)
+#include <string>
+
+std::string json_encode(const char *_src)
 {
-  for (int i = 0; _src[i] != 0; i++)
+  std::string result;
+  const unsigned char *src = reinterpret_cast<const unsigned char *>(_src);
+
+  for (size_t i = 0; src[i] != 0; ++i)
   {
-    char c = _src[i];
-    switch (c)
+    unsigned char c = src[i];
+    if (c == 0x22 || c == 0x5C) // '"' or '\'
     {
-    case '"':
-      str += "\\\"";
-      break;
-    case '\\':
-      str += "\\\\";
-      break;
-    case '\b':
-      str += "\\b";
-      break;
-    case '\f':
-      str += "\\f";
-      break;
-    case '\n':
-      str += "\\n";
-      break;
-    case '\r':
-      str += "\\r";
-      break;
-    case '\t':
-      str += "\\t";
-      break;
-    case '\0':
-      str += "\\0";
-      return;
-    default:
-      str += c;
-      break;
+      result += 0x5C; // backslash
+      result += c;
+    }
+    else if (c == 0x08) // \b
+    {
+      result += 0x5C; // backslash
+      result += 0x62; // 'b'
+    }
+    else if (c == 0x0C) // \f
+    {
+      result += 0x5C; // backslash
+      result += 0x66; // 'f'
+    }
+    else if (c == 0x0A) // \n
+    {
+      result += 0x5C; // backslash
+      result += 0x6E; // 'n'
+    }
+    else if (c == 0x0D) // \r
+    {
+      result += 0x5C; // backslash
+      result += 0x72; // 'r'
+    }
+    else if (c == 0x09) // \t
+    {
+      result += 0x5C; // backslash
+      result += 0x74; // 't'
+    }
+    else if (c == 0x00) // null char
+    {
+      // JSON requires \u0000 for null, so add those bytes:
+      result += 0x5C; // '\'
+      result += 0x75; // 'u'
+      result += 0x30; // '0'
+      result += 0x30; // '0'
+      result += 0x30; // '0'
+      result += 0x30; // '0'
+    }
+    else
+    {
+      result += c;
     }
   }
+
+  return result;
 }
+
+// void json_encode(std::string &str, const char *_src)
+// {
+//   for (int i = 0; _src[i] != 0; i++)
+//   {
+//     char c = _src[i];
+//     switch (c)
+//     {
+//     case '"':
+//       str += "\\\"";
+//       break;
+//     case '\\':
+//       str += "\\\\";
+//       break;
+//     case '\b':
+//       str += "\\b";
+//       break;
+//     case '\f':
+//       str += "\\f";
+//       break;
+//     case '\n':
+//       str += "\\n";
+//       break;
+//     case '\r':
+//       str += "\\r";
+//       break;
+//     case '\t':
+//       str += "\\t";
+//       break;
+//     case '\0':
+//       str += "\\0";
+//       return;
+//     default:
+//       str += c;
+//       break;
+//     }
+//   }
+// }
 void append_json_element(std::string &_str, const char *_key, const char *_value)
 {
   // Here we append the utf-8 bytes directly to avoid ccsid issues. The exception is for the
@@ -255,7 +314,7 @@ std::string construct_json_message(PUBLISH_MESSAGE_FUNCTION_SIGNATURE)
 
   // Uncomment this if you need to see the raw bytes of the message.
   // Advanced debugging only.
-  // printHex("Final JSON in UTF-8 bytes: ", jsonStr);
+  printHex("Final JSON in UTF-8 bytes: ", jsonStr);
   return jsonStr;
 }
 

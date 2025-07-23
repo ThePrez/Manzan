@@ -14,6 +14,7 @@
 #include "mzversion.h"
 #include "pub_json.h"
 #include "SockClient.h"
+#include <qusrjobi.h>
 
 static FILE *fd = NULL;
 
@@ -72,6 +73,25 @@ std::string get_iso8601_timestamp(const char *_in)
   formatted += ".";
   formatted += std::string(output + 14, 6);
   return formatted;
+}
+
+int getCurrentJobCcsid() {
+    char buffer[400];
+    memset(buffer, 0x00, sizeof(buffer));
+
+    QUSRJOBI(
+        buffer, sizeof(buffer),
+        "JOBI0400",
+        "*                         ",  // current job
+        "                "             // current thread
+    );
+
+    int jobCcsid = 0;
+    memcpy(&jobCcsid, buffer + 372, sizeof(int));
+
+    DEBUG_INFO("Job CCSID: %d\n", jobCcsid);
+
+    return jobCcsid;
 }
 
 int main(int _argc, char **argv)
@@ -184,8 +204,8 @@ int main(int _argc, char **argv)
     DEBUG_INFO("About to publish...\n");
 
     // We can uncomment the next two lines if we are debugging ccsid issues
-    // std::string message_asstr(msg_info_buf->message);
-    // printHex("PRINTING HEX BYTES original ccsid: ",message_asstr );
+    std::string message_asstr(msg_info_buf->message);
+    printHex("PRINTING HEX BYTES original ccsid: ",message_asstr );
 
 
     // TODO: At a certain point we may want to do the json encoding after conversion to UTF-8. This is because
@@ -193,23 +213,40 @@ int main(int _argc, char **argv)
     // if it needs to be escaped. This can cause issues if the characters needing escaping have different hex values
     // in the tgtccsid than in the data ccsid. We will defer this for now because the issue is rare, and the user can recompile
     // this code using the data ccsid if needed. Also, the task of json encoding after conversion to UTF-8 is highly complex.
-    std::string encoded_message;
-    json_encode(encoded_message, msg_info_buf->message);
+    // std::string encoded_message;
+    // json_encode(encoded_message, msg_info_buf->message);
+    char *message_utf8_before_encode = convert_field(msg_info_buf->message, msg_event->replacement_data_ccsid);
+    std::string message_utf8 = json_encode(message_utf8_before_encode);
+    printHex("PRINTING HEX BYTES for message encoded and utf8: ", message_utf8 );
 
-    char *session_id_utf8           = convert_field(session_id, msg_event->replacement_data_ccsid);
-    char *msgid_utf8                = convert_field(msgid, msg_event->replacement_data_ccsid);
-    char *msg_type_utf8             = convert_field(message_type, msg_event->replacement_data_ccsid);
-    char *msg_timestamp_utf8        = convert_field(message_timestamp, msg_event->replacement_data_ccsid);
-    char *job_utf8                  = convert_field(job, msg_event->replacement_data_ccsid);
-    char *sending_usrprf_utf8       = convert_field(sending_usrprf, msg_event->replacement_data_ccsid);
-    char *message_utf8              = convert_field(encoded_message, msg_event->replacement_data_ccsid);
-    char *sending_program_name_utf8= convert_field(sending_program_name, msg_event->replacement_data_ccsid);
-    char *sending_module_name_utf8  = convert_field(sending_module_name, msg_event->replacement_data_ccsid);
-    char *sending_procedure_name_utf8 = convert_field(sending_procedure_name, msg_event->replacement_data_ccsid);
+
+    std::string session_id_asstr(session_id);
+    printHex("PRINTING HEX BYTES session id original ccsid: ", session_id_asstr );
+
+  // char buffer[400];
+  // memset(buffer, 0x00, sizeof(buffer));
+  // QUSRJOBI(buffer, sizeof(buffer), "JOBI0400", "*                         ","                ");
+  // int jobCcsid = 0;
+  // memcpy(&jobCcsid, buffer + 372, sizeof(int));
+  // printf("Job CCSID: %d\n", jobCcsid);
+  // DEBUG_INFO("Job CCSID: %d\n", jobCcsid);
+
+    int job_ccsid = getCurrentJobCcsid();
+
+    char *session_id_utf8           = convert_field(session_id, job_ccsid);
+    char *msgid_utf8                = convert_field(msgid, job_ccsid);
+    char *msg_type_utf8             = convert_field(message_type, job_ccsid);
+    char *msg_timestamp_utf8        = convert_field(message_timestamp, job_ccsid);
+    char *job_utf8                  = convert_field(job, job_ccsid);
+    char *sending_usrprf_utf8       = convert_field(sending_usrprf, job_ccsid);
+    // char *message_utf8              = convert_field(encoded_message, msg_event->replacement_data_ccsid);
+    char *sending_program_name_utf8= convert_field(sending_program_name, job_ccsid);
+    char *sending_module_name_utf8  = convert_field(sending_module_name, job_ccsid);
+    char *sending_procedure_name_utf8 = convert_field(sending_procedure_name, job_ccsid);
 
     // We can uncomment the next two lines if we are debugging ccsid issues
     // std::string message_utf8_asstr(message_utf8);
-    // printHex("PRINTING HEX BYTES FOR MSG UTF8: ",  message_utf8_asstr);
+    printHex("PRINTING HEX BYTES FOR MSG UTF8: ",  message_utf8);
 
     for (int i = 0; i < num_publishers; i++)
     {
@@ -222,7 +259,7 @@ int main(int _argc, char **argv)
           msg_timestamp_utf8,
           job_utf8,
           sending_usrprf_utf8,
-          message_utf8,
+          message_utf8.c_str(),
           sending_program_name_utf8,
           sending_module_name_utf8,
           sending_procedure_name_utf8);
