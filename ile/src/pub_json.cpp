@@ -271,7 +271,7 @@ std::string construct_json_message(PUBLISH_MESSAGE_FUNCTION_SIGNATURE)
 
   // Uncomment this if you need to see the raw bytes of the message.
   // Advanced debugging only.
-  printHex("Final JSON in UTF-8 bytes: ", jsonStr);
+  // printHex("Final JSON in UTF-8 bytes: ", jsonStr);
   return jsonStr;
 }
 
