@@ -99,13 +99,7 @@ std::string json_encode(const char *_src)
     }
     else if (c == 0x00) // null char
     {
-      // JSON requires \u0000 for null, so add those bytes:
-      result += 0x5C; // '\'
-      result += 0x75; // 'u'
-      result += 0x30; // '0'
-      result += 0x30; // '0'
-      result += 0x30; // '0'
-      result += 0x30; // '0'
+      continue;
     }
     else
     {
@@ -116,43 +110,6 @@ std::string json_encode(const char *_src)
   return result;
 }
 
-// void json_encode(std::string &str, const char *_src)
-// {
-//   for (int i = 0; _src[i] != 0; i++)
-//   {
-//     char c = _src[i];
-//     switch (c)
-//     {
-//     case '"':
-//       str += "\\\"";
-//       break;
-//     case '\\':
-//       str += "\\\\";
-//       break;
-//     case '\b':
-//       str += "\\b";
-//       break;
-//     case '\f':
-//       str += "\\f";
-//       break;
-//     case '\n':
-//       str += "\\n";
-//       break;
-//     case '\r':
-//       str += "\\r";
-//       break;
-//     case '\t':
-//       str += "\\t";
-//       break;
-//     case '\0':
-//       str += "\\0";
-//       return;
-//     default:
-//       str += c;
-//       break;
-//     }
-//   }
-// }
 void append_json_element(std::string &_str, const char *_key, const char *_value)
 {
   // Here we append the utf-8 bytes directly to avoid ccsid issues. The exception is for the

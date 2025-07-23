@@ -207,30 +207,6 @@ int main(int _argc, char **argv)
     std::string message_asstr(msg_info_buf->message);
     printHex("PRINTING HEX BYTES original ccsid: ",message_asstr );
 
-
-    // TODO: At a certain point we may want to do the json encoding after conversion to UTF-8. This is because
-    // as it stands now, each hex byte in the received string will be checked against the tgtccsid encoding to check
-    // if it needs to be escaped. This can cause issues if the characters needing escaping have different hex values
-    // in the tgtccsid than in the data ccsid. We will defer this for now because the issue is rare, and the user can recompile
-    // this code using the data ccsid if needed. Also, the task of json encoding after conversion to UTF-8 is highly complex.
-    // std::string encoded_message;
-    // json_encode(encoded_message, msg_info_buf->message);
-    char *message_utf8_before_encode = convert_field(msg_info_buf->message, msg_event->replacement_data_ccsid);
-    std::string message_utf8 = json_encode(message_utf8_before_encode);
-    printHex("PRINTING HEX BYTES for message encoded and utf8: ", message_utf8 );
-
-
-    std::string session_id_asstr(session_id);
-    printHex("PRINTING HEX BYTES session id original ccsid: ", session_id_asstr );
-
-  // char buffer[400];
-  // memset(buffer, 0x00, sizeof(buffer));
-  // QUSRJOBI(buffer, sizeof(buffer), "JOBI0400", "*                         ","                ");
-  // int jobCcsid = 0;
-  // memcpy(&jobCcsid, buffer + 372, sizeof(int));
-  // printf("Job CCSID: %d\n", jobCcsid);
-  // DEBUG_INFO("Job CCSID: %d\n", jobCcsid);
-
     int job_ccsid = getCurrentJobCcsid();
 
     char *session_id_utf8           = convert_field(session_id, job_ccsid);
@@ -239,14 +215,16 @@ int main(int _argc, char **argv)
     char *msg_timestamp_utf8        = convert_field(message_timestamp, job_ccsid);
     char *job_utf8                  = convert_field(job, job_ccsid);
     char *sending_usrprf_utf8       = convert_field(sending_usrprf, job_ccsid);
-    // char *message_utf8              = convert_field(encoded_message, msg_event->replacement_data_ccsid);
+    char *message_utf8_before_encode = convert_field(msg_info_buf->message, msg_event->replacement_data_ccsid);
     char *sending_program_name_utf8= convert_field(sending_program_name, job_ccsid);
     char *sending_module_name_utf8  = convert_field(sending_module_name, job_ccsid);
     char *sending_procedure_name_utf8 = convert_field(sending_procedure_name, job_ccsid);
 
+    std::string message_utf8 = json_encode(message_utf8_before_encode);
+
     // We can uncomment the next two lines if we are debugging ccsid issues
-    // std::string message_utf8_asstr(message_utf8);
-    printHex("PRINTING HEX BYTES FOR MSG UTF8: ",  message_utf8);
+    printHex("PRINTING HEX BYTES for message encoded and utf8: ", message_utf8 );
+
 
     for (int i = 0; i < num_publishers; i++)
     {
