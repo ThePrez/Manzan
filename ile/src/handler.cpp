@@ -204,8 +204,8 @@ int main(int _argc, char **argv)
     DEBUG_INFO("About to publish...\n");
 
     // We can uncomment the next two lines if we are debugging ccsid issues
-    std::string message_asstr(msg_info_buf->message);
-    printHex("PRINTING HEX BYTES original ccsid: ",message_asstr );
+    // std::string message_asstr(msg_info_buf->message);
+    // printHex("PRINTING HEX BYTES original ccsid: ",message_asstr );
 
     int job_ccsid = getCurrentJobCcsid();
 
@@ -223,7 +223,7 @@ int main(int _argc, char **argv)
     std::string message_utf8 = json_encode(message_utf8_before_encode);
 
     // We can uncomment the next two lines if we are debugging ccsid issues
-    printHex("PRINTING HEX BYTES for message encoded and utf8: ", message_utf8 );
+    // printHex("PRINTING HEX BYTES for message encoded and utf8: ", message_utf8 );
 
 
     for (int i = 0; i < num_publishers; i++)
