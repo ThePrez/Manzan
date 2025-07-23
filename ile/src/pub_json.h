@@ -17,5 +17,6 @@ void printHex(const std::string &label, const std::string &data);
 char* convert_field(const std::string& field, int from_ccsid);
 void json_encode(std::string &str, const char *_src);
 
+std::string json_encode(const char *_src);
 
 #endif
