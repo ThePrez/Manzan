@@ -34,7 +34,7 @@ uninstall:
 	/QOpenSys/pkgs/bin/yum install wget
 
 appinstall.jar: /QOpenSys/pkgs/bin/wget
-	/QOpenSys/pkgs/bin/wget -O appinstall.jar https://github.com/ThePrez/AppInstall-IBMi/releases/download/v0.0.5/appinstall-v0.0.5.jar
+	/QOpenSys/pkgs/bin/wget -O appinstall.jar https://github.com/ThePrez/AppInstall-IBMi/releases/download/v0.0.6/appinstall-v0.0.6.jar
 
 manzan-installer-v%.jar: /QOpenSys/pkgs/bin/zip appinstall.jar
 	echo "Building version $*"
