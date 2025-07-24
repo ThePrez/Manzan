@@ -2,7 +2,8 @@ TESTLIB:=MZNTEST
 INPUT_MSGQ:=QCPFMSG
 OUTPUT_FILE:=/tmp/mzntestoutput
 MESSAGE_ID:=*IMMED
-MESSAGE:=My snd2q message
+MESSAGE:=My snd2q message\"-_=+~%^*
+ENCODED_MESSAGE:=My snd2q message"-_=+~%^*
 MSGTYPE:=*INFO
 SEVERITY:=80
 
@@ -47,9 +48,9 @@ run:
 
 checkresult:
 	cat ${OUTPUT_FILE}
-	grep -i "${MESSAGE_ID} (severity ${SEVERITY}): ${MESSAGE}1" ${OUTPUT_FILE}
-	grep -i "${MESSAGE_ID} (severity ${SEVERITY}): ${MESSAGE}2" ${OUTPUT_FILE}
-	grep -i "${MESSAGE_ID} (severity ${SEVERITY}): ${MESSAGE}3" ${OUTPUT_FILE}
-	grep -i "${MESSAGE_ID} (severity ${SEVERITY}): ${MESSAGE}4" ${OUTPUT_FILE}
-	grep -i "${MESSAGE_ID} (severity ${SEVERITY}): ${MESSAGE}5" ${OUTPUT_FILE}
+	grep -Fi '${MESSAGE_ID} (severity ${SEVERITY}): ${ENCODED_MESSAGE}1' ${OUTPUT_FILE}
+	grep -Fi '${MESSAGE_ID} (severity ${SEVERITY}): ${ENCODED_MESSAGE}2' ${OUTPUT_FILE}
+	grep -Fi '${MESSAGE_ID} (severity ${SEVERITY}): ${ENCODED_MESSAGE}3' ${OUTPUT_FILE}
+	grep -Fi '${MESSAGE_ID} (severity ${SEVERITY}): ${ENCODED_MESSAGE}4' ${OUTPUT_FILE}
+	grep -Fi '${MESSAGE_ID} (severity ${SEVERITY}): ${ENCODED_MESSAGE}5' ${OUTPUT_FILE}
 
