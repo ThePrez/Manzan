@@ -34,7 +34,7 @@ uninstall:
 	/QOpenSys/pkgs/bin/yum install wget
 
 appinstall.jar: /QOpenSys/pkgs/bin/wget
-	/QOpenSys/pkgs/bin/wget -O appinstall.jar https://github.com/ThePrez/AppInstall-IBMi/releases/download/v0.0.5/appinstall-v0.0.5.jar
+	/QOpenSys/pkgs/bin/wget -O appinstall.jar https://github.com/ThePrez/AppInstall-IBMi/releases/download/v0.0.6/appinstall-v0.0.6.jar
 
 manzan-installer-v%.jar: /QOpenSys/pkgs/bin/zip appinstall.jar
 	echo "Building version $*"
@@ -50,4 +50,4 @@ manzan-installer-v%.jar: /QOpenSys/pkgs/bin/zip appinstall.jar
 	install -m 600 -o qsys service-commander-def.yaml ${INSTALL_ROOT}/opt/manzan/lib/manzan.yaml
 	echo "#!/QOpenSys/usr/bin/sh" > .postinstall
 	echo "ln -sf ${INSTALL_ROOT}/opt/manzan/lib/manzan.yaml /QOpenSys/etc/sc/services/manzan.yaml" >> .postinstall
-	/QOpenSys/QIBM/ProdData/JavaVM/jdk80/64bit/bin/java -jar appinstall.jar -o $@ --qsys manzan --file /QOpenSys/etc/manzan --file /opt/manzan --post .postinstall
+	/QOpenSys/QIBM/ProdData/JavaVM/jdk80/64bit/bin/java -jar appinstall.jar -o $@ --qsys manzan --fileIfMissing /QOpenSys/etc/manzan --file /opt/manzan --post .postinstall
