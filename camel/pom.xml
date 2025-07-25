@@ -195,6 +195,11 @@
       <artifactId>opentelemetry-exporter-otlp</artifactId>
       <version>1.49.0</version>
     </dependency>
+      <dependency>
+          <groupId>org.junit.jupiter</groupId>
+          <artifactId>junit-jupiter</artifactId>
+          <scope>test</scope>
+      </dependency>
   </dependencies>
 
   <build>

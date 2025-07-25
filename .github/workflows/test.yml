@@ -72,6 +72,10 @@ jobs:
         working-directory: scripts
         run: bash ./testIle.sh
 
+      - name: Run Junit Tests
+        working-directory: camel
+        run: mvn clean test
+
       - name: Cleanup
         if: always()
         run: | 
