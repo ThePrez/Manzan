@@ -8,21 +8,6 @@ import com.google.gson.Gson;
 
 public class ManzanMessageFormatter {
 
-    private static final Map<String, ManzanMessageFormatter> s_formatterCache = new WeakHashMap<String, ManzanMessageFormatter>();
-
-    public static String format(final String _in, final Map<String, Object> _mappings) {
-        ManzanMessageFormatter formatter = s_formatterCache.get(_in);
-        if (null == formatter) {
-            formatter = new ManzanMessageFormatter(_in);
-            s_formatterCache.put(_in, formatter);
-        }
-        return formatter.format(_mappings);
-    }
-
-    public String getM_fmtStr() {
-        return m_fmtStr;
-    }
-
     private final String m_fmtStr;
 
     public ManzanMessageFormatter(final String _fmtStr) {
@@ -31,6 +16,9 @@ public class ManzanMessageFormatter {
 
     public String format(final Map<String, Object> _mappings) {
         String ret = m_fmtStr;
+        if (ret == null){
+            return "";
+        }
         ret = ret.replace("\r\n", "\n");
         ret = ret.replace("\r", "");
         ret = ret.replace("\\n", "\n").replace("\\t", "\t");
@@ -76,11 +64,11 @@ public class ManzanMessageFormatter {
         String[] propertyTokens = property.split("\\.");
         Object currentMapping = mapping;
         for (String propertyToken: propertyTokens){
-            while(currentMapping instanceof ArrayList){
-                if (((ArrayList<?>) currentMapping).isEmpty()){
+            while(currentMapping instanceof List){
+                if (((List<?>) currentMapping).isEmpty()){
                     return "";
                 }
-                currentMapping = ((ArrayList<?>) currentMapping).get(0);
+                currentMapping = ((List<?>) currentMapping).get(0);
             }
             if (currentMapping instanceof HashMap){
                 if (((HashMap<?, ?>)currentMapping).containsKey(propertyToken)){
@@ -90,11 +78,13 @@ public class ManzanMessageFormatter {
                 }
             }
             else if (currentMapping instanceof Map.Entry){
-                if (((Map.Entry<?, ?>) currentMapping).getKey() == propertyToken){
+                if (((Map.Entry<?, ?>) currentMapping).getKey().equals(propertyToken)){
                     currentMapping = ((Map.Entry<?, ?>) currentMapping).getValue();
                 } else {
                     return "";
                 }
+            } else {
+                return "";
             }
         }
         return currentMapping == null ? "" : currentMapping.toString();
