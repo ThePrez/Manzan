@@ -1,8 +1,7 @@
 package com.github.theprez.manzan;
 
 import java.util.regex.Pattern;
-
-import com.github.theprez.jcmdutils.StringUtils;
+import java.util.regex.PatternSyntaxException;
 
 public class ManzanMessageFilter {
 
@@ -11,11 +10,14 @@ public class ManzanMessageFilter {
     private final Pattern m_pattern;
 
     public ManzanMessageFilter(final String _filterStr) {
-        m_filterStr = StringUtils.isEmpty(_filterStr) ? null : _filterStr.trim();
-        m_isRegex = null == m_filterStr? false:m_filterStr.startsWith("re:");
+        m_filterStr = _filterStr;
+        m_isRegex = m_filterStr.startsWith("re:");
         if (m_isRegex) {
             final String regex = m_filterStr.substring(3);
-            m_pattern = Pattern.compile(regex, Pattern.CASE_INSENSITIVE);// TODO: handle invalid regex
+            if (regex.isEmpty()){
+                throw new PatternSyntaxException("No pattern was specified", "", 0);
+            }
+            m_pattern = Pattern.compile(regex, Pattern.DOTALL);
         } else {
             m_pattern = null;
         }
@@ -23,7 +25,7 @@ public class ManzanMessageFilter {
 
     public boolean matches(final String _data) {
         if (null == m_pattern) {
-            return StringUtils.isEmpty(m_filterStr) ? true : _data.toLowerCase().contains(m_filterStr.toLowerCase());
+            return m_filterStr.isEmpty() ? true : _data.contains(m_filterStr);
         }
         return m_pattern.matcher(_data).find();
     }
