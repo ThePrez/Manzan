@@ -72,7 +72,13 @@ class FilterTests {
     @Test
     void testSubstringMatchCaseSensitive() {
         ManzanMessageFilter filter = new ManzanMessageFilter("Apple");
-        assertFalse(filter.matches("applepie")); // case-sensitive
+        assertFalse(filter.matches("applepie"));
+    }
+
+    @Test
+    void testCaseInsensitiveRegex() {
+        ManzanMessageFilter filter = new ManzanMessageFilter("re:(?i)Apple");
+        assertTrue(filter.matches("applepie"));
     }
 
     @Test
