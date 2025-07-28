@@ -85,13 +85,6 @@ class FilterTests {
     // --- EDGE CASES ---
 
     @Test
-    void testEmptyFilterSubstring() {
-        ManzanMessageFilter filter = new ManzanMessageFilter("");
-        assertTrue(filter.matches("non-empty")); // "" is always contained
-        assertTrue(filter.matches(""));          // "" in "" is true
-    }
-
-    @Test
     void testEmptyInputWithNonEmptyFilter() {
         ManzanMessageFilter filter = new ManzanMessageFilter("apple");
         assertFalse(filter.matches(""));
@@ -99,16 +92,29 @@ class FilterTests {
 
     @Test
     void testEmptyInputAndEmptyFilter() {
-        ManzanMessageFilter filter = new ManzanMessageFilter("");
-        assertTrue(filter.matches(""));
+        ManzanMessageFilter emptyFilter = new ManzanMessageFilter("");
+        ManzanMessageFilter nullFilter = new ManzanMessageFilter(null);
+
+
+        assertTrue(emptyFilter.matches(""));
+        assertTrue(emptyFilter.matches("asdfnjkaerfaoe"));
+
+        assertTrue(nullFilter.matches(""));
+        assertTrue(nullFilter.matches("asdfnjkaerfaoe"));
+
     }
 
     @Test
     void testNullInputThrowsException() {
         ManzanMessageFilter filter = new ManzanMessageFilter("apple");
         assertThrows(NullPointerException.class, () -> filter.matches(null));
-        assertThrows(NullPointerException.class, () -> new ManzanMessageFilter(null));
-        ;
+    }
+
+    @Test
+    void testNullFormatStringMatchesAll() {
+        ManzanMessageFilter filter = new ManzanMessageFilter(null);
+        assertTrue(filter.matches(""));
+        assertTrue(filter.matches("asdfnjkaerfaoe"));
     }
 
     @Test

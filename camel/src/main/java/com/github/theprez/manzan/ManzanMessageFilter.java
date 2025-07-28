@@ -10,7 +10,7 @@ public class ManzanMessageFilter {
     private final Pattern m_pattern;
 
     public ManzanMessageFilter(final String _filterStr) {
-        m_filterStr = _filterStr;
+        m_filterStr = _filterStr == null ? "" : _filterStr;
         m_isRegex = m_filterStr.startsWith("re:");
         if (m_isRegex) {
             final String regex = m_filterStr.substring(3);
