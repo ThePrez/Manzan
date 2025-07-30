@@ -1,4 +1,4 @@
-
+package CamelTests;
 
 import com.github.theprez.manzan.routes.dest.StreamDestination;
 import org.apache.camel.RoutesBuilder;
@@ -18,10 +18,7 @@ import java.util.HashMap;
 import java.util.LinkedList;
 import java.util.Map;
 
-public class CamelTests extends CamelTestSupport {
-
-
-
+public class FileEventTest extends CamelTestSupport {
     Path baseDir = Paths.get("").toAbsolutePath();  // current working dir
     Path fileDir = baseDir
             .resolve("src")
@@ -31,14 +28,11 @@ public class CamelTests extends CamelTestSupport {
     final String filePathNoFormatString = fileDir.resolve("test.txt").toString();
     final String filePathWithFormatString = fileDir.resolve("testFormat.txt").toString();
     final String filePathUnmatchedFilter = fileDir.resolve("testUnmatchedFilter.txt").toString();
-
     final String testOutDest = "test_out";
 
     @Override
     protected void doPreSetup() throws Exception {
         ensureFileExistsAndIsEmpty();
-
-
     }
 
     private void ensureFileExistsAndIsEmpty() throws Exception{
@@ -71,7 +65,6 @@ public class CamelTests extends CamelTestSupport {
             writer.write(textContent);
         }
         mockOut.setResultWaitTime(5000); // give Camel up to 5 seconds
-
         mockOut.expectedMessageCount(1);
         mockOut.expectedBodiesReceived(expectedTextContent);
         mockOut.assertIsSatisfied();
@@ -84,7 +77,6 @@ public class CamelTests extends CamelTestSupport {
         String fileName = path.getFileName().toString();
         String expectedTextContent = String.format("fname: %s fpath: %s fdata: %s",
                 fileName, filePathWithFormatString, textContent);
-
 
         MockEndpoint mockOut = getMockEndpoint("mock:direct:" + testOutDest);
         try (BufferedWriter writer = new BufferedWriter(new FileWriter(filePathWithFormatString))) {
@@ -100,9 +92,7 @@ public class CamelTests extends CamelTestSupport {
     @Test
     public void testFileWithFilterNoMatch() throws Exception {
         final String textContent = "Hello World";
-
         MockEndpoint mockOut = getMockEndpoint("mock:direct:" + testOutDest);
-
         mockOut.expectedMessageCount(0);      // Expect zero messages
 
         try (BufferedWriter writer = new BufferedWriter(new FileWriter(filePathUnmatchedFilter))) {
@@ -136,6 +126,5 @@ public class CamelTests extends CamelTestSupport {
                 new StreamDestination(context, testOutDest, null, componentOptions)
         };
     }
-
 }
 
