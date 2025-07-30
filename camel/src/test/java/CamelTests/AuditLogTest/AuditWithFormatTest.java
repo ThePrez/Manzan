@@ -9,23 +9,16 @@ import org.apache.camel.component.mock.MockEndpoint;
 import org.apache.camel.test.junit5.CamelTestSupport;
 import org.junit.jupiter.api.Test;
 import com.github.theprez.manzan.routes.event.AuditLog;
-import com.github.theprez.manzan.routes.event.AuditType;
 
 import java.beans.PropertyVetoException;
-import java.io.BufferedWriter;
-import java.io.FileWriter;
 import java.io.IOException;
-import java.nio.file.Files;
-import java.nio.file.Path;
-import java.nio.file.Paths;
-import java.nio.file.StandardOpenOption;
 import java.util.HashMap;
 import java.util.LinkedList;
 import java.util.Map;
+
 import com.ibm.as400.access.AS400;
 import com.ibm.as400.access.AS400SecurityException;
-import com.ibm.as400.access.ConnectionDroppedException;
-import java.io.IOException;
+
 import java.util.concurrent.TimeUnit;
 
 public class AuditWithFormatTest extends CamelTestSupport {
@@ -62,11 +55,9 @@ public class AuditWithFormatTest extends CamelTestSupport {
             system.connectService(AS400.COMMAND); // Try connecting to the COMMAND service
             System.out.println("Login unexpectedly succeeded.");
             return false;
-        }
-        catch (AS400SecurityException e) {
+        } catch (AS400SecurityException e) {
             System.out.println("Login failed: Invalid credentials.");
-        }
-        catch (Exception e) {
+        } catch (Exception e) {
             System.out.println("Login failed: IO or connection error - " + e.getMessage());
         } finally {
             if (system.isConnected()) {
@@ -83,7 +74,7 @@ public class AuditWithFormatTest extends CamelTestSupport {
         String fakePassword = "fakePassword";
         MockEndpoint mockOut = getMockEndpoint("mock:direct:" + testOutDest);
         boolean loginFailed = attemptInvalidLogin(hostname, fakeUser, fakePassword);
-        if (loginFailed){
+        if (loginFailed) {
             mockOut.setResultWaitTime(5000); // give Camel up to 5 seconds
             mockOut.setMinimumExpectedMessageCount(1);
             mockOut.expectedMessagesMatches(exchange ->

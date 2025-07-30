@@ -18,8 +18,6 @@ import java.util.*;
 import com.ibm.as400.access.AS400;
 import com.ibm.as400.access.AS400SecurityException;
 
-import java.util.concurrent.TimeUnit;
-
 public class AuditNoFormatTest extends CamelTestSupport {
     final String testOutDest = "test_out";
     @Override
