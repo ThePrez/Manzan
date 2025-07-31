@@ -1,8 +1,11 @@
 package CamelTests;
 
 import com.fasterxml.jackson.databind.ObjectMapper;
+import com.github.theprez.manzan.configuration.ApplicationConfig;
 import com.ibm.as400.access.AS400;
+import com.ibm.as400.access.AS400JDBCDataSource;
 import com.ibm.as400.access.AS400SecurityException;
+import org.apache.camel.CamelContext;
 import org.apache.camel.component.mock.MockEndpoint;
 import org.apache.camel.test.junit5.CamelTestSupport;
 
@@ -60,5 +63,22 @@ public abstract class CamelTestHelper extends CamelTestSupport {
             }
         }
         return true;
+    }
+
+    @Override
+    protected CamelContext createCamelContext() throws Exception {
+        CamelContext context = super.createCamelContext();
+
+        final AS400 as400 = ApplicationConfig.get().getRemoteConnection();
+        as400.setGuiAvailable(false);
+        as400.validateSignon();
+
+        final AS400JDBCDataSource dataSource = new AS400JDBCDataSource(as400);
+        dataSource.setTransactionIsolation("none");
+
+        // Register the dataSource with the correct Camel registry
+        context.getRegistry().bind("jt400", dataSource);
+
+        return context;
     }
 }

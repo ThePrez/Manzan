@@ -18,23 +18,6 @@ public class AuditNoFormatTest extends CamelTestHelper {
     final String testOutDest = "test_out";
 
     @Override
-    protected CamelContext createCamelContext() throws Exception {
-        CamelContext context = super.createCamelContext();
-
-        final AS400 as400 = ApplicationConfig.get().getRemoteConnection();
-        as400.setGuiAvailable(false);
-        as400.validateSignon();
-
-        final AS400JDBCDataSource dataSource = new AS400JDBCDataSource(as400);
-        dataSource.setTransactionIsolation("none");
-
-        // Register the dataSource with the correct Camel registry
-        context.getRegistry().bind("jt400", dataSource);
-
-        return context;
-    }
-
-    @Override
     public String isMockEndpoints() {
         String[] mockEndpoints = new String[]{"direct:" + testOutDest};
         return String.join(",", mockEndpoints);
