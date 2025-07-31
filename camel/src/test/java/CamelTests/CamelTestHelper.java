@@ -10,12 +10,13 @@ import org.apache.camel.component.mock.MockEndpoint;
 import org.apache.camel.test.junit5.CamelTestSupport;
 
 import java.beans.PropertyVetoException;
-import java.util.HashSet;
-import java.util.List;
-import java.util.Map;
-import java.util.Set;
+import java.util.*;
 
 public abstract class CamelTestHelper extends CamelTestSupport {
+    protected LinkedList<String> destinations = new LinkedList<>();
+    protected Map<String, String> dataMapInjections = new HashMap<>();
+    protected Map<String, String> componentOptions = new HashMap<>();
+
     protected void expectBodyToHaveKeys(MockEndpoint mockOut, List<String> keys) {
         mockOut.expectedMessagesMatches(exchange -> {
             try {

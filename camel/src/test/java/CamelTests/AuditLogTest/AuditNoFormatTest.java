@@ -53,14 +53,9 @@ public class AuditNoFormatTest extends CamelTestHelper {
         final int numToProcess = 1000;
         final int fallbackStartTime = 1;
         final String routeNameNoFormat = "auditNoFormat";
-
         final String auditType = "PASSWORD";
 
-        LinkedList<String> destinations = new LinkedList<>();
-        Map<String, String> dataMapInjections = new HashMap<>();
         dataMapInjections.put("FOO", "BAR");
-        Map<String, String> componentOptions = new HashMap<>();
-
         destinations.add(testOutDest);
 
         return new RoutesBuilder[]{

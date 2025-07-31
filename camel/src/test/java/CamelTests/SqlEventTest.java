@@ -42,11 +42,7 @@ public class SqlEventTest extends CamelTestHelper {
         final Map<String, String> headerParams = new LinkedHashMap();
         headerParams.put("authorization", "bearer eyt");
 
-        LinkedList<String> destinations = new LinkedList<>();
-        Map<String, String> dataMapInjections = new HashMap<>();
         dataMapInjections.put("foo", "bar");
-        Map<String, String> componentOptions = new HashMap<>();
-
         destinations.add(testOutDest);
 
         return new RoutesBuilder[]{

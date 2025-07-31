@@ -112,10 +112,6 @@ public class FileEventTest extends CamelTestHelper {
         final String filterMatch = "Hello";
         final String filterNoMatch = "re:^goodbye";
 
-        LinkedList<String> destinations = new LinkedList<>();
-        Map<String, String> dataMapInjections = new HashMap<>();
-        Map<String, String> componentOptions = new HashMap<>();
-
         destinations.add(testOutDest);
 
         return new RoutesBuilder[]{

@@ -8,9 +8,6 @@ import org.apache.camel.component.mock.MockEndpoint;
 import org.junit.jupiter.api.Test;
 
 import java.io.IOException;
-import java.util.HashMap;
-import java.util.LinkedList;
-import java.util.Map;
 import java.util.concurrent.TimeUnit;
 
 public class AuditWithFormatTest extends CamelTestHelper {
@@ -47,13 +44,8 @@ public class AuditWithFormatTest extends CamelTestHelper {
         final int numToProcess = 1000;
         final int fallbackStartTime = 1;
         final String routeName = "audit";
-
         final String auditType = "PASSWORD";
         final String format = "Violation type: $VIOLATION_TYPE_DETAIL$ username: $AUDIT_USER_NAME$ remote ip: $REMOTE_ADDRESS$:$REMOTE_PORT$";
-
-        LinkedList<String> destinations = new LinkedList<>();
-        Map<String, String> dataMapInjections = new HashMap<>();
-        Map<String, String> componentOptions = new HashMap<>();
 
         destinations.add(testOutDest);
 
