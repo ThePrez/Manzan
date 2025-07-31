@@ -1,7 +1,6 @@
 package CamelTests;
 
 import com.github.theprez.manzan.routes.dest.StreamDestination;
-import com.github.theprez.manzan.routes.event.HttpEvent;
 import com.github.theprez.manzan.routes.event.WatchSql;
 import org.apache.camel.RoutesBuilder;
 import org.apache.camel.component.mock.MockEndpoint;
@@ -9,7 +8,6 @@ import org.junit.jupiter.api.Test;
 
 import java.io.IOException;
 import java.util.*;
-
 
 public class SqlEventTest extends CamelTestHelper {
     final String testOutDest = "test_out";

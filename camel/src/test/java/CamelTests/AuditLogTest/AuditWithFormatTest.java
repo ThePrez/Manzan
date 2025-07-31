@@ -1,12 +1,8 @@
 package CamelTests.AuditLogTest;
 
 import CamelTests.CamelTestHelper;
-import com.github.theprez.manzan.configuration.ApplicationConfig;
 import com.github.theprez.manzan.routes.dest.StreamDestination;
 import com.github.theprez.manzan.routes.event.AuditLog;
-import com.ibm.as400.access.AS400;
-import com.ibm.as400.access.AS400JDBCDataSource;
-import org.apache.camel.CamelContext;
 import org.apache.camel.RoutesBuilder;
 import org.apache.camel.component.mock.MockEndpoint;
 import org.junit.jupiter.api.Test;
