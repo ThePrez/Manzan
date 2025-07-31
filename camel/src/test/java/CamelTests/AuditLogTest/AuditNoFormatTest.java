@@ -5,6 +5,7 @@ import com.github.theprez.manzan.routes.dest.StreamDestination;
 import com.github.theprez.manzan.routes.event.AuditLog;
 import org.apache.camel.RoutesBuilder;
 import org.apache.camel.component.mock.MockEndpoint;
+import org.ini4j.Ini;
 import org.junit.jupiter.api.Test;
 
 import java.io.IOException;
@@ -21,7 +22,8 @@ public class AuditNoFormatTest extends CamelTestHelper {
 
     @Test
     public void testWithoutFormat() throws Exception {
-        String hostname = "p8adt05.rch.stglabs.ibm.com";
+        Ini ini = readIni();
+        String hostname = ini.get("remote", "system");
         String fakeUser = "fakeUser";
         String fakePassword = "fakePassword";
         MockEndpoint mockOut = getMockEndpoint("mock:direct:" + testOutDest);

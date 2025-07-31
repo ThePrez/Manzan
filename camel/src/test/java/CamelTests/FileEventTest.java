@@ -13,10 +13,6 @@ import java.nio.file.Files;
 import java.nio.file.Path;
 import java.nio.file.Paths;
 import java.nio.file.StandardOpenOption;
-import java.util.HashMap;
-import java.util.LinkedList;
-import java.util.Map;
-
 public class FileEventTest extends CamelTestHelper {
     Path baseDir = Paths.get("").toAbsolutePath();  // current working dir
     Path fileDir = baseDir

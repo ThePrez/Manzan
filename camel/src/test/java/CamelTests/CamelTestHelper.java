@@ -8,8 +8,13 @@ import com.ibm.as400.access.AS400SecurityException;
 import org.apache.camel.CamelContext;
 import org.apache.camel.component.mock.MockEndpoint;
 import org.apache.camel.test.junit5.CamelTestSupport;
+import org.ini4j.Ini;
 
 import java.beans.PropertyVetoException;
+import java.io.File;
+import java.io.IOException;
+import java.nio.file.Path;
+import java.nio.file.Paths;
 import java.util.*;
 
 public abstract class CamelTestHelper extends CamelTestSupport {
@@ -64,6 +69,14 @@ public abstract class CamelTestHelper extends CamelTestSupport {
             }
         }
         return true;
+    }
+
+    protected Ini readIni() throws IOException {
+        Path baseDir = Paths.get("").toAbsolutePath();  // current working dir
+        Path fileDir = baseDir.resolve("app.ini");
+        File appIni = new File(fileDir.toString());
+        Ini ini = new Ini(appIni);
+        return ini;
     }
 
     @Override
