@@ -1,48 +1,16 @@
 package CamelTests;
 
-import com.fasterxml.jackson.databind.ObjectMapper;
 import com.github.theprez.manzan.routes.dest.StreamDestination;
 import org.apache.camel.RoutesBuilder;
 import org.apache.camel.component.mock.MockEndpoint;
-import org.apache.camel.test.junit5.CamelTestSupport;
 import org.junit.jupiter.api.Test;
 import com.github.theprez.manzan.routes.event.HttpEvent;
 
 import java.io.IOException;
 import java.util.*;
 
-public class HttpEventTest extends CamelTestSupport {
-
+public class HttpEventTest extends CamelTestHelper {
     final String testOutDest = "test_out";
-
-    private void expectBodyToHaveKeys(MockEndpoint mockOut, List<String> keys){
-        mockOut.expectedMessagesMatches(exchange -> {
-            try {
-                String body = exchange.getIn().getBody(String.class);
-                ObjectMapper mapper = new ObjectMapper();
-                Map<String, Object> json = mapper.readValue(body, Map.class);
-
-                Set<String> expectedKeys = new HashSet<>(keys);
-
-                return json.keySet().containsAll(expectedKeys);
-            } catch (Exception e) {
-                return false;
-            }
-        });
-    }
-
-    private void expectBodyToStartWith(MockEndpoint mockOut, String prefix){
-        mockOut.expectedMessagesMatches(exchange -> {
-            try {
-                String body = exchange.getIn().getBody(String.class);
-
-
-                return body.startsWith(prefix);
-            } catch (Exception e) {
-                return false;
-            }
-        });
-    }
 
     @Override
     public String isMockEndpoints() {

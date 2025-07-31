@@ -1,27 +1,23 @@
 package CamelTests.AuditLogTest;
 
+import CamelTests.CamelTestHelper;
 import com.github.theprez.manzan.configuration.ApplicationConfig;
 import com.github.theprez.manzan.routes.dest.StreamDestination;
+import com.github.theprez.manzan.routes.event.AuditLog;
+import com.ibm.as400.access.AS400;
 import com.ibm.as400.access.AS400JDBCDataSource;
 import org.apache.camel.CamelContext;
 import org.apache.camel.RoutesBuilder;
 import org.apache.camel.component.mock.MockEndpoint;
-import org.apache.camel.test.junit5.CamelTestSupport;
 import org.junit.jupiter.api.Test;
-import com.github.theprez.manzan.routes.event.AuditLog;
 
-import java.beans.PropertyVetoException;
 import java.io.IOException;
 import java.util.HashMap;
 import java.util.LinkedList;
 import java.util.Map;
-
-import com.ibm.as400.access.AS400;
-import com.ibm.as400.access.AS400SecurityException;
-
 import java.util.concurrent.TimeUnit;
 
-public class AuditWithFormatTest extends CamelTestSupport {
+public class AuditWithFormatTest extends CamelTestHelper {
     final String testOutDest = "test_out";
 
     @Override
@@ -45,26 +41,6 @@ public class AuditWithFormatTest extends CamelTestSupport {
     public String isMockEndpoints() {
         String[] mockEndpoints = new String[]{"direct:" + testOutDest};
         return String.join(",", mockEndpoints);
-    }
-
-    private boolean attemptInvalidLogin(String hostname, String username, String password) throws PropertyVetoException {
-        AS400 system = new AS400(hostname, username, password);
-        system.setGuiAvailable(false); // ✅ Disable GUI prompt
-
-        try {
-            system.connectService(AS400.COMMAND); // Try connecting to the COMMAND service
-            System.out.println("Login unexpectedly succeeded.");
-            return false;
-        } catch (AS400SecurityException e) {
-            System.out.println("Login failed: Invalid credentials.");
-        } catch (Exception e) {
-            System.out.println("Login failed: IO or connection error - " + e.getMessage());
-        } finally {
-            if (system.isConnected()) {
-                system.disconnectAllServices();
-            }
-        }
-        return true;
     }
 
     @Test

@@ -3,7 +3,6 @@ package CamelTests;
 import com.github.theprez.manzan.routes.dest.StreamDestination;
 import org.apache.camel.RoutesBuilder;
 import org.apache.camel.component.mock.MockEndpoint;
-import org.apache.camel.test.junit5.CamelTestSupport;
 import org.junit.jupiter.api.Test;
 import com.github.theprez.manzan.routes.event.FileEvent;
 
@@ -18,7 +17,7 @@ import java.util.HashMap;
 import java.util.LinkedList;
 import java.util.Map;
 
-public class FileEventTest extends CamelTestSupport {
+public class FileEventTest extends CamelTestHelper {
     Path baseDir = Paths.get("").toAbsolutePath();  // current working dir
     Path fileDir = baseDir
             .resolve("src")
