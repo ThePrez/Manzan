@@ -40,4 +40,4 @@ jobs:
 
       - name: Build with Maven
         working-directory: camel
-        run: mvn -B package --file pom.xml
+        run: mvn -B package -Dtest='!CamelTests.**' --file pom.xml

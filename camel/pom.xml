@@ -200,6 +200,12 @@
           <artifactId>junit-jupiter</artifactId>
           <scope>test</scope>
       </dependency>
+    <dependency>
+      <groupId>org.apache.camel</groupId>
+      <artifactId>camel-test-junit5</artifactId>
+      <scope>test</scope>
+      <version>3.14.10</version>
+    </dependency>
   </dependencies>
 
   <build>
