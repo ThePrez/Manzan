@@ -79,6 +79,7 @@ jobs:
           echo "system=${{ secrets.IBMI_HOST }}" >> app.ini
           echo "user=${{ secrets.IBMI_USER }}" >> app.ini
           echo "password=${{ secrets.IBMI_PASSWORD }}" >> app.ini
+          chmod 600 app.ini
           mvn clean test -Dsurefire.excludes="CamelTests/AuditLogTest/**,CamelTests/SqlEventTest.java"
 
       - name: Cleanup
