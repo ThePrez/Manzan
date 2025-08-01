@@ -72,9 +72,14 @@ jobs:
         working-directory: scripts
         run: bash ./testIle.sh
 
-      - name: Run Junit Tests
+      - name: Run JUnit Tests
         working-directory: camel
-        run: mvn clean test -Dsurefire.excludes="CamelTests/AuditLogTest/**,CamelTests/SqlEventTest.java"
+        run: |
+          echo "[remote]" > app.ini
+          echo "system=${{ secrets.IBMI_HOST }}" >> app.ini
+          echo "user=${{ secrets.IBMI_USER }}" >> app.ini
+          echo "password=${{ secrets.IBMI_PASSWORD }}" >> app.ini
+          mvn clean test -Dsurefire.excludes="CamelTests/AuditLogTest/**,CamelTests/SqlEventTest.java"
 
       - name: Cleanup
         if: always()
