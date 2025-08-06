@@ -13,6 +13,9 @@ import java.nio.file.Files;
 import java.nio.file.Path;
 import java.nio.file.Paths;
 import java.nio.file.StandardOpenOption;
+import java.util.LinkedHashMap;
+import java.util.Map;
+
 public class FileEventTest extends CamelTestHelper {
     Path baseDir = Paths.get("").toAbsolutePath();  // current working dir
     Path fileDir = baseDir
@@ -49,11 +52,10 @@ public class FileEventTest extends CamelTestHelper {
         final String textContent = "Hello World";
         Path path = Paths.get(filePathNoFormatString);
         String fileName = path.getFileName().toString();
-        String expectedTextContent = "{\n" +
-                "  \"FILE_NAME\" : \"" + fileName + "\",\n" +
-                "  \"FILE_PATH\" : \"" + filePathNoFormatString + "\",\n" +
-                "  \"FILE_DATA\" : \"" + textContent + "\"\n" +
-                "}";
+        Map<String, Object> expectedDataMap = new LinkedHashMap<>();
+                    expectedDataMap.put("FILE_NAME", fileName);
+                    expectedDataMap.put("FILE_PATH", filePathNoFormatString);
+                    expectedDataMap.put("FILE_DATA", textContent);
 
         MockEndpoint mockOut = getMockEndpoint("mock:direct:" + testOutDest);
         try (BufferedWriter writer = new BufferedWriter(new FileWriter(filePathNoFormatString))) {
@@ -61,7 +63,7 @@ public class FileEventTest extends CamelTestHelper {
         }
         mockOut.setResultWaitTime(5000); // give Camel up to 5 seconds
         mockOut.expectedMessageCount(1);
-        mockOut.expectedBodiesReceived(expectedTextContent);
+        mockOut.expectedHeaderReceived("data_map", expectedDataMap);
         mockOut.assertIsSatisfied();
     }
 
