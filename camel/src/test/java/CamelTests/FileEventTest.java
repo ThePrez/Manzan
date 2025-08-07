@@ -84,13 +84,13 @@ public class FileEventTest extends CamelTestHelper {
     public void testFileWithFilterNoMatch() throws Exception {
         final String textContent = "Hello World";
         MockEndpoint mockOut = getMockEndpoint("mock:direct:" + testOutDest);
-        mockOut.expectedMessageCount(0);      // Expect zero messages
 
         try (BufferedWriter writer = new BufferedWriter(new FileWriter(filePathUnmatchedFilter))) {
             writer.write(textContent);         // Write file that should NOT trigger a message
         }
         mockOut.setAssertPeriod(2000);
-        mockOut.assertIsSatisfied();           // Will fail if any messages arrive within 5 seconds
+        mockOut.expectedMessageCount(0);
+        mockOut.assertIsSatisfied();
     }
 
     @Override
