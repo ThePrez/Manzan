@@ -21,6 +21,7 @@ public abstract class CamelTestHelper extends CamelTestSupport {
     protected LinkedList<String> destinations = new LinkedList<>();
     protected Map<String, String> dataMapInjections = new HashMap<>();
     protected Map<String, String> componentOptions = new HashMap<>();
+    final protected String testOutDest = "test_out";
 
     protected void expectBodyToHaveKeys(MockEndpoint mockOut, List<String> keys) {
         mockOut.expectedMessagesMatches(exchange -> {

@@ -10,8 +10,6 @@ import java.io.IOException;
 import java.util.*;
 
 public class SqlEventTest extends CamelTestHelper {
-    final String testOutDest = "test_out";
-
     @Override
     public String isMockEndpoints() {
         String[] mockEndpoints = new String[]{"direct:" + testOutDest};

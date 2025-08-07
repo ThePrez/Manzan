@@ -12,8 +12,6 @@ import java.io.IOException;
 import java.util.concurrent.TimeUnit;
 
 public class AuditWithFormatTest extends CamelTestHelper {
-    final String testOutDest = "test_out";
-
     @Override
     public String isMockEndpoints() {
         String[] mockEndpoints = new String[]{"direct:" + testOutDest};
