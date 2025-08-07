@@ -12,12 +12,6 @@ import java.io.IOException;
 import java.util.*;
 
 public class AuditNoFormatTest extends CamelTestHelper {
-    @Override
-    public String isMockEndpoints() {
-        String[] mockEndpoints = new String[]{"direct:" + testOutDest};
-        return String.join(",", mockEndpoints);
-    }
-
     @Test
     public void testWithoutFormat() throws Exception {
         Ini ini = readIni();
@@ -45,7 +39,6 @@ public class AuditNoFormatTest extends CamelTestHelper {
             mockOut.assertIsSatisfied();
         }
     }
-
 
     @Override
     protected RoutesBuilder[] createRouteBuilders() throws IOException {

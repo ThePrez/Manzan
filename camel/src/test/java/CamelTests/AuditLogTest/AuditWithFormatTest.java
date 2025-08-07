@@ -12,12 +12,6 @@ import java.io.IOException;
 import java.util.concurrent.TimeUnit;
 
 public class AuditWithFormatTest extends CamelTestHelper {
-    @Override
-    public String isMockEndpoints() {
-        String[] mockEndpoints = new String[]{"direct:" + testOutDest};
-        return String.join(",", mockEndpoints);
-    }
-
     @Test
     public void testWithFormat() throws Exception {
         Ini ini = readIni();

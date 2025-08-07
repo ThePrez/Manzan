@@ -10,12 +10,6 @@ import java.io.IOException;
 import java.util.*;
 
 public class HttpEventTest extends CamelTestHelper {
-    @Override
-    public String isMockEndpoints() {
-        String[] mockEndpoints = new String[]{"direct:" + testOutDest};
-        return String.join(",", mockEndpoints);
-    }
-
     @Test
     public void testHttpEndpoint() throws Exception {
         String prefix = "{seed=";

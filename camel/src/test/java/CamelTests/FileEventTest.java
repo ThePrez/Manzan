@@ -41,12 +41,6 @@ public class FileEventTest extends CamelTestHelper {
         }
     }
 
-    @Override
-    public String isMockEndpoints() {
-        String[] mockEndpoints = new String[]{"direct:" + testOutDest};
-        return String.join(",", mockEndpoints);
-    }
-
     @Test
     public void testFileNoFilter() throws Exception {
         final String textContent = "Hello World";

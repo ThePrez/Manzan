@@ -96,4 +96,10 @@ public abstract class CamelTestHelper extends CamelTestSupport {
 
         return context;
     }
+
+    @Override
+    public String isMockEndpoints() {
+        String[] mockEndpoints = new String[]{"direct:" + testOutDest};
+        return String.join(",", mockEndpoints);
+    }
 }
