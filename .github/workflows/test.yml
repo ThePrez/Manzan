@@ -80,7 +80,7 @@ jobs:
           echo "user=${{ secrets.IBMI_USER }}" >> app.ini
           echo "password=${{ secrets.IBMI_PASSWORD }}" >> app.ini
           chmod 600 app.ini
-          mvn clean test -Dsurefire.excludes="CamelTests/AuditLogTest/**,CamelTests/SqlEventTest.java"
+          mvn clean test -Dsurefire.excludes="CamelTests/AuditLogTest/**"
 
       - name: Cleanup
         if: always()

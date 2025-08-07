@@ -27,7 +27,7 @@ public class SqlEventTest extends CamelTestHelper {
                 Arrays.asList("JOB_NAME", "JOB_USER", "SUBSYSTEM",
                         "JOB_STATUS", "CPU_TIME", "ELAPSED_CPU_PERCENTAGE",
                         "TOTAL_DISK_IO_COUNT", "ELAPSED_TIME", "TEMPORARY_STORAGE",
-                        "MEMORY_POOL", "FUNCTION", "THREAD_COUNT");
+                        "MEMORY_POOL", "FUNCTION", "THREAD_COUNT", "FOO");
         expectBodyToHaveKeys(mockOut, expectedKeys);
         mockOut.assertIsSatisfied();
     }
@@ -42,7 +42,7 @@ public class SqlEventTest extends CamelTestHelper {
         final Map<String, String> headerParams = new LinkedHashMap();
         headerParams.put("authorization", "bearer eyt");
 
-        dataMapInjections.put("foo", "bar");
+        dataMapInjections.put("FOO", "BAR");
         destinations.add(testOutDest);
 
         return new RoutesBuilder[]{
