@@ -10,7 +10,6 @@
   <packaging>jar</packaging>
   <version>1.0</version>
 
-
   <properties>
     <project.build.sourceEncoding>UTF-8</project.build.sourceEncoding>
     <project.reporting.outputEncoding>UTF-8</project.reporting.outputEncoding>
@@ -38,16 +37,44 @@
       <artifactId>camel-core</artifactId>
       <version>3.14.10</version>
     </dependency>
+
+    <!-- Guava switched to 31.1-jre -->
     <dependency>
       <groupId>com.google.guava</groupId>
       <artifactId>guava</artifactId>
-      <version>30.1-android</version>
+      <version>31.1-jre</version>
     </dependency>
+
+    <!-- Camel Pub/Sub with transitive guava & pubsub excluded -->
     <dependency>
       <groupId>org.apache.camel</groupId>
       <artifactId>camel-google-pubsub</artifactId>
       <version>3.14.6</version>
+      <exclusions>
+        <exclusion>
+          <groupId>com.google.cloud</groupId>
+          <artifactId>google-cloud-pubsub</artifactId>
+        </exclusion>
+        <exclusion>
+          <groupId>com.google.guava</groupId>
+          <artifactId>guava</artifactId>
+        </exclusion>
+      </exclusions>
     </dependency>
+
+    <!-- Google Pub/Sub client, explicit  -->
+    <dependency>
+      <groupId>com.google.cloud</groupId>
+      <artifactId>google-cloud-pubsub</artifactId>
+      <version>1.110.3</version>
+      <exclusions>
+        <exclusion>
+          <groupId>com.google.guava</groupId>
+          <artifactId>guava</artifactId>
+        </exclusion>
+      </exclusions>
+    </dependency>
+
     <dependency>
       <groupId>org.apache.camel</groupId>
       <artifactId>camel-activemq</artifactId>
@@ -68,7 +95,6 @@
       <artifactId>camel-main</artifactId>
       <version>3.14.7</version>
     </dependency>
-
 
     <dependency>
       <groupId>org.apache.camel</groupId>
@@ -100,7 +126,6 @@
       <version>3.14.6</version>
     </dependency>
 
-
     <dependency>
       <groupId>org.apache.camel</groupId>
       <artifactId>camel-file</artifactId>
@@ -116,7 +141,6 @@
       <artifactId>camel-http</artifactId>
       <version>3.14.7</version>
     </dependency>
-
 
     <dependency>
       <groupId>org.apache.camel</groupId>
@@ -144,7 +168,8 @@
       <artifactId>gson</artifactId>
       <version>2.10.1</version>
     </dependency>
-    <!-- logging -->
+
+    <!-- logging (unchanged except whatever BOMs manage) -->
     <dependency>
       <groupId>org.apache.logging.log4j</groupId>
       <artifactId>log4j-api</artifactId>
@@ -189,17 +214,16 @@
       <scope>test</scope>
     </dependency>
 
-    <!-- https://mvnrepository.com/artifact/io.opentelemetry/opentelemetry-exporter-otlp -->
     <dependency>
       <groupId>io.opentelemetry</groupId>
       <artifactId>opentelemetry-exporter-otlp</artifactId>
       <version>1.49.0</version>
     </dependency>
-      <dependency>
-          <groupId>org.junit.jupiter</groupId>
-          <artifactId>junit-jupiter</artifactId>
-          <scope>test</scope>
-      </dependency>
+    <dependency>
+      <groupId>org.junit.jupiter</groupId>
+      <artifactId>junit-jupiter</artifactId>
+      <scope>test</scope>
+    </dependency>
     <dependency>
       <groupId>org.apache.camel</groupId>
       <artifactId>camel-test-junit5</artifactId>
@@ -220,6 +244,34 @@
           <source>1.8</source>
           <target>1.8</target>
         </configuration>
+      </plugin>
+      <plugin>
+        <groupId>org.apache.maven.plugins</groupId>
+        <artifactId>maven-surefire-plugin</artifactId>
+        <version>3.2.5</version>
+      </plugin>
+      <!-- Shade plugin to relocate Guava and avoid conflicts with Google PubSub -->
+      <plugin>
+        <groupId>org.apache.maven.plugins</groupId>
+        <artifactId>maven-shade-plugin</artifactId>
+        <version>3.4.1</version>
+        <executions>
+          <execution>
+            <phase>package</phase>
+            <goals>
+              <goal>shade</goal>
+            </goals>
+            <configuration>
+              <relocations>
+                <relocation>
+                  <pattern>com.google.common</pattern>
+                  <shadedPattern>manzan.shaded.com.google.common</shadedPattern>
+                </relocation>
+              </relocations>
+              <createDependencyReducedPom>false</createDependencyReducedPom>
+            </configuration>
+          </execution>
+        </executions>
       </plugin>
       <plugin>
         <groupId>org.apache.maven.plugins</groupId>

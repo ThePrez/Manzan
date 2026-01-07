@@ -1,3 +1,4 @@
+package CamelTests;
 import org.junit.jupiter.api.Test;
 import com.github.theprez.manzan.ManzanMessageFilter;
 
