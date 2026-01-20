@@ -25,7 +25,24 @@ src/mzversion.h:
 	system "CRTPGM PGM(${BUILDLIB}/$*) MODULE($(patsubst %.module,$(BUILDLIB)/%,$(notdir $^))) ACTGRP(*CALLER)"
 
 /qsys.lib/${BUILDLIB}.lib/%.module: src/%.cpp src/mzversion.h
-	system "CRTCPPMOD MODULE(${BUILDLIB}/$*) SRCSTMF('$(CURDIR)/$<') OPTION(*EVENTF) SYSIFCOPT(*IFS64IO) DBGVIEW(*SOURCE) TERASPACE(*YES *TSIFC) STGMDL(*SNGLVL) DTAMDL(*p128) DEFINE(DEBUG_ENABLED) OUTPUT(*PRINT) TGTCCSID(*JOB)" 
+	@echo "Compiling $< -> ${BUILDLIB}/$*"
+	@if ! system "CRTCPPMOD MODULE(${BUILDLIB}/$*) SRCSTMF('$(CURDIR)/$<') \
+	               OPTION(*EVENTF) SYSIFCOPT(*IFS64IO) DBGVIEW(*SOURCE) \
+	               TERASPACE(*YES *TSIFC) STGMDL(*SNGLVL) DTAMDL(*p128) \
+	               DEFINE(DEBUG_ENABLED) OUTPUT(*PRINT) TGTCCSID(*JOB)"; then \
+		echo "CRTCPPMOD failed for ${BUILDLIB}/$*; retrieving listing..."; \
+		if system "CPYSPLF FILE(QSYSPRT) TOFILE(*TOSTMF) JOB(*) SPLNBR(*LAST) \
+		                  TOSTMF('/tmp/$*_CRTCPPMOD.txt') \
+		                  STMFOPT(*REPLACE) WSCST(*TXT)"; then \
+			echo '===== C++ Compilation Error Listing ====='; \
+			cat /tmp/$*_CRTCPPMOD.txt; \
+			echo '===== End of Listing ====='; \
+			rm -f /tmp/$*_CRTCPPMOD.txt; \
+		else \
+			echo "Warning: Could not retrieve spool file"; \
+		fi; \
+		exit 1; \
+	fi
 
 /qsys.lib/${BUILDLIB}.lib/%.module: src/%.sqlc
 	system "CRTSQLCPPI OBJ(${BUILDLIB}/$*) SRCSTMF('$(CURDIR)/$^') COMMIT(*NONE) DATFMT(*ISO) TIMFMT(*ISO) DBGVIEW(*SOURCE) CVTCCSID(*JOB) COMPILEOPT('INCDIR(''src'')') SQLPATH(${BUILDLIB}) DFTRDBCOL(${BUILDLIB}) OPTION(*SQL)" 
@@ -46,4 +63,5 @@ src/mzversion.h:
 	echo "Success"
 
 uninstall:
+
 	system "dltlib ${BUILDLIB}" || echo "could not delete library"
