@@ -25,16 +25,7 @@ src/mzversion.h:
 	system "CRTPGM PGM(${BUILDLIB}/$*) MODULE($(patsubst %.module,$(BUILDLIB)/%,$(notdir $^))) ACTGRP(*CALLER)"
 
 /qsys.lib/${BUILDLIB}.lib/%.module: src/%.cpp src/mzversion.h
-	@echo "Compiling $< -> ${BUILDLIB}/$*"
-	@system "CRTCPPMOD MODULE(${BUILDLIB}/$*) SRCSTMF('$(CURDIR)/$<') \
-	               OPTION(*EVENTF) SYSIFCOPT(*IFS64IO) DBGVIEW(*SOURCE) \
-	               TERASPACE(*YES *TSIFC) STGMDL(*SNGLVL) DTAMDL(*p128) \
-	               DEFINE(DEBUG_ENABLED) OUTPUT(*PRINT) TGTCCSID(*JOB)" 2>&1 || \
-	(echo "===== CRTCPPMOD failed for ${BUILDLIB}/$* =====" && \
-	 echo "Attempting to retrieve compilation errors..." && \
-	 db2 "SELECT MESSAGE_TEXT FROM TABLE(QSYS2.JOBLOG_INFO('*')) WHERE MESSAGE_ID LIKE 'CZS%' OR MESSAGE_ID LIKE 'CPP%' ORDER BY ORDINAL_POSITION DESC FETCH FIRST 20 ROWS ONLY" 2>/dev/null || \
-	 echo "Could not retrieve detailed error messages. Check CRTCPPMOD parameters and source file." && \
-	 exit 1)
+	system "CRTCPPMOD MODULE(${BUILDLIB}/$*) SRCSTMF('$(CURDIR)/$<') OPTION(*EVENTF) SYSIFCOPT(*IFS64IO) DBGVIEW(*SOURCE) TERASPACE(*YES *TSIFC) STGMDL(*SNGLVL) DTAMDL(*p128) DEFINE(DEBUG_ENABLED) OUTPUT(*PRINT) TGTCCSID(*JOB)" 
 
 /qsys.lib/${BUILDLIB}.lib/%.module: src/%.sqlc
 	system "CRTSQLCPPI OBJ(${BUILDLIB}/$*) SRCSTMF('$(CURDIR)/$^') COMMIT(*NONE) DATFMT(*ISO) TIMFMT(*ISO) DBGVIEW(*SOURCE) CVTCCSID(*JOB) COMPILEOPT('INCDIR(''src'')') SQLPATH(${BUILDLIB}) DFTRDBCOL(${BUILDLIB}) OPTION(*SQL)" 
@@ -57,6 +48,7 @@ src/mzversion.h:
 uninstall:
 
 	system "dltlib ${BUILDLIB}" || echo "could not delete library"
+
 
 
 
