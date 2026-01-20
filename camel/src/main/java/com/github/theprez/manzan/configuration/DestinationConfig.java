@@ -65,6 +65,14 @@ public class DestinationConfig extends Config {
                     getRequiredString(name, "index"); // This ensures that the user sets the index query parameter
                     ret.put(name, new SplunkDestination(context, name, splunkUrl, token, format, componentOptions, getUriAndHeaderParameters(name, sectionObj, "splunkUrl", "token")));
                     break;
+                case "azure-servicebus":
+                    final String topicOrQueueName = getRequiredString(name, "topicOrQueueName");
+                    final String serviceBusType = getRequiredString(name, "serviceBusType");
+                    // One of below credentials must be provided
+                    final String connectionString = getOptionalString(name, "connectionString");
+                    final String tokenCredential = getOptionalString(name, "tokenCredential");
+                    ret.put(name, new AzureServiceBusDestination(context, name, topicOrQueueName, serviceBusType, connectionString, tokenCredential, format, componentOptions, getUriAndHeaderParameters(name, sectionObj, "topicOrQueueName")));
+                    break;
                 case "elasticsearch":
                     final String endpoint = getRequiredString(name, "endpoint");
                     final String apiKey = getRequiredString(name, "apiKey");
