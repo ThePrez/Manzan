@@ -23,7 +23,6 @@ src/mzversion.h:
 
 /qsys.lib/${BUILDLIB}.lib/%.pgm:
 	system "CRTPGM PGM(${BUILDLIB}/$*) MODULE($(patsubst %.module,$(BUILDLIB)/%,$(notdir $^))) ACTGRP(*CALLER)"
-
 /qsys.lib/${BUILDLIB}.lib/%.module: src/%.cpp src/mzversion.h
 	@echo "Compiling $< -> ${BUILDLIB}/$*"
 	@if ! system "CRTCPPMOD MODULE(${BUILDLIB}/$*) SRCSTMF('$(CURDIR)/$<') \
@@ -31,15 +30,14 @@ src/mzversion.h:
 	               TERASPACE(*YES *TSIFC) STGMDL(*SNGLVL) DTAMDL(*p128) \
 	               DEFINE(DEBUG_ENABLED) OUTPUT(*PRINT) TGTCCSID(*JOB)"; then \
 		echo "CRTCPPMOD failed for ${BUILDLIB}/$*; retrieving listing..."; \
-		system "CPYSPLF FILE(QSYSPRT) TOFILE(*TOSTMF) JOB(*) SPLNBR(*LAST) \
-		               TOSTMF('$(CURDIR)/crtcppmod_error.txt') \
-		               STMFOPT(*REPLACE) WSCST(*TXT)" || true; \
+		ERRFILE=/tmp/cpperr.txt; \
+		system "CPYSPLF FILE(QSYSPRT) TOFILE(*TOSTMF) JOB(*) SPLNBR(*LAST) TOSTMF('$$ERRFILE') STMFOPT(*REPLACE)" > /dev/null 2>&1 || true; \
 		echo '===== C++ Compilation Error Listing ====='; \
-		cat $(CURDIR)/crtcppmod_error.txt 2>/dev/null || echo "Could not read listing file"; \
+		cat $$ERRFILE 2>/dev/null || echo 'Could not retrieve compilation listing'; \
 		echo '===== End of Listing ====='; \
+		rm -f $$ERRFILE; \
 		exit 1; \
 	fi
-
 /qsys.lib/${BUILDLIB}.lib/%.module: src/%.sqlc
 	system "CRTSQLCPPI OBJ(${BUILDLIB}/$*) SRCSTMF('$(CURDIR)/$^') COMMIT(*NONE) DATFMT(*ISO) TIMFMT(*ISO) DBGVIEW(*SOURCE) CVTCCSID(*JOB) COMPILEOPT('INCDIR(''src'')') SQLPATH(${BUILDLIB}) DFTRDBCOL(${BUILDLIB}) OPTION(*SQL)" 
 
@@ -61,4 +59,5 @@ src/mzversion.h:
 uninstall:
 
 	system "dltlib ${BUILDLIB}" || echo "could not delete library"
+
 
