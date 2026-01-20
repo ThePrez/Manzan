@@ -31,16 +31,12 @@ src/mzversion.h:
 	               TERASPACE(*YES *TSIFC) STGMDL(*SNGLVL) DTAMDL(*p128) \
 	               DEFINE(DEBUG_ENABLED) OUTPUT(*PRINT) TGTCCSID(*JOB)"; then \
 		echo "CRTCPPMOD failed for ${BUILDLIB}/$*; retrieving listing..."; \
-		if system "CPYSPLF FILE(QSYSPRT) TOFILE(*TOSTMF) JOB(*) SPLNBR(*LAST) \
-		                  TOSTMF('/tmp/$*_CRTCPPMOD.txt') \
-		                  STMFOPT(*REPLACE) WSCST(*TXT)"; then \
-			echo '===== C++ Compilation Error Listing ====='; \
-			cat /tmp/$*_CRTCPPMOD.txt; \
-			echo '===== End of Listing ====='; \
-			rm -f /tmp/$*_CRTCPPMOD.txt; \
-		else \
-			echo "Warning: Could not retrieve spool file"; \
-		fi; \
+		system "CPYSPLF FILE(QSYSPRT) TOFILE(*TOSTMF) JOB(*) SPLNBR(*LAST) \
+		               TOSTMF('$(CURDIR)/crtcppmod_error.txt') \
+		               STMFOPT(*REPLACE) WSCST(*TXT)" || true; \
+		echo '===== C++ Compilation Error Listing ====='; \
+		cat $(CURDIR)/crtcppmod_error.txt 2>/dev/null || echo "Could not read listing file"; \
+		echo '===== End of Listing ====='; \
 		exit 1; \
 	fi
 
@@ -65,3 +61,4 @@ src/mzversion.h:
 uninstall:
 
 	system "dltlib ${BUILDLIB}" || echo "could not delete library"
+
