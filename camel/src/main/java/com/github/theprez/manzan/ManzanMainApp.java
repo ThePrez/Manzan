@@ -108,7 +108,7 @@ public class ManzanMainApp {
             CommandCall cmd = new CommandCall(as400,
                     "CALL PGM(" + library.trim() + "/handler) PARM('*VERSION' '*VERSION')");
 
-            cmd.setMessageOption(AS400Message.MESSAGE_OPTION_ALL);;
+            cmd.setMessageOption(AS400Message.MESSAGE_OPTION_ALL);
             boolean isSuccess = cmd.run();
             if (isSuccess) {
                 AS400Message[] msgs = cmd.getMessageList();
