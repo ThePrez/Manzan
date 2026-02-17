@@ -1,7 +1,2 @@
-# MODULE.bazel
-
-# C++ rules for Bazel 
-bazel_dep(name = "rules_cc", version = "0.2.8")
-
-# GoogleTest 
+bazel_dep(name = "rules_cc", version = "0.2.14")
 bazel_dep(name = "googletest", version = "1.17.0.bcr.2")

@@ -13,4 +13,6 @@ cc_test(
         "-Iile/src",
         "-std=c++17",  # GoogleTest 1.17.0+ requires C++17
     ],
+    # Disable default compile flags to prevent C++14 from being added
+    features = ["-default_compile_flags"],
 )
