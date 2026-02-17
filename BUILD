@@ -8,6 +8,9 @@ cc_test(
         "@googletest//:gtest",
         "@googletest//:gtest_main",
     ],
-    includes = ["ile/src"],  # Adjusted to relative path
-    copts = ["-Iile/src"],
+    includes = ["ile/src"],
+    copts = [
+        "-Iile/src",
+        "-std=c++17",  # GoogleTest 1.17.0+ requires C++17
+    ],
 )
