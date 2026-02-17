@@ -1,0 +1,5 @@
+# Bazel configuration for Manzan
+
+# Set C++17 as the default standard (required by GoogleTest 1.17.0+)
+build --cxxopt=-std=c++17
+build --host_cxxopt=-std=c++17
