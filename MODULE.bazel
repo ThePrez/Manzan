@@ -1,5 +1,8 @@
 # MODULE.bazel
 
+# C++ rules for Bazel
+bazel_dep(name = "rules_cc", version = "0.0.9")
+
 # Choose the most recent version available at
 # https://registry.bazel.build/modules/googletest
-bazel_dep(name = "googletest", version = "1.15.0")
+bazel_dep(name = "googletest", version = "1.17.0")

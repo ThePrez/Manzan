@@ -1,3 +1,5 @@
+load("@rules_cc//cc:defs.bzl", "cc_test")
+
 cc_test(
     name = "test_util",
     size = "small",
@@ -6,6 +8,6 @@ cc_test(
         "@googletest//:gtest",
         "@googletest//:gtest_main",
     ],
-   includes = ["ile/src"],  # Adjusted to relative path
-   copts = ["-Iile/src"]
-   )
+    includes = ["ile/src"],  # Adjusted to relative path
+    copts = ["-Iile/src"],
+)
