@@ -104,5 +104,7 @@
         "concepts": "cpp",
         "algorithm": "cpp"
     },
-    "java.configuration.updateBuildConfiguration": "automatic"
+    "java.configuration.updateBuildConfiguration": "automatic",
+    "makefile.configureOnOpen": false,
+    "java.compile.nullAnalysis.mode": "disabled"
 }
