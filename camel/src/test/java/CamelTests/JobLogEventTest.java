@@ -73,11 +73,48 @@ public class JobLogEventTest extends CamelTestHelper {
     /**
      * Get the current job identifier for testing
      * Format: number/user/name
+     * Queries the actual current job from the IBM i system
      */
     private String getCurrentJobIdentifier() {
-        // For testing purposes, we'll use a placeholder
-        // In a real IBM i environment, this would query the current job
-        // For now, return a test job identifier that may or may not exist
-        return "999999/QUSER/QZDASOINIT";
+        try {
+            // Query the current job information from the system
+            // This will return the job that's running this test
+            String sql = "SELECT JOB_NAME FROM TABLE(QSYS2.ACTIVE_JOB_INFO(JOB_NAME_FILTER => '*')) WHERE JOB_NAME = QSYS2.JOB_NAME FETCH FIRST 1 ROW ONLY";
+            
+            // Use the JDBC connection to get current job
+            // The job name returned is in format: number/user/name
+            java.sql.Connection conn = context.getRegistry().lookupByNameAndType("jt400", javax.sql.DataSource.class).getConnection();
+            java.sql.Statement stmt = conn.createStatement();
+            java.sql.ResultSet rs = stmt.executeQuery(sql);
+            
+            String jobName = null;
+            if (rs.next()) {
+                jobName = rs.getString("JOB_NAME");
+            }
+            
+            rs.close();
+            stmt.close();
+            conn.close();
+            
+            // If we couldn't get the job name, fall back to a generic active job
+            if (jobName == null || jobName.isEmpty()) {
+                // Query for any active job as fallback
+                conn = context.getRegistry().lookupByNameAndType("jt400", javax.sql.DataSource.class).getConnection();
+                stmt = conn.createStatement();
+                rs = stmt.executeQuery("SELECT JOB_NAME FROM TABLE(QSYS2.ACTIVE_JOB_INFO()) FETCH FIRST 1 ROW ONLY");
+                if (rs.next()) {
+                    jobName = rs.getString("JOB_NAME");
+                }
+                rs.close();
+                stmt.close();
+                conn.close();
+            }
+            
+            return jobName != null ? jobName : "000000/QSYS/QINTER";
+        } catch (Exception e) {
+            // If query fails, return a fallback job identifier
+            System.err.println("Failed to get current job identifier: " + e.getMessage());
+            return "000000/QSYS/QINTER";
+        }
     }
 }
