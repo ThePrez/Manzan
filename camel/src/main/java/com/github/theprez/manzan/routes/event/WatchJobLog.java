@@ -4,6 +4,7 @@ import java.io.IOException;
 import java.sql.Timestamp;
 import java.time.Instant;
 import java.util.*;
+import java.util.regex.Pattern;
 
 import com.github.theprez.jcmdutils.StringUtils;
 import com.github.theprez.manzan.ManzanEventType;
@@ -11,6 +12,10 @@ import com.github.theprez.manzan.ManzanMessageFormatter;
 import com.github.theprez.manzan.routes.ManzanRoute;
 
 public class WatchJobLog extends ManzanRoute {
+    // Pattern to validate job identifier format: number/user/name
+    // Job number: 6 digits, User: up to 10 alphanumeric, Name: up to 10 alphanumeric
+    private static final Pattern JOB_IDENTIFIER_PATTERN = Pattern.compile("^\\d{6}/[A-Z0-9]{1,10}/[A-Z0-9]{1,10}$");
+    
     private final int m_interval;
     private final ManzanMessageFormatter m_formatter;
     private final List<String> m_jobIdentifiers;
@@ -18,11 +23,14 @@ public class WatchJobLog extends ManzanRoute {
     private final Map<String, String> dataMapInjection;
 
     public WatchJobLog(final String _name, final List<String> _jobIdentifiers, final String _format,
-                       final List<String> _destinations, final int _interval, 
+                       final List<String> _destinations, final int _interval,
                        final Map<String, String> _dataMapInjection) throws IOException {
         super(_name);
         m_interval = _interval;
         m_formatter = StringUtils.isEmpty(_format) ? null : new ManzanMessageFormatter(_format);
+        
+        // Validate all job identifiers before storing them
+        validateJobIdentifiers(_jobIdentifiers);
         m_jobIdentifiers = _jobIdentifiers;
         m_lastCheckTimestamps = new HashMap<>();
         dataMapInjection = _dataMapInjection;
@@ -42,6 +50,23 @@ public class WatchJobLog extends ManzanRoute {
     }
 
     /**
+     * Validates job identifiers to prevent SQL injection
+     * Job identifiers must match the format: number/user/name
+     * @param jobIdentifiers List of job identifiers to validate
+     * @throws IllegalArgumentException if any job identifier is invalid
+     */
+    private void validateJobIdentifiers(List<String> jobIdentifiers) {
+        for (String jobId : jobIdentifiers) {
+            if (jobId == null || !JOB_IDENTIFIER_PATTERN.matcher(jobId.trim().toUpperCase()).matches()) {
+                throw new IllegalArgumentException(
+                    "Invalid job identifier format: '" + jobId + "'. " +
+                    "Expected format: NNNNNN/USER/JOBNAME (e.g., 123456/QUSER/MYJOB)"
+                );
+            }
+        }
+    }
+
+    /**
      * Build SQL query to fetch job log entries for all monitored jobs
      * Uses QSYS2.JOBLOG_INFO table function
      */
@@ -49,6 +74,7 @@ public class WatchJobLog extends ManzanRoute {
         StringBuilder sql = new StringBuilder();
         
         for (int i = 0; i < m_jobIdentifiers.size(); i++) {
+            // Job identifiers are pre-validated in constructor, safe to use
             String jobId = m_jobIdentifiers.get(i);
             Timestamp lastCheck = m_lastCheckTimestamps.get(jobId);
             
