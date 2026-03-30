@@ -33,12 +33,26 @@ type=stdout
 type=twilio
 
 # These come from a Twilio account
-componentOptions.sid=x
-componentOptions.token=x
+# Use 'username' for Account SID and 'password' for Auth Token
+componentOptions.username=ACxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxx
+componentOptions.password=yyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyy
 
 to=...
 from=+12058135364
 ```
+
+## Important Notes
+
+### Configuration Parameters
+
+The Apache Camel Twilio component requires specific parameter names:
+- Use `componentOptions.username` for your Twilio Account SID (starts with "AC")
+- Use `componentOptions.password` for your Twilio Auth Token
+
+**Note:** The parameter names `sid` and `token` are NOT supported by the Camel Twilio component and will result in the error: "Unable to initialise Twilio, Twilio component configuration is missing"
+
+### Message Body
+
 
 ##  Result
 

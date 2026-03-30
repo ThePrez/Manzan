@@ -42,6 +42,7 @@ Some types have additional properties that they require.
 | `sql`  | Executes arbitrary sql at a predefined interval    | `query` to be executed  | * `interval`  the interval in ms at which to run the sql statement |
 | `cmd`  | Executes an arbitrary command at a predefined interval  | `cmd` command to be executed  | * `args` The arguments to be passed to this command. The full command to be executed will be `<cmd> <args>`. Note. Chaining commands together will not work. In the case of needing to execute multiple commands, try putting them in a script and then executing the script. <br> * `interval`  the interval in ms at which to run the command. |
 | `http` | Fetches data from an http endpoint at the specified interval | `url` to make an http request from including any path parameters | * `interval` the interval at which to query for new messages <br> * `filter` only listen for responses that include this value <br> * \<header\> any header key value pair to be used for this http request|
+| `joblog` | Monitors IBM i job logs and triggers events for new log entries | `jobs` comma-separated list of job identifiers in format `number/user/name` (e.g., `123456/QUSER/MYJOB`) | * `interval` the interval in ms at which to poll for new log entries (default `1000`, recommended `200` for near-real-time) |
 
 ### Special event types
 The `table` event type is primarily used as a mechanism to transport arbitrary data to a chosen destination. This data can be programmatically inserted into the table, or it can be inserted manually. Note that this data will be deleted from the table after it is processed. In the case that you want to persist the data in the database, consider using a different event type such as `file` or `watch`.
@@ -123,7 +124,7 @@ args="DSPJOBLOG JOB(047284/QTMHHTTP/ADMIN)"
 format=cmd $CMD$ args $ARGS$ exitval $EXITVALUE$ stderr $STDERR$ stdout $STDOUT$
 interval=60000
 
-# Fetch data from https://fakeusergenerator.com every 5 minutes, with the specified 
+# Fetch data from https://fakeusergenerator.com every 5 minutes, with the specified
 # authorization header
 [http1]
 type=http
@@ -132,4 +133,14 @@ format=Result: $results.name.first$ $results.name.last$ $json:results.location$
 url=https://fakeusergenerator.com
 interval=300000
 authorization=bearer xxxxxx
+
+# Monitor job logs for specific jobs with near-real-time monitoring (200ms polling)
+[joblog1]
+type=joblog
+jobs=123456/QUSER/MYJOB,789012/ADMIN/BATCH01
+destinations=elasticsearch,slack
+format=$MESSAGE_TIMESTAMP$ [$JOB_NAME$] $MESSAGE_ID$ ($SEVERITY$): $MESSAGE_TEXT$
+interval=200
+injections.ENVIRONMENT=PRODUCTION
+injections.SYSTEM=IBMI-PROD-01
 ```
