@@ -32,13 +32,18 @@ public class PrometheusDestinationTest extends CamelTestHelper {
         // Wait for routes to start
         Thread.sleep(2000);
         
-        // Test that the metrics endpoint is accessible
+        // Test that the metrics endpoint is accessible with authentication
         String metricsUrl = "http://localhost:" + TEST_PORT + TEST_PATH;
         HttpURLConnection conn = (HttpURLConnection) new URL(metricsUrl).openConnection();
         conn.setRequestMethod("GET");
         
+        // Add authentication
+        String auth = TEST_USERNAME + ":" + TEST_PASSWORD;
+        String encodedAuth = Base64.getEncoder().encodeToString(auth.getBytes());
+        conn.setRequestProperty("Authorization", "Basic " + encodedAuth);
+        
         int responseCode = conn.getResponseCode();
-        assertEquals(200, responseCode, "Metrics endpoint should return 200 OK");
+        assertEquals(200, responseCode, "Metrics endpoint should return 200 OK with authentication");
         
         conn.disconnect();
     }
@@ -48,10 +53,15 @@ public class PrometheusDestinationTest extends CamelTestHelper {
         // Wait for routes to start and process some events
         Thread.sleep(3000);
         
-        // Fetch metrics
+        // Fetch metrics with authentication
         String metricsUrl = "http://localhost:" + TEST_PORT + TEST_PATH;
         HttpURLConnection conn = (HttpURLConnection) new URL(metricsUrl).openConnection();
         conn.setRequestMethod("GET");
+        
+        // Add authentication
+        String auth = TEST_USERNAME + ":" + TEST_PASSWORD;
+        String encodedAuth = Base64.getEncoder().encodeToString(auth.getBytes());
+        conn.setRequestProperty("Authorization", "Basic " + encodedAuth);
         
         BufferedReader in = new BufferedReader(new InputStreamReader(conn.getInputStream()));
         StringBuilder response = new StringBuilder();
@@ -85,6 +95,11 @@ public class PrometheusDestinationTest extends CamelTestHelper {
         String metricsUrl = "http://localhost:" + TEST_PORT + TEST_PATH;
         HttpURLConnection conn = (HttpURLConnection) new URL(metricsUrl).openConnection();
         conn.setRequestMethod("GET");
+        
+        // Add authentication
+        String auth = TEST_USERNAME + ":" + TEST_PASSWORD;
+        String encodedAuth = Base64.getEncoder().encodeToString(auth.getBytes());
+        conn.setRequestProperty("Authorization", "Basic " + encodedAuth);
         
         BufferedReader in = new BufferedReader(new InputStreamReader(conn.getInputStream()));
         StringBuilder response = new StringBuilder();
