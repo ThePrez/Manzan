@@ -68,6 +68,9 @@ public abstract class ManzanRoute extends RouteBuilder {
     }
 
     protected void injectIntoDataMap(Map<String, Object> data_map, Map<String, String> dataMapInjection){
+        if (null == dataMapInjection || dataMapInjection.isEmpty()) {
+            return;
+        }
         for (Map.Entry<String, String> entry: dataMapInjection.entrySet()){
             data_map.put(entry.getKey(), entry.getValue());
         }

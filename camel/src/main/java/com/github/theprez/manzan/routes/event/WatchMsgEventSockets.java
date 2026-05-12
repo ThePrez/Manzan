@@ -56,7 +56,9 @@ public class WatchMsgEventSockets extends ManzanRoute {
             .setHeader("session_id", simple("${body[SESSION_ID]}"))
                 .process(exchange -> {
                     String sessionId = exchange.getIn().getHeader("session_id", String.class);
-                    Map<String, String> dataMapInjection = m_dataMapInjectionsMap.get(sessionId);
+                    String normalizedSessionId = sessionId == null ? null : sessionId.trim().toUpperCase();
+                    exchange.getIn().setHeader("session_id", normalizedSessionId);
+                    Map<String, String> dataMapInjection = normalizedSessionId == null ? null : m_dataMapInjectionsMap.get(normalizedSessionId);
                     Map<String, Object> dataMap = exchange.getIn().getBody(Map.class);
                     injectIntoDataMap(dataMap, dataMapInjection);
                     exchange.getIn().setHeader("data_map", dataMap);
@@ -66,16 +68,16 @@ public class WatchMsgEventSockets extends ManzanRoute {
             .setBody(simple("${body}\n"))
             .process(exchange -> {
                 String sessionId = exchange.getIn().getHeader("session_id", String.class);
-                String format = m_formatMap.get(sessionId);
+                String format = sessionId == null ? null : m_formatMap.get(sessionId);
                 if (format != null) {
                     ManzanMessageFormatter m_formatter = new ManzanMessageFormatter(format);
                     exchange.getIn().setBody(m_formatter.format(getDataMap(exchange)));
                     exchange.getIn().setHeader("format_applied", true);
                 }
-                String destinations = m_destMap.get(sessionId); // Get destinations from m_destMap
+                String destinations = sessionId == null ? null : m_destMap.get(sessionId); // Get destinations from m_destMap
                 exchange.getIn().setHeader("destinations", destinations);
 
-                ManzanEventType eventType = m_eventMap.get(sessionId);
+                ManzanEventType eventType = sessionId == null ? null : m_eventMap.get(sessionId);
                 setEventType(eventType);
                 exchange.getIn().setHeader(EVENT_TYPE, m_eventType);
             })

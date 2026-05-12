@@ -1,3 +1,4 @@
 # Ensure critical config files always use LF line endings (required for Linux CI/CD)
 .gitattributes text eol=lf
 .bazelrc text eol=lf
+* text=auto eol=lf

@@ -152,6 +152,14 @@ public class DestinationConfig extends Config {
                     String errorRegex = getOptionalString(name, "errorRegex");
                     ret.put(name, OpenTelemetryDestination.get(context, name, url, format, errorRegex));
                     break;
+                case "prometheus":
+                    final int prometheusPort = getOptionalInt(name, "port");
+                    final String prometheusPath = getOptionalString(name, "path");
+                    final String metricPrefix = getOptionalString(name, "metricPrefix");
+                    final String prometheusUsername = getOptionalString(name, "username");
+                    final String prometheusPassword = getOptionalString(name, "password");
+                    ret.put(name, new PrometheusDestination(name, prometheusPort != -1 ? prometheusPort : 9090, prometheusPath, metricPrefix, prometheusUsername, prometheusPassword));
+                    break;
                 default:
                     throw new RuntimeException("Unknown destination type: " + type);
             }

@@ -24,11 +24,11 @@ for ActiveMQ, you should write the option as `componentOptions.brokerURL=<yourAc
 
 | id               | Description                     | Required properties                                        | Commonly used properties                                 | All properties
 |------------------|---------------------------------|------------------------------------------------------------| -------------------------------------------------------- |----------------------------------------------------------------------|
-| `stdout`         | Write all data to standard out. | None.                                                      |                                                          | https://camel.apache.org/components/3.22.x/stream-component.html     |  
+| `stdout`         | Write all data to standard out. | None.                                                      |                                                          | https://camel.apache.org/components/3.22.x/stream-component.html     |
 | `slack`          | Send data to a Slack channel    | * `webhook` <br> * `channel`                               |                                                          | https://camel.apache.org/components/3.22.x/slack-component.html      |
 | `fluentd`        | Send data to FluentD            | * `tag` <br> * `host` <br> * `port`                        |                                                          |                                                                      |
 | `file`           | Send data to a file             | * `file`                                                   |                                                          | https://camel.apache.org/components/3.22.x/stream-component.html     |
-| `dir`            | Send data to a directory        | * `dir`                                                    |                                                          | https://camel.apache.org/components/3.22.x/file-component.html       |    
+| `dir`            | Send data to a directory        | * `dir`                                                    |                                                          | https://camel.apache.org/components/3.22.x/file-component.html       |
 | `smtp`/`smtps`   | Sent data via email             | * `server` <br> * `subject` <br> * `to` <br> * `from`      | * `port`                                                 | https://camel.apache.org/components/3.22.x/mail-component.html       |
 | `sentry`         | Send data into Sentry           | * `dsn`                                                    |                                                          |                                                                      |
 | `twilio`         | Send via SMS                    | * `sid` <br> * `token` <br> * `to` <br> * `from`           |                                                          | https://camel.apache.org/components/3.22.x/twilio-component.html     |
@@ -40,6 +40,7 @@ for ActiveMQ, you should write the option as `componentOptions.brokerURL=<yourAc
 | `mezmo`          | Send data to Mezmo              | * `apiKey`                                                 | * `tags` <br> * `app`                                    |                                                                      |
 | `elasticsearch`  | Send data to Elasticsearch      | * `endpoint` <br> * `apiKey` <br> * `index`                |                                                          |                                                                      |
 | `otlp`  | Send data to OpenTelemetry server | * `url` | * `errorRegex`                                                         |                                                                      |
+| `prometheus`     | Expose metrics for Prometheus   | None.                                                      | * `port` (default: 9090) <br> * `path` (default: /metrics) <br> * `metricPrefix` (default: manzan_) <br> * `username` <br> * `password` | [Prometheus Documentation](examples/prometheus.md)                   |
 
 ### Example
 
@@ -134,6 +135,14 @@ index=manzan
 [myOtlpServer]
 type=otlp
 url=http://127.0.0.1:4318/v1/logs
-# If this regex is found, the log severity will be set to error. Otherwise, it will be info. 
+# If this regex is found, the log severity will be set to error. Otherwise, it will be info.
 errorRegex=hit error: [0-9]?.*
+
+[prometheus_exporter]
+type=prometheus
+port=9090
+path=/metrics
+metricPrefix=ibmi_
+username=prometheus
+password=secret
 ```

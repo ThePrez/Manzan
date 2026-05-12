@@ -1,0 +1,2 @@
+#!/QOpenSys/usr/bin/sh
+ln -sf /opt/manzan/lib/manzan.yaml /QOpenSys/etc/sc/services/manzan.yaml
