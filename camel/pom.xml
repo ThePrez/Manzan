@@ -338,7 +338,6 @@
             <include>**/*Test.java</include>
             <include>**/*Tests.java</include>
           </includes>
-          <testSourceDirectory>${project.basedir}/src/test/java</testSourceDirectory>
         </configuration>
       </plugin>
     </plugins>
