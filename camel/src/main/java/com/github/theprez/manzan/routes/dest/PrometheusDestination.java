@@ -282,12 +282,49 @@ public class PrometheusDestination extends ManzanRoute {
         }
 
         private void processSqlEvent(Exchange exchange, Map<String, Object> dataMap, String system) {
+            // Count SQL operations
             String operation = getString(exchange, "SQL_OPERATION", "unknown");
             String table = getString(exchange, "TABLE_NAME", "unknown");
             
-            Counter sqlCounter = getOrCreateCounter("sql_operations_total", 
+            Counter sqlCounter = getOrCreateCounter("sql_operations_total",
                 "Total number of SQL operations", "operation", "table", "system");
             sqlCounter.labels(operation, table, system).inc();
+            
+            // Extract numeric values from SQL query results and create gauges
+            for (Map.Entry<String, Object> entry : dataMap.entrySet()) {
+                String columnName = entry.getKey();
+                Object value = entry.getValue();
+                
+                // Skip non-numeric values and metadata fields
+                if (value == null || columnName.startsWith("_") ||
+                    columnName.equals("SYSTEM_NAME") || columnName.equals("SQL_OPERATION") ||
+                    columnName.equals("TABLE_NAME")) {
+                    continue;
+                }
+                
+                // Try to convert to double
+                Double numericValue = null;
+                try {
+                    if (value instanceof Number) {
+                        numericValue = ((Number) value).doubleValue();
+                    } else if (value instanceof String) {
+                        numericValue = Double.parseDouble((String) value);
+                    }
+                } catch (NumberFormatException e) {
+                    // Not a numeric value, skip it
+                    continue;
+                }
+                
+                if (numericValue != null) {
+                    // Create a gauge for this metric
+                    // Convert column name to lowercase with underscores for Prometheus naming convention
+                    String metricName = columnName.toLowerCase().replace(' ', '_');
+                    String helpText = "SQL query result: " + columnName;
+                    
+                    Gauge gauge = getOrCreateGauge(metricName, helpText, "system");
+                    gauge.labels(system).set(numericValue);
+                }
+            }
         }
 
         private String getString(Exchange exchange, String key, String defaultValue) {
