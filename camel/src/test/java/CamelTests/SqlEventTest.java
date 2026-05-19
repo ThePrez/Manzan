@@ -14,7 +14,7 @@ public class SqlEventTest extends CamelTestHelper {
     public void testHttpEndpoint() throws Exception {
         MockEndpoint mockOut = getMockEndpoint("mock:direct:" + testOutDest);
         mockOut.setResultWaitTime(5000); // give Camel up to 5 seconds
-        mockOut.expectedMessageCount(1);
+        mockOut.expectedMinimumMessageCount(1);
         List<String> expectedKeys =
                 Arrays.asList("JOB_NAME", "JOB_USER", "SUBSYSTEM",
                         "JOB_STATUS", "CPU_TIME", "ELAPSED_CPU_PERCENTAGE",

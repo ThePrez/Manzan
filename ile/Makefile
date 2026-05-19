@@ -17,7 +17,7 @@ src/mzversion.h:
 	grep MANZAN_ $@
 
 /qsys.lib/${BUILDLIB}.lib:
-	system "RUNSQL SQL('create schema ${BUILDLIB}')  COMMIT(*NONE) NAMING(*SQL) "
+	system "QSYS/RUNSQL SQL('create schema ${BUILDLIB}')  COMMIT(*NONE) NAMING(*SQL) "
 
 /qsys.lib/${BUILDLIB}.lib/handler.pgm: /qsys.lib/${BUILDLIB}.lib/handler.module /qsys.lib/${BUILDLIB}.lib/pub_json.module /qsys.lib/${BUILDLIB}.lib/pub_db2.module /qsys.lib/${BUILDLIB}.lib/debug.module /qsys.lib/${BUILDLIB}.lib/pub_db2.module /qsys.lib/${BUILDLIB}.lib/userconf.module /qsys.lib/${BUILDLIB}.lib/SockClient.module
 
@@ -31,7 +31,7 @@ src/mzversion.h:
 	system "CRTSQLCPPI OBJ(${BUILDLIB}/$*) SRCSTMF('$(CURDIR)/$^') COMMIT(*NONE) DATFMT(*ISO) TIMFMT(*ISO) DBGVIEW(*SOURCE) CVTCCSID(*JOB) COMPILEOPT('INCDIR(''src'')') SQLPATH(${BUILDLIB}) DFTRDBCOL(${BUILDLIB}) OPTION(*SQL)" 
 
 /qsys.lib/${BUILDLIB.lib}:
-	-system "RUNSQL SQL('create schema ${BUILDLIB}') NAMING(*SYS)"
+	-system "QSYS/RUNSQL SQL('create schema ${BUILDLIB}') NAMING(*SYS)"
 
 /qsys.lib/${BUILDLIB}.lib/manzandtaq.dtaq:
 	-system "DLTDTAQ DTAQ(${BUILDLIB}/MANZANDTAQ)"
