@@ -30,3 +30,4 @@ bazel-manzan
 bazel-out
 bazel-testlogs
 docs/troubleshooting.md
+docs/design/*.md

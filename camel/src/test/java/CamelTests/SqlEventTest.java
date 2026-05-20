@@ -14,7 +14,7 @@ public class SqlEventTest extends CamelTestHelper {
     public void testHttpEndpoint() throws Exception {
         MockEndpoint mockOut = getMockEndpoint("mock:direct:" + testOutDest);
         mockOut.setResultWaitTime(5000); // give Camel up to 5 seconds
-        mockOut.expectedMinimumMessageCount(1); // Expect at least 1 message (may be more depending on system load)
+        mockOut.expectedMinimumMessageCount(1);
         List<String> expectedKeys =
                 Arrays.asList("JOB_NAME", "JOB_USER", "SUBSYSTEM",
                         "JOB_STATUS", "CPU_TIME", "ELAPSED_CPU_PERCENTAGE",
@@ -28,7 +28,7 @@ public class SqlEventTest extends CamelTestHelper {
     protected RoutesBuilder[] createRouteBuilders() throws IOException {
         final int pollInterval = 1000;
         final String sqlEvent = "sqlEvent";
-        final String sql = "SELECT JOB_NAME, JOB_USER, SUBSYSTEM, JOB_STATUS, CPU_TIME, ELAPSED_CPU_PERCENTAGE, TOTAL_DISK_IO_COUNT, ELAPSED_TIME, TEMPORARY_STORAGE, MEMORY_POOL, FUNCTION, THREAD_COUNT FROM TABLE(QSYS2.ACTIVE_JOB_INFO()) AS X WHERE ELAPSED_CPU_PERCENTAGE > 20 OR TOTAL_DISK_IO_COUNT > 100000 ORDER BY ELAPSED_CPU_PERCENTAGE DESC FETCH FIRST 20 ROWS ONLY";
+        final String sql = "SELECT JOB_NAME, JOB_USER, SUBSYSTEM, JOB_STATUS, CPU_TIME, ELAPSED_CPU_PERCENTAGE, TOTAL_DISK_IO_COUNT, ELAPSED_TIME, TEMPORARY_STORAGE, MEMORY_POOL, FUNCTION, THREAD_COUNT FROM TABLE(QSYS2.ACTIVE_JOB_INFO()) AS X WHERE ELAPSED_CPU_PERCENTAGE > 20 OR TOTAL_DISK_IO_COUNT > 100000 ORDER BY ELAPSED_CPU_PERCENTAGE DESC FETCH FIRST 1 ROW ONLY";
 
         dataMapInjections.put("FOO", "BAR");
         destinations.add(testOutDest);

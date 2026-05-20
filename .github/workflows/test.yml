@@ -40,7 +40,8 @@ jobs:
         run: npm i -g @ibm/ibmi-ci
 
       - name: Install Manzan
-        run: | 
+        if: github.actor != 'dependabot[bot]'
+        run: |
           ici \
             --rcwd "${{ env.remote_home_dir }}" \
             --ignore --cmd "rm -rf ${{ env.remote_build_dir }}" \
@@ -48,8 +49,8 @@ jobs:
             --rcwd "${{ env.remote_build_dir }}" \
             --push "." \
             --cmd "/QOpenSys/pkgs/bin/gmake BUILDLIB=${{ env.BUILDLIB }} install" \
-            --cmd "find . -type f -name "*.ini" -exec chmod 600 {} +" \
-            --cmd "find . -type f -name "*.ini" -exec ls -l {} +" \
+            --cmd "find . -type f -name \"*.ini\" -exec chmod 600 {} +" \
+            --cmd "find . -type f -name \"*.ini\" -exec ls -l {} +" \
         env:
           IBMI_HOST: ${{ secrets.IBMI_HOST }}
           IBMI_USER: ${{ secrets.IBMI_USER }}
@@ -57,8 +58,9 @@ jobs:
           IBMI_SSH_PORT: ${{ secrets.IBMI_SSH_PORT }}
 
       - name: Run E2E Tests
+        if: github.actor != 'dependabot[bot]'
         working-directory: test
-        run: | 
+        run: |
           ici \
             --rcwd "${{ env.remote_build_dir }}" \
             --cmd "/QOpenSys/pkgs/bin/gmake testonly;" \
@@ -69,10 +71,12 @@ jobs:
           IBMI_SSH_PORT: ${{ secrets.IBMI_SSH_PORT }}
 
       - name: Run ILE Tests
+        if: github.actor != 'dependabot[bot]'
         working-directory: scripts
         run: bash ./testIle.sh
 
       - name: Run JUnit Tests
+        if: github.actor != 'dependabot[bot]'
         working-directory: camel
         run: |
           echo "[remote]" > app.ini
@@ -83,8 +87,8 @@ jobs:
           mvn clean test -Dsurefire.excludes="CamelTests/AuditLogTest/**"
 
       - name: Cleanup
-        if: always()
-        run: | 
+        if: always() && github.actor != 'dependabot[bot]'
+        run: |
           ici \
             --rcwd "${{ env.remote_build_dir }}" \
             --cmd "/QOpenSys/pkgs/bin/gmake BUILDLIB=${{ env.BUILDLIB }} uninstall" \

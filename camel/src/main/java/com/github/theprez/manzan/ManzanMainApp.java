@@ -106,7 +106,7 @@ public class ManzanMainApp {
         try {
             AS400 as400 = ApplicationConfig.get().getRemoteConnection();
             CommandCall cmd = new CommandCall(as400,
-                    "CALL PGM(" + library.trim() + "/handler) PARM('*VERSION' '*VERSION')");
+                    "QSYS/CALL PGM(" + library.trim() + "/handler) PARM('*VERSION' '*VERSION')");
 
             cmd.setMessageOption(AS400Message.MESSAGE_OPTION_ALL);
             boolean isSuccess = cmd.run();

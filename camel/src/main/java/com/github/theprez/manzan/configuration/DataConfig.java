@@ -122,6 +122,20 @@ public class DataConfig extends Config {
                     Map<String, String> headerParams = getUriAndHeaderParameters(name, sectionObj, "url");
                     ret.put(name, new HttpEvent(name, url, format, destinations,filter,  interval, headerParams, dataMapInjections));
                     break;
+                case "joblog":
+                    final String jobs = getRequiredString(name, "jobs");
+                    final List<String> jobIdentifiers = new LinkedList<>();
+                    for (String jobId : jobs.split("\\s*,\\s*")) {
+                        jobId = jobId.trim();
+                        if (StringUtils.isNonEmpty(jobId)) {
+                            jobIdentifiers.add(jobId);
+                        }
+                    }
+                    if (jobIdentifiers.isEmpty()) {
+                        throw new RuntimeException("No valid job identifiers specified for joblog data source '" + name + "'");
+                    }
+                    ret.put(name, new WatchJobLog(name, jobIdentifiers, format, destinations, interval, dataMapInjections));
+                    break;
                 default:
                     throw new RuntimeException("Unknown destination type: " + type);
             }
