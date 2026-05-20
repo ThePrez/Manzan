@@ -1,3 +1,11 @@
 # Ensure critical config files always use LF line endings (required for Linux CI/CD)
 .gitattributes text eol=lf
 .bazelrc text eol=lf
+
+# Shell scripts must always use LF (critical for IBM i and Linux)
+*.sh text eol=lf
+.postinstall text eol=lf
+camel/scripts/manzan text eol=lf
+
+# Default: auto-detect text files and use LF
+* text=auto eol=lf
