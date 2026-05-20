@@ -43,6 +43,9 @@ public class PrometheusDestination extends ManzanRoute {
     private static final String MESSAGE_COUNTER_NAME = "messages_total";
     private static final String MESSAGE_COUNTER_HELP = "Total number of messages processed";
     
+    private static final String JOB_COUNTER_NAME = "jobs_total";
+    private static final String JOB_COUNTER_HELP = "Total number of jobs processed";
+    
     private static final String JOB_DURATION_NAME = "job_duration_seconds";
     private static final String JOB_DURATION_HELP = "Job execution duration in seconds";
     
@@ -73,6 +76,9 @@ public class PrometheusDestination extends ManzanRoute {
         
         // Message counter
         getOrCreateCounter(MESSAGE_COUNTER_NAME, MESSAGE_COUNTER_HELP, "message_type", "severity", "system");
+        
+        // Job counter
+        getOrCreateCounter(JOB_COUNTER_NAME, JOB_COUNTER_HELP, "job_name", "status", "system");
         
         // Job duration histogram
         getOrCreateHistogram(JOB_DURATION_NAME, JOB_DURATION_HELP, "job_name", "status", "system");
@@ -258,7 +264,7 @@ public class PrometheusDestination extends ManzanRoute {
             }
             
             // Count job completions
-            Counter jobCounter = getOrCreateCounter("jobs_total", "Total number of jobs processed", 
+            Counter jobCounter = getOrCreateCounter(JOB_COUNTER_NAME, JOB_COUNTER_HELP,
                 "job_name", "status", "system");
             jobCounter.labels(jobName, status, system).inc();
         }
