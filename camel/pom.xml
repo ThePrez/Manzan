@@ -137,7 +137,7 @@
     <dependency>
       <groupId>io.sentry</groupId>
       <artifactId>sentry</artifactId>
-      <version>6.21.0</version>
+      <version>8.41.0</version>
     </dependency>
     <dependency>
       <groupId>org.ini4j</groupId>
