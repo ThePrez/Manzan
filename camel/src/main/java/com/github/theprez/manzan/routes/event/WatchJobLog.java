@@ -10,8 +10,12 @@ import com.github.theprez.jcmdutils.StringUtils;
 import com.github.theprez.manzan.ManzanEventType;
 import com.github.theprez.manzan.ManzanMessageFormatter;
 import com.github.theprez.manzan.routes.ManzanRoute;
+import org.slf4j.Logger;
+import org.slf4j.LoggerFactory;
 
 public class WatchJobLog extends ManzanRoute {
+    private static final Logger LOG = LoggerFactory.getLogger(WatchJobLog.class);
+    
     // Pattern to validate job identifier format: number/user/name
     // Job number: 6 digits, User: up to 10 alphanumeric, Name: up to 10 alphanumeric
     private static final Pattern JOB_IDENTIFIER_PATTERN = Pattern.compile("^\\d{6}/[A-Z0-9]{1,10}/[A-Z0-9]{1,10}$");
@@ -21,6 +25,11 @@ public class WatchJobLog extends ManzanRoute {
     private final List<String> m_jobIdentifiers;
     private final Map<String, Timestamp> m_lastCheckTimestamps;
     private final Map<String, String> dataMapInjection;
+    
+    // Error tracking to prevent log spam
+    private int consecutiveErrors = 0;
+    private long lastErrorLogTime = 0;
+    private static final long ERROR_LOG_INTERVAL_MS = 60000; // Log errors at most once per minute
 
     public WatchJobLog(final String _name, final List<String> _jobIdentifiers, final String _format,
                        final List<String> _destinations, final int _interval,
@@ -118,50 +127,83 @@ public class WatchJobLog extends ManzanRoute {
 
     @Override
     public void configure() {
+        // Custom error handler with suppression to prevent log spam
+        onException(Exception.class)
+                .handled(true)
+                .process(exchange -> {
+                    Exception cause = exchange.getProperty(org.apache.camel.Exchange.EXCEPTION_CAUGHT, Exception.class);
+                    consecutiveErrors++;
+                    
+                    long currentTime = System.currentTimeMillis();
+                    boolean shouldLog = (currentTime - lastErrorLogTime) >= ERROR_LOG_INTERVAL_MS;
+                    
+                    if (consecutiveErrors == 1 || shouldLog) {
+                        // Log first error or periodic errors
+                        LOG.error("Error querying job log for route '{}' (jobs: {}). " +
+                                "Error count: {}. Will suppress similar errors for {} seconds. Error: {}",
+                                m_name, m_jobIdentifiers, consecutiveErrors,
+                                ERROR_LOG_INTERVAL_MS / 1000, cause.getMessage());
+                        lastErrorLogTime = currentTime;
+                    }
+                })
+                .stop(); // Stop processing this exchange but continue route
+        
         from("timer://foo?synchronous=true&period=" + m_interval)
                 .routeId("manzan_joblog:" + m_name)
                 .process(exchange -> {
                     String sql = buildJobLogQuery();
                     exchange.getIn().setBody(sql);
                 })
-                .to("jdbc:jt400?outputType=StreamList")
-                .split(body()).streaming().parallelProcessing()
-                .process(exchange -> {
-                    Map<String, Object> dataMap = exchange.getIn().getBody(Map.class);
-                    
-                    // Update last check timestamp for this job
-                    String jobId = (String) dataMap.get("JOB_FULL");
-                    Object timestampObj = dataMap.get("MESSAGE_TIMESTAMP");
-                    if (timestampObj instanceof Timestamp) {
-                        updateLastCheckTimestamp(jobId, (Timestamp) timestampObj);
-                    }
-                    
-                    // Parse job identifier into components
-                    String[] jobParts = jobId.split("/");
-                    if (jobParts.length == 3) {
-                        dataMap.put("JOB_NUMBER", jobParts[0]);
-                        dataMap.put("JOB_USER", jobParts[1]);
-                        dataMap.put("JOB_NAME", jobParts[2]);
-                    }
-                    
-                    // Inject custom data
-                    injectIntoDataMap(dataMap, dataMapInjection);
-                    exchange.getIn().setHeader("data_map", dataMap);
-                    exchange.getIn().setBody(dataMap);
-                })
-                .setHeader(EVENT_TYPE, constant(m_eventType))
-                .marshal().json(true) // TODO: skip this if we are applying a format
-                .setBody(simple("${body}\n"))
-                .process(exchange -> {
-                    if (null != m_formatter) {
-                        exchange.getIn().setBody(m_formatter.format(getDataMap(exchange)));
-                    }
-                })
-                .recipientList(constant(getRecipientList()))
-                .parallelProcessing()
-                .stopOnException()
-                .end()
+                .doTry()
+                    .to("jdbc:jt400?outputType=StreamList")
+                    .process(exchange -> {
+                        // Reset error counter on successful query
+                        if (consecutiveErrors > 0) {
+                            LOG.info("Job log query for route '{}' recovered after {} consecutive errors",
+                                    m_name, consecutiveErrors);
+                            consecutiveErrors = 0;
+                        }
+                    })
+                    .split(body()).streaming().parallelProcessing()
+                    .process(exchange -> {
+                        Map<String, Object> dataMap = exchange.getIn().getBody(Map.class);
+                        
+                        // Update last check timestamp for this job
+                        String jobId = (String) dataMap.get("JOB_FULL");
+                        Object timestampObj = dataMap.get("MESSAGE_TIMESTAMP");
+                        if (timestampObj instanceof Timestamp) {
+                            updateLastCheckTimestamp(jobId, (Timestamp) timestampObj);
+                        }
+                        
+                        // Parse job identifier into components
+                        String[] jobParts = jobId.split("/");
+                        if (jobParts.length == 3) {
+                            dataMap.put("JOB_NUMBER", jobParts[0]);
+                            dataMap.put("JOB_USER", jobParts[1]);
+                            dataMap.put("JOB_NAME", jobParts[2]);
+                        }
+                        
+                        // Inject custom data
+                        injectIntoDataMap(dataMap, dataMapInjection);
+                        exchange.getIn().setHeader("data_map", dataMap);
+                        exchange.getIn().setBody(dataMap);
+                    })
+                    .setHeader(EVENT_TYPE, constant(m_eventType))
+                    .marshal().json(true) // TODO: skip this if we are applying a format
+                    .setBody(simple("${body}\n"))
+                    .process(exchange -> {
+                        if (null != m_formatter) {
+                            exchange.getIn().setBody(m_formatter.format(getDataMap(exchange)));
+                        }
+                    })
+                    .recipientList(constant(getRecipientList()))
+                    .parallelProcessing()
+                    .stopOnException()
+                    .end()
+                    .end()
+                .endDoTry()
+                .doCatch(Exception.class)
+                    // Exception will be handled by onException above
                 .end();
     }
 }
-
