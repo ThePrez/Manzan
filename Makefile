@@ -52,6 +52,6 @@ manzan-installer-v%.jar: /QOpenSys/pkgs/bin/zip appinstall.jar
 	ln -sf /opt/manzan/lib/manzan.yaml ${INSTALL_ROOT}/QOpenSys/etc/sc/services/manzan.yaml
 	mkdir -p ${INSTALL_ROOT}/opt/manzan/.install-marker
 	$(eval BUILD_TS := $(shell date +%Y%m%d-%H%M%S))
- 	echo "Manzan v$* build $(BUILD_TS) - workaround for AppInstall bug" > ${INSTALL_ROOT}/opt/manzan/.install-marker/.build-$(BUILD_TS)
- 	/QOpenSys/QIBM/ProdData/JavaVM/jdk80/64bit/bin/java -jar appinstall.jar -o $@ --qsys manzan --file /opt/manzan --file /QOpenSys/etc/sc/services/manzan.yaml --fileIfMissing /QOpenSys/etc/manzan/app.ini --fileIfMissing /QOpenSys/etc/manzan/data.ini --fileIfMissing /QOpenSys/etc/manzan/dests.ini --fileIfMissing /opt/manzan/.install-marker/.build-$(BUILD_TS)
+	echo "Manzan v$* build $(BUILD_TS) - workaround for AppInstall bug" > ${INSTALL_ROOT}/opt/manzan/.install-marker/.build-$(BUILD_TS)
+	/QOpenSys/QIBM/ProdData/JavaVM/jdk80/64bit/bin/java -jar appinstall.jar -o $@ --qsys manzan --file /opt/manzan --file /QOpenSys/etc/sc/services/manzan.yaml --fileIfMissing /QOpenSys/etc/manzan/app.ini --fileIfMissing /QOpenSys/etc/manzan/data.ini --fileIfMissing /QOpenSys/etc/manzan/dests.ini --fileIfMissing /opt/manzan/.install-marker/.build-$(BUILD_TS)
 	
