@@ -41,13 +41,17 @@ manzan-installer-v%.jar: /QOpenSys/pkgs/bin/zip appinstall.jar
 	system "dltlib ${BUILDLIB}" || echo "could not delete"
 	system "crtlib ${BUILDLIB}"
 	system "dltlib ${BUILDLIB}"
-	> config/app.ini > config/data.ini > config/dests.ini
+	: > config/app.ini
 	rm -fr /QOpenSys/etc/manzan
 	rm -fr /opt/manzan
 	gmake -C config BUILDVERSION="$*" install BUILDLIB=${BUILDLIB}
 	gmake -C ile BUILDVERSION="$*" BUILDLIB=${BUILDLIB}
 	gmake -C camel BUILDVERSION="$*" clean install
 	install -m 600 -o qsys service-commander-def.yaml ${INSTALL_ROOT}/opt/manzan/lib/manzan.yaml
-	echo "#!/QOpenSys/usr/bin/sh" > .postinstall
-	echo "ln -sf ${INSTALL_ROOT}/opt/manzan/lib/manzan.yaml /QOpenSys/etc/sc/services/manzan.yaml" >> .postinstall
-	/QOpenSys/QIBM/ProdData/JavaVM/jdk80/64bit/bin/java -jar appinstall.jar -o $@ --qsys manzan --fileIfMissing /QOpenSys/etc/manzan --file /opt/manzan --post .postinstall
+	mkdir -p ${INSTALL_ROOT}/QOpenSys/etc/sc/services
+	ln -sf /opt/manzan/lib/manzan.yaml ${INSTALL_ROOT}/QOpenSys/etc/sc/services/manzan.yaml
+	mkdir -p ${INSTALL_ROOT}/opt/manzan/.install-marker
+	$(eval BUILD_TS := $(shell date +%Y%m%d-%H%M%S))
+    echo "Manzan v$* build $(BUILD_TS) - workaround for AppInstall bug" > ${INSTALL_ROOT}/opt/manzan/.install-marker/.build-$(BUILD_TS)
+    /QOpenSys/QIBM/ProdData/JavaVM/jdk80/64bit/bin/java -jar appinstall.jar -o $@ --qsys manzan --file /opt/manzan --file /QOpenSys/etc/sc/services/manzan.yaml --fileIfMissing /QOpenSys/etc/manzan/app.ini --fileIfMissing /QOpenSys/etc/manzan/data.ini --fileIfMissing /QOpenSys/etc/manzan/dests.ini --fileIfMissing /opt/manzan/.install-marker/.build-$(BUILD_TS)
+	
