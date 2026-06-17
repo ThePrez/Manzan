@@ -81,6 +81,10 @@ Manzan can be manually started using:
 /opt/manzan/bin/manzan
 ```
 
+## Uninstall
+
+To uninstall Manzan, please refer to the [uninstall guide](/uninstall.md).
+
 ## Next Steps
 
 * Read more about the [configuration files](/config/index.md)
