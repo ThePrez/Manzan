@@ -31,13 +31,13 @@ Manzan has support for all CCSIDs on IBM i. What this means is that when you dec
     java -jar <name of jar file>
     ```
 
-For instance, to install version `0.0.9`, the steps from an IBM i (using open source `wget`) would look like:
+For instance, to install version `0.0.15`, the steps from an IBM i (using open source `wget`) would look like:
 
 ```bash
 mkdir -p /opt/download
 cd /opt/download
-wget https://github.com/ThePrez/Manzan/releases/download/v0.0.9/manzan-installer-v0.0.9.jar
-java -jar manzan-installer-v0.0.9.jar
+wget https://github.com/ThePrez/Manzan/releases/download/v0.0.15/manzan-installer-v0.0.15.jar
+java -jar manzan-installer-v0.0.15.jar
 ```
 
 Note: There is currently a bug in the installer where it might say `ERROR: Error running command` after the install is completed.
