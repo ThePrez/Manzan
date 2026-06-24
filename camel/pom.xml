@@ -179,7 +179,7 @@
     <dependency>
       <groupId>io.github.mjfryc</groupId>
       <artifactId>mjaron-tinyloki-java</artifactId>
-      <version>0.3.11</version>
+      <version>1.1.8</version>
     </dependency>
     <dependency>
       <groupId>co.elastic.clients</groupId>
