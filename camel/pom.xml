@@ -260,6 +260,16 @@
           <scope>test</scope>
       </dependency>
     <!-- MockWebServer: in-process HTTP server for integration testing destinations -->
+    <!-- okhttp must be declared explicitly at the same version as mockwebserver so that
+         Maven's dependency resolution does not pick up an older 3.x transitive pull
+         (which lacks okhttp3.internal.concurrent.TaskRunner$RealBackend) and cause a
+         NoClassDefFoundError at test startup. -->
+    <dependency>
+      <groupId>com.squareup.okhttp3</groupId>
+      <artifactId>okhttp</artifactId>
+      <version>4.12.0</version>
+      <scope>test</scope>
+    </dependency>
     <dependency>
       <groupId>com.squareup.okhttp3</groupId>
       <artifactId>mockwebserver</artifactId>
