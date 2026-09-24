@@ -166,22 +166,30 @@ public class InstanceContext {
     
     /**
      * Resolve configuration directory path based on instance name.
-     * Respects the {@code manzan.configdir} system property (set via {@code --configdir})
-     * so that test harnesses and legacy deployments that pass an explicit directory
-     * continue to work after the multi-instance refactor.
-     * When no override is set, falls back to the standard IBM i path
-     * {@code /QOpenSys/etc/manzan-<instance>}.
+     * Resolution order:
+     * <ol>
+     *   <li>The {@code manzan.configdir} system property (set via {@code --configdir}) —
+     *       honours the legacy flag used by e2e tests and operators.</li>
+     *   <li>On IBM i: {@code /QOpenSys/etc/manzan-<instance>}</li>
+     *   <li>On any other OS (CI runner, developer workstation): the current working
+     *       directory — preserving the pre-multi-instance behaviour where the test
+     *       workflow writes {@code app.ini} into the Maven working directory.</li>
+     * </ol>
      */
     private static String resolveConfigDirectory(String instanceName) {
         // "manzan.configdir" is the same constant as Config.DIRECTORY_OVERRIDE_PROPERTY.
-        // We read it directly here to avoid a circular dependency between this class and
-        // the configuration package (Config already imports InstanceContext).
+        // Read directly to avoid a circular dependency (Config already imports InstanceContext).
         String override = System.getProperty("manzan.configdir");
         if (StringUtils.isNonEmpty(override)) {
             return new File(override).getAbsolutePath();
         }
-        // IBM i: /QOpenSys/etc/manzan-<instance>
-        return "/QOpenSys/etc/manzan-" + instanceName;
+        final String osName = System.getProperty("os.name", "");
+        if ("os400".equalsIgnoreCase(osName) || "os/400".equalsIgnoreCase(osName)) {
+            return "/QOpenSys/etc/manzan-" + instanceName;
+        }
+        // Non-IBM i: use the current working directory, matching the behaviour of
+        // the old getConfigFileLegacy() and the CI workflow that writes app.ini there.
+        return new File(".").getAbsolutePath();
     }
 
     /**
