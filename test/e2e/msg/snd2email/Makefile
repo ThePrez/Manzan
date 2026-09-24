@@ -7,7 +7,7 @@ setup:
 	rm -f ${INPUT_FILE} ${OUTPUT_FILE}
 	touch ${INPUT_FILE} ${OUTPUT_FILE}
 	cd ../../../smtp-server; npm install; cd ../e2e/msg/snd2email
-	ps -ef | grep 'smtp-server/server.js' | grep -v 'grep' | awk '{ print $$2 }' | xargs kill
+	ps -ef | grep 'smtp-server/server.js' | grep -v 'grep' | awk '{ print $$2 }' | xargs -r kill || true
 
 cleanup:
 	rm -f ${INPUT_FILE} ${OUTPUT_FILE}
