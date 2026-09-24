@@ -202,7 +202,6 @@ public class DataConfig extends Config {
                 } else {
                     throw new RuntimeException("Watch for message, LIC log entry, or PAL entry not specified");
                 }
-                eventMap.put(id.toUpperCase(), eventType);
 
                 // Process the destinations
                 final List<String> destinations = new LinkedList<String>();
@@ -217,15 +216,21 @@ public class DataConfig extends Config {
                     }
                 }
 
-                // Build the maps
-                String destString = createRecipientList(destinations);
-                formatMap.put(id.toUpperCase(), format);
-                destMap.put(id.toUpperCase(), destString);
-                dataMapInjectionsMap.put(id.toUpperCase(), dataMapInjections);
-
-                // Create the watcher first so the SQL route can query using the exact
-                // generated SESSION_ID written by STRWCH/HANDLER.
+                // Create the watcher first so the generated SESSION_ID is known before
+                // populating the maps. The socket listener and SQL route both look up
+                // messages by the session ID that STRWCH/HANDLER actually writes —
+                // which is the generated ID, not the raw 'id' from data.ini.
                 WatchStarter ws = new WatchStarter(m_ctx, id, strwch);
+                final String sessionId = ws.getSessionId().trim().toUpperCase();
+
+                // Build the maps keyed by the generated session ID so that
+                // WatchMsgEventSockets can match incoming socket messages correctly.
+                String destString = createRecipientList(destinations);
+                formatMap.put(sessionId, format);
+                destMap.put(sessionId, destString);
+                eventMap.put(sessionId, eventType);
+                dataMapInjectionsMap.put(sessionId, dataMapInjections);
+
                 String sqlRouteName = name + "sql";
                 ret.put(sqlRouteName, new WatchMsgEventSql(sqlRouteName, ws.getSessionId(), format, destinations, schema, eventType,
                         interval, numToProcess, dataMapInjections));
