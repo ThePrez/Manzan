@@ -59,10 +59,7 @@ public class OpenSearchDestinationTest extends CamelTestHelper {
     @Test
     public void testIndexRequestReachesServer() throws Exception {
         // OpenSearch REST client expects a JSON success response on index
-        server.enqueue(new MockResponse()
-                .setResponseCode(200)
-                .addHeader("Content-Type", "application/json")
-                .setBody("{\"result\":\"created\",\"_index\":\"" + TEST_INDEX + "\",\"_id\":\"1\"}"));
+        server.enqueue(successResponse());
 
         // Send a message into the route
         template.sendBodyAndHeaders("direct:" + TEST_DEST, "test body",
@@ -309,13 +306,21 @@ public class OpenSearchDestinationTest extends CamelTestHelper {
         return headers;
     }
 
-    /** Convenience: 200 OK JSON response that satisfies the OpenSearch REST client. */
+    /** Convenience: 200 OK JSON response that satisfies the OpenSearch REST client.
+     *  opensearch-java 2.x requires _index, _id, _version, result, _shards,
+     *  _seq_no, and _primary_term to all be present or it throws
+     *  MissingRequiredPropertyException before the test assertions are reached. */
     private MockResponse successResponse() {
         return new MockResponse()
                 .setResponseCode(200)
                 .addHeader("Content-Type", "application/json")
-                .setBody("{\"result\":\"created\",\"_index\":\"" + TEST_INDEX
-                        + "\",\"_id\":\"1\",\"_shards\":{\"total\":1,\"successful\":1,\"failed\":0}}");
+                .setBody("{\"_index\":\"" + TEST_INDEX + "\","
+                        + "\"_id\":\"1\","
+                        + "\"_version\":1,"
+                        + "\"result\":\"created\","
+                        + "\"_shards\":{\"total\":1,\"successful\":1,\"failed\":0},"
+                        + "\"_seq_no\":0,"
+                        + "\"_primary_term\":1}");
     }
 
     // -------------------------------------------------------------------------

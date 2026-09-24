@@ -254,6 +254,14 @@
       <artifactId>opentelemetry-sdk</artifactId>
       <version>1.49.0</version>
     </dependency>
+    <!-- Pin opentelemetry-api to 1.49.0 so camel-parent BOM cannot downgrade it to
+         a pre-1.46 version that is missing InstrumentationUtil, which causes a
+         NoClassDefFoundError in OkHttpHttpSender at export time. -->
+    <dependency>
+      <groupId>io.opentelemetry</groupId>
+      <artifactId>opentelemetry-api</artifactId>
+      <version>1.49.0</version>
+    </dependency>
       <dependency>
           <groupId>org.junit.jupiter</groupId>
           <artifactId>junit-jupiter</artifactId>
