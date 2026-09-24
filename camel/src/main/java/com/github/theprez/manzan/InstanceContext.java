@@ -165,11 +165,21 @@ public class InstanceContext {
     }
     
     /**
-     * Resolve configuration directory path based on instance name
-     * IBM i only: Always uses /QOpenSys/etc/manzan-<instance>
-     * Security: Uses absolute paths to prevent relative path attacks
+     * Resolve configuration directory path based on instance name.
+     * Respects the {@code manzan.configdir} system property (set via {@code --configdir})
+     * so that test harnesses and legacy deployments that pass an explicit directory
+     * continue to work after the multi-instance refactor.
+     * When no override is set, falls back to the standard IBM i path
+     * {@code /QOpenSys/etc/manzan-<instance>}.
      */
     private static String resolveConfigDirectory(String instanceName) {
+        // "manzan.configdir" is the same constant as Config.DIRECTORY_OVERRIDE_PROPERTY.
+        // We read it directly here to avoid a circular dependency between this class and
+        // the configuration package (Config already imports InstanceContext).
+        String override = System.getProperty("manzan.configdir");
+        if (StringUtils.isNonEmpty(override)) {
+            return new File(override).getAbsolutePath();
+        }
         // IBM i: /QOpenSys/etc/manzan-<instance>
         return "/QOpenSys/etc/manzan-" + instanceName;
     }
