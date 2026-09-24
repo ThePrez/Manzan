@@ -187,6 +187,25 @@
       <version>8.17.2</version>
     </dependency>
 
+    <!-- OpenSearch Java client (transport + high-level API) -->
+    <dependency>
+      <groupId>org.opensearch.client</groupId>
+      <artifactId>opensearch-java</artifactId>
+      <version>2.19.0</version>
+    </dependency>
+    <!-- OpenSearch low-level REST client (RestClient / RestClientBuilder) -->
+    <dependency>
+      <groupId>org.opensearch.client</groupId>
+      <artifactId>opensearch-rest-client</artifactId>
+      <version>2.19.0</version>
+    </dependency>
+    <!-- AWS SDK v1 core: AWS4Signer + DefaultAWSCredentialsProviderChain (SigV4 auth) -->
+    <dependency>
+      <groupId>com.amazonaws</groupId>
+      <artifactId>aws-java-sdk-core</artifactId>
+      <version>1.12.600</version>
+    </dependency>
+
     <!-- Prometheus client library -->
     <dependency>
       <groupId>io.prometheus</groupId>
@@ -217,10 +236,30 @@
       <scope>test</scope>
     </dependency>
 
-    <!-- https://mvnrepository.com/artifact/io.opentelemetry/opentelemetry-exporter-otlp -->
+    <!-- OpenTelemetry: OTLP exporter (HTTP + gRPC) -->
     <dependency>
       <groupId>io.opentelemetry</groupId>
       <artifactId>opentelemetry-exporter-otlp</artifactId>
+      <version>1.49.0</version>
+    </dependency>
+    <!-- OpenTelemetry: SDK logs (SdkLoggerProvider, BatchLogRecordProcessor) — used directly -->
+    <dependency>
+      <groupId>io.opentelemetry</groupId>
+      <artifactId>opentelemetry-sdk-logs</artifactId>
+      <version>1.49.0</version>
+    </dependency>
+    <!-- OpenTelemetry: SDK core (Resource) — used directly -->
+    <dependency>
+      <groupId>io.opentelemetry</groupId>
+      <artifactId>opentelemetry-sdk</artifactId>
+      <version>1.49.0</version>
+    </dependency>
+    <!-- Pin opentelemetry-api to 1.49.0 so camel-parent BOM cannot downgrade it to
+         a pre-1.46 version that is missing InstrumentationUtil, which causes a
+         NoClassDefFoundError in OkHttpHttpSender at export time. -->
+    <dependency>
+      <groupId>io.opentelemetry</groupId>
+      <artifactId>opentelemetry-api</artifactId>
       <version>1.49.0</version>
     </dependency>
       <dependency>
@@ -228,6 +267,23 @@
           <artifactId>junit-jupiter</artifactId>
           <scope>test</scope>
       </dependency>
+    <!-- MockWebServer: in-process HTTP server for integration testing destinations -->
+    <!-- okhttp must be declared explicitly at the same version as mockwebserver so that
+         Maven's dependency resolution does not pick up an older 3.x transitive pull
+         (which lacks okhttp3.internal.concurrent.TaskRunner$RealBackend) and cause a
+         NoClassDefFoundError at test startup. -->
+    <dependency>
+      <groupId>com.squareup.okhttp3</groupId>
+      <artifactId>okhttp</artifactId>
+      <version>4.12.0</version>
+      <scope>test</scope>
+    </dependency>
+    <dependency>
+      <groupId>com.squareup.okhttp3</groupId>
+      <artifactId>mockwebserver</artifactId>
+      <version>4.12.0</version>
+      <scope>test</scope>
+    </dependency>
     <dependency>
       <groupId>org.apache.camel</groupId>
       <artifactId>camel-test-junit5</artifactId>

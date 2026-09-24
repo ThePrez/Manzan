@@ -15,6 +15,7 @@ import com.github.theprez.manzan.routes.event.*;
 import org.ini4j.InvalidFileFormatException;
 
 import com.github.theprez.jcmdutils.StringUtils;
+import com.github.theprez.manzan.InstanceContext;
 import com.github.theprez.manzan.ManzanEventType;
 import com.github.theprez.manzan.WatchStarter;
 import com.github.theprez.manzan.routes.ManzanRoute;
@@ -30,16 +31,33 @@ public class DataConfig extends Config {
     private final static int DEFAULT_INTERVAL = 1000;
     private final static int DEFAULT_NUM_TO_PROCESS = 1000;
 
-    public static DataConfig get(final Set<String> _destinations) throws InvalidFileFormatException, IOException {
-        return new DataConfig(getConfigFile("data.ini"), _destinations);
+    /**
+     * Get DataConfig for a specific instance.
+     */
+    public static DataConfig get(final InstanceContext ctx, final Set<String> destinations)
+            throws InvalidFileFormatException, IOException {
+        return new DataConfig(getConfigFile(ctx, "data.ini"), ctx, destinations);
     }
 
+    /**
+     * Get DataConfig for the default instance.
+     *
+     * @deprecated Use {@link #get(InstanceContext, Set)} for multi-instance support.
+     */
+    @Deprecated
+    public static DataConfig get(final Set<String> destinations) throws InvalidFileFormatException, IOException {
+        return get(InstanceContext.getDefault(), destinations);
+    }
+
+    private final InstanceContext m_ctx;
     private final Set<String> m_destinations;
 
     private Map<String, ManzanRoute> m_routes = null;
 
-    private DataConfig(final File _f, final Set<String> _destinations) throws InvalidFileFormatException, IOException {
+    private DataConfig(final File _f, final InstanceContext ctx, final Set<String> _destinations)
+            throws InvalidFileFormatException, IOException {
         super(_f);
+        m_ctx = ctx;
         m_destinations = _destinations;
     }
 
@@ -50,7 +68,11 @@ public class DataConfig extends Config {
         }
         final Map<String, ManzanRoute> ret = new LinkedHashMap<String, ManzanRoute>();
         final List<String> watchEvents = new ArrayList<>();
-        final String schema = ApplicationConfig.get().getLibrary();
+        final ApplicationConfig appConfig = ApplicationConfig.get(m_ctx);
+        final String schema = appConfig.getLibrary();
+        // Read the per-instance socket port once so it can be passed to
+        // WatchMsgEventSockets without touching the global env var.
+        final int socketPort = appConfig.getSocketPort();
 
         for (final String section : getIni().keySet()) {
             final String type = getIni().get(section, "type");
@@ -103,7 +125,7 @@ public class DataConfig extends Config {
                     fallbackStartTime = fallbackStartTime != -1 ? fallbackStartTime : 24;
 
                     final String userAuditType = getRequiredString(name, "auditType");
-                    ret.put(name, new AuditLog(name, format, destinations, interval, numToProcess, userAuditType, fallbackStartTime, dataMapInjections));
+                    ret.put(name, new AuditLog(m_ctx, name, format, destinations, interval, numToProcess, userAuditType, fallbackStartTime, dataMapInjections));
                     break;
                 case "sql":
                     final String query = getRequiredString(name, "query");
@@ -180,7 +202,6 @@ public class DataConfig extends Config {
                 } else {
                     throw new RuntimeException("Watch for message, LIC log entry, or PAL entry not specified");
                 }
-                eventMap.put(id.toUpperCase(), eventType);
 
                 // Process the destinations
                 final List<String> destinations = new LinkedList<String>();
@@ -195,19 +216,29 @@ public class DataConfig extends Config {
                     }
                 }
 
-                // Build the maps
+                // Create the watcher first so the generated SESSION_ID is known before
+                // populating the maps. The socket listener and SQL route both look up
+                // messages by the session ID that STRWCH/HANDLER actually writes —
+                // which is the generated ID, not the raw 'id' from data.ini.
+                WatchStarter ws = new WatchStarter(m_ctx, id, strwch);
+                final String sessionId = ws.getSessionId().trim().toUpperCase();
+
+                // Build the maps keyed by the generated session ID so that
+                // WatchMsgEventSockets can match incoming socket messages correctly.
                 String destString = createRecipientList(destinations);
-                formatMap.put(id.toUpperCase(), format);
-                destMap.put(id.toUpperCase(), destString);
-                dataMapInjectionsMap.put(id.toUpperCase(), dataMapInjections);
+                formatMap.put(sessionId, format);
+                destMap.put(sessionId, destString);
+                eventMap.put(sessionId, eventType);
+                dataMapInjectionsMap.put(sessionId, dataMapInjections);
 
                 String sqlRouteName = name + "sql";
-                ret.put(sqlRouteName, new WatchMsgEventSql(sqlRouteName, id, format, destinations, schema, eventType,
+                ret.put(sqlRouteName, new WatchMsgEventSql(sqlRouteName, ws.getSessionId(), format, destinations, schema, eventType,
                         interval, numToProcess, dataMapInjections));
+                ws.strwch();
+                continue;
             }
 
-            // Create the watcher
-            WatchStarter ws = new WatchStarter(id, strwch);
+            WatchStarter ws = new WatchStarter(m_ctx, id, strwch);
             ws.strwch();
         }
 
@@ -215,7 +246,7 @@ public class DataConfig extends Config {
             // After iterating over the loop, the formatMap and destMap are complete. Now
             // create the route.
             final String routeName = "socketWatcher";
-            ret.put(routeName, new WatchMsgEventSockets(routeName, formatMap, destMap, eventMap, dataMapInjectionsMap));
+            ret.put(routeName, new WatchMsgEventSockets(routeName, socketPort, formatMap, destMap, eventMap, dataMapInjectionsMap));
         }
         return m_routes = ret;
     }

@@ -23,28 +23,58 @@ public class WatchStarter {
     private final String m_command;
     private final String m_stopCommand;
     private final String m_session_id;
+    private final InstanceContext m_ctx;
 
-    public WatchStarter(final String _session_id, final String _deets) throws InvalidFileFormatException, IOException {
+    /**
+     * Create a WatchStarter for a specific instance.
+     * The session ID is generated from the instance context, making it unique
+     * per instance and human-readable (e.g. "WATSON0001").
+     *
+     * @param ctx       Instance context — used for session ID generation and AS400 connection
+     * @param _baseName Base name from data.ini (the user-configured watch ID)
+     * @param _deets    Raw STRWCH command string from data.ini
+     */
+    public WatchStarter(final InstanceContext ctx, final String _baseName, final String _deets)
+            throws InvalidFileFormatException, IOException {
+        m_ctx = ctx;
+
+        // Generate instance-aware session ID from context using the configured base name
+        final String sessionId = ctx.generateSessionId(_baseName);
 
         String command = _deets;
-        String wchpgm = " WCHPGM(" + ApplicationConfig.get().getLibrary() + "/HANDLER) ";
+        String wchpgm = " WCHPGM(" + ApplicationConfig.get(ctx).getLibrary() + "/HANDLER) ";
         command = command.replaceAll("(?i)(^|\\s+)wchpgm\\([A-Z0-9\\/\\*\\s]+\\)\\s*", " ");
 
-        String ssnid = " SSNID(" + _session_id + ") ";
+        String ssnid = " SSNID(" + sessionId + ") ";
         command = command.replaceAll("(?i)(^|\\s+)ssnid\\([A-Z0-9\\*\\s]+\\)\\s*", " ");
 
         command = command.replaceFirst("^(?i)([a-z0-9]+\\/)?strwch\\s+", " ");
         command = "QSYS/STRWCH" + ssnid + wchpgm + command;
-        System.out.println("STRWCH Command:\n"+command);
+        System.out.println("STRWCH Command:\n" + command);
         m_command = command;
-        m_stopCommand = "QSYS/ENDWCH SSNID(" + _session_id.trim() + ")";
-        m_session_id = _session_id;
+        m_stopCommand = "QSYS/ENDWCH SSNID(" + sessionId.trim() + ")";
+        m_session_id = sessionId;
+    }
+
+    public String getSessionId() {
+        return m_session_id;
+    }
+
+    /**
+     * Create a WatchStarter for the default instance.
+     *
+     * @deprecated Use {@link #WatchStarter(InstanceContext, String, String)} for multi-instance support.
+     */
+    @Deprecated
+    public WatchStarter(final String _session_id, final String _deets)
+            throws InvalidFileFormatException, IOException {
+        this(InstanceContext.getDefault(), _session_id, _deets);
     }
 
     public void endwch()
             throws AS400SecurityException, ErrorCompletingRequestException, IOException, InterruptedException {
         System.out.println("ending watch");
-        runCmd(m_stopCommand);
+        runCmd(m_ctx, m_stopCommand);
     }
 
     public void strwch()
@@ -54,12 +84,11 @@ public class WatchStarter {
             System.err.println("Watch '" + m_session_id + "' already running");
             return;
         }
-        runCmd(m_command);
+        runCmd(m_ctx, m_command);
         Runtime.getRuntime().addShutdownHook(new Thread(() -> {
             try {
                 endwch();
             } catch (AS400SecurityException | ErrorCompletingRequestException | IOException | InterruptedException e) {
-                // TODO Auto-generated catch block
                 e.printStackTrace();
             }
         }));
@@ -69,26 +98,17 @@ public class WatchStarter {
     public boolean isRunning()
             throws AS400SecurityException, ErrorCompletingRequestException, IOException, InterruptedException,
             PropertyVetoException, ObjectDoesNotExistException {
-        AS400 as400 = ApplicationConfig.get().getRemoteConnection();
-        ProgramCall pc = new ProgramCall(as400);
-
+        AS400 as400 = ApplicationConfig.get(m_ctx).getRemoteConnection();
         final ProgramCall program = new ProgramCall(as400);
-        // Initialize the name of the program to run.
         final String programName = "/qsys.lib/QSCRWCHI.pgm";
         final String sessionParmString = (m_session_id + "           ").substring(0, 10).toUpperCase();
 
-        // Set up the parms
         final ProgramParameter[] parameterList = new ProgramParameter[5];
-        // 1 Receiver variable Output Char(*)
         byte[] output = new byte[8];
         parameterList[0] = new ProgramParameter(output);
-        // 2 Length of receiver variable Input Binary(4)
         parameterList[1] = new ProgramParameter(new AS400Bin4().toBytes(output.length));
-        // 3 Receiver format name Input Char(8)
         parameterList[2] = new ProgramParameter(new AS400Text(8).toBytes("WCHI0100"));
-        // 4 Session ID Input Char(10)
         parameterList[3] = new ProgramParameter(new AS400Text(10).toBytes(sessionParmString));
-        // 5 Error Code I/O Char(*)
         final ErrorCodeParameter ec = new ErrorCodeParameter(true, true);
         parameterList[4] = ec;
         program.setProgram(programName, parameterList);
@@ -103,13 +123,12 @@ public class WatchStarter {
         return StringUtils.isEmpty(errmsg);
     }
 
-    private static void runCmd(final String _command)
+    private static void runCmd(final InstanceContext ctx, final String _command)
             throws AS400SecurityException, ErrorCompletingRequestException, IOException, InterruptedException {
-        AS400 as400 = ApplicationConfig.get().getRemoteConnection();
+        AS400 as400 = ApplicationConfig.get(ctx).getRemoteConnection();
         CommandCall cmd = new CommandCall(as400, _command);
         boolean isSuccess = cmd.run();
 
-        // Show the messages (returned whether or not there was an error.)
         AS400Message[] messagelist = cmd.getMessageList();
         String messages = "";
         for (AS400Message msg : messagelist) {

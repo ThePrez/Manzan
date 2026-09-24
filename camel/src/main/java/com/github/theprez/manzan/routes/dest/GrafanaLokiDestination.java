@@ -3,6 +3,7 @@ package com.github.theprez.manzan.routes.dest;
 import java.sql.Timestamp;
 import java.util.Map;
 
+import com.github.theprez.manzan.InstanceContext;
 import com.github.theprez.manzan.ManzanEventType;
 import com.github.theprez.manzan.routes.ManzanRoute;
 
@@ -20,9 +21,9 @@ public class GrafanaLokiDestination extends ManzanRoute {
     private int maxLabels = 15;
     private String[] labels = {};
 
-    public GrafanaLokiDestination(final String _name, final String _url, final String _username, final String _password,
+    public GrafanaLokiDestination(final InstanceContext _ctx, final String _name, final String _url, final String _username, final String _password,
                                   final int _maxLabels, final String _labels) {
-        super(_name);
+        super(_ctx, _name);
 
         if (_maxLabels != -1){
             maxLabels = _maxLabels;
@@ -104,7 +105,7 @@ public class GrafanaLokiDestination extends ManzanRoute {
     @Override
     public void configure() {
         from(getInUri())
-                .routeId(m_name).process(exchange -> {
+                .routeId(getRouteId()).process(exchange -> {
                     StreamBuilder builder = logController
                             .stream()
                             .l(appLabelName, appLabelValue);
@@ -119,3 +120,5 @@ public class GrafanaLokiDestination extends ManzanRoute {
     protected void setEventType(ManzanEventType manzanEventType) {
     }
 }
+
+
