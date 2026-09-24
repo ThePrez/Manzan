@@ -17,4 +17,70 @@ if [[ "$LC_ALL" != *UTF-8* ]]; then
     fi
 fi
 
+# ---------------------------------------------------------------------------
+# Config migration
+#
+# Goal: on the target system, operator-edited configs always win over the
+# bundled templates, regardless of whether this is a fresh install, a
+# jar-based upgrade from legacy single-instance Manzan, or a re-install
+# over an existing multi-instance setup.
+#
+# Sources checked in priority order:
+#   1. /QOpenSys/etc/manzan-default/<file>  -- already-configured default instance
+#   2. /QOpenSys/etc/manzan/<file>          -- legacy single-instance config dir
+#   3. /opt/manzan/lib/templates/<file>     -- bundled template (last resort)
+#
+# A file at a given source is only used if it differs from the bundled template,
+# i.e. the operator has actually edited it.  This prevents a previously-installed
+# unedited template from blocking a fresh template install on upgrade.
+#
+# Named instances (/QOpenSys/etc/manzan-<name>) are never touched here; they
+# are managed entirely by create-instance / remove-instance.
+# ---------------------------------------------------------------------------
+
+TEMPLATES_DIR="/opt/manzan/lib/templates"
+DEFAULT_DIR="/QOpenSys/etc/manzan-default"
+LEGACY_DIR="/QOpenSys/etc/manzan"
+
+mkdir -p "${DEFAULT_DIR}"
+chmod 700 "${DEFAULT_DIR}"
+
+for tpl in "${TEMPLATES_DIR}"/*.ini; do
+    [ -f "${tpl}" ] || continue
+    name="$(basename "${tpl}")"
+    dest="${DEFAULT_DIR}/${name}"
+
+    # Determine the best available source for this file, in priority order.
+    src=""
+
+    # 1. If manzan-default already has this file AND it differs from the template,
+    #    the operator has edited it — leave it completely alone.
+    if [ -f "${dest}" ] && ! cmp -s "${dest}" "${tpl}"; then
+        continue
+    fi
+
+    # 2. Check the legacy directory for an operator-edited version.
+    legacy="${LEGACY_DIR}/${name}"
+    if [ -f "${legacy}" ] && ! cmp -s "${legacy}" "${tpl}"; then
+        src="${legacy}"
+    fi
+
+    # 3. Fall back to the bundled template if no operator-edited source found.
+    if [ -z "${src}" ]; then
+        src="${tpl}"
+    fi
+
+    # Only write if the destination is missing or still matches the template
+    # (i.e. it was placed there by a previous install and never edited).
+    if [ ! -f "${dest}" ] || cmp -s "${dest}" "${tpl}"; then
+        cp "${src}" "${dest}"
+        chmod 600 "${dest}"
+        if [ "${src}" = "${tpl}" ]; then
+            echo "[Manzan] Installed template ${name} to ${DEFAULT_DIR}."
+        else
+            echo "[Manzan] Migrated operator config ${name} from ${LEGACY_DIR}."
+        fi
+    fi
+done
+
 exec /QOpenSys/QIBM/ProdData/JavaVM/jdk80/64bit/bin/java -jar /opt/manzan/lib/manzan.jar $*

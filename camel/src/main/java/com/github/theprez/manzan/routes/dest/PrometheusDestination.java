@@ -5,6 +5,7 @@ import java.io.StringWriter;
 import java.util.Map;
 import java.util.concurrent.ConcurrentHashMap;
 
+import com.github.theprez.manzan.InstanceContext;
 import com.github.theprez.manzan.ManzanEventType;
 import com.github.theprez.manzan.routes.ManzanRoute;
 
@@ -52,10 +53,10 @@ public class PrometheusDestination extends ManzanRoute {
     private static final String QUEUE_DEPTH_NAME = "queue_depth";
     private static final String QUEUE_DEPTH_HELP = "Current message queue depth";
 
-    public PrometheusDestination(final String _name, final int _port, final String _path, 
-                                  final String _metricPrefix, final String _username, 
+    public PrometheusDestination(final InstanceContext _ctx, final String _name, final int _port, final String _path,
+                                  final String _metricPrefix, final String _username,
                                   final String _password) {
-        super(_name);
+        super(_ctx, _name);
         this.port = _port;
         this.path = _path != null ? _path : "/metrics";
         this.metricPrefix = _metricPrefix != null ? _metricPrefix : "manzan_";
@@ -68,6 +69,18 @@ public class PrometheusDestination extends ManzanRoute {
         
         // Initialize default metrics
         initializeDefaultMetrics();
+    }
+
+    /** Returns the HTTP port this destination's scrape endpoint is bound to. */
+    public int getPort() {
+        return port;
+    }
+
+    @Deprecated
+    public PrometheusDestination(final String _name, final int _port, final String _path,
+                                  final String _metricPrefix, final String _username,
+                                  final String _password) {
+        this(null, _name, _port, _path, _metricPrefix, _username, _password);
     }
 
     private void initializeDefaultMetrics() {
@@ -124,12 +137,12 @@ public class PrometheusDestination extends ManzanRoute {
     public void configure() {
         // Process incoming events and update metrics
         from(getInUri())
-            .routeId(m_name)
+            .routeId(getRouteId())
             .process(new MetricsProcessor());
         
         // HTTP endpoint for Prometheus scraping
         from("netty-http:http://0.0.0.0:" + port + path + "?matchOnUriPrefix=true")
-            .routeId(m_name + "_http_endpoint")
+            .routeId(getRouteId() + "_http_endpoint")
             .process(exchange -> {
                 // Basic authentication if configured
                 if (username != null && password != null) {
@@ -343,3 +356,6 @@ public class PrometheusDestination extends ManzanRoute {
         }
     }
 }
+
+
+

@@ -4,6 +4,7 @@ import java.util.HashMap;
 import java.util.Map;
 import java.util.Map.Entry;
 
+import com.github.theprez.manzan.InstanceContext;
 import com.github.theprez.manzan.ManzanEventType;
 import org.apache.camel.CamelContext;
 import org.apache.camel.Component;
@@ -22,10 +23,10 @@ public abstract class ManzanGenericCamelRoute extends ManzanRoute {
     private final String m_path;
     protected final Map<String, String> m_uriParams;
 
-    public ManzanGenericCamelRoute(final CamelContext _context, final String _name, final String _camelComponent, final String _path,
+    public ManzanGenericCamelRoute(final CamelContext _context, final InstanceContext _ctx, final String _name, final String _camelComponent, final String _path,
                                        final String _format, final Map<String, String> _uriParams, final Map<String, Object> _headerParams,
                                        final Map<String, String> componentOptions) {
-        super(_name);
+        super(_ctx, _name);
         m_uriParams = null == _uriParams ? new HashMap<String, String>(1) : _uriParams;
         m_headerParams = null == _headerParams ? new HashMap<String, Object>(1) : _headerParams;
         m_camelComponent = _camelComponent;

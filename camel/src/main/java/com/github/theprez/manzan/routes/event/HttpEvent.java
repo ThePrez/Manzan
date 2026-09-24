@@ -43,7 +43,7 @@ public class HttpEvent extends ManzanRoute {
     @Override
     public void configure() {
         from("timer://foo?period=" + m_interval + "&synchronous=true")
-                .routeId(m_name)
+                .routeId(getRouteId())
                 .setHeader(EVENT_TYPE, constant(m_eventType))
                 .process(exchange -> {
                     for (Map.Entry<String, String> header : m_headerParams.entrySet()) {
@@ -73,3 +73,4 @@ public class HttpEvent extends ManzanRoute {
                 .recipientList(constant(getRecipientList())).stopOnException();
     }
 }
+

@@ -13,6 +13,7 @@ import com.fasterxml.jackson.core.JsonProcessingException;
 import com.fasterxml.jackson.databind.ObjectMapper;
 import com.github.theprez.manzan.LocalHostResolver;
 import com.github.theprez.manzan.ManzanEventType;
+import com.github.theprez.manzan.InstanceContext;
 import com.github.theprez.manzan.routes.ManzanGenericCamelRoute;
 import com.github.theprez.manzan.routes.ManzanRoute;
 import com.github.theprez.manzan.routes.event.FileEvent;
@@ -20,8 +21,8 @@ import com.github.theprez.manzan.routes.event.FileEvent;
 public class MezmoDestination extends ManzanGenericCamelRoute {
     private final String m_app;
 
-    public MezmoDestination(final CamelContext _context, final String _name, final String _apiKey, final String _tags, final String _app, final String _format) {
-        super(_context, _name, "https", "logs.mezmo.com/logs/ingest", _format, null, null, null);
+    public MezmoDestination(final CamelContext _context, final InstanceContext _ctx, final String _name, final String _apiKey, final String _tags, final String _app, final String _format) {
+        super(_context, _ctx, _name, "https", "logs.mezmo.com/logs/ingest", _format, null, null, null);
         this.m_app = _app;
         this.m_headerParams.put(Exchange.CONTENT_TYPE, "application/json");
         this.m_headerParams.put(Exchange.HTTP_METHOD, "POST");
@@ -86,3 +87,5 @@ public class MezmoDestination extends ManzanGenericCamelRoute {
         exchange.getIn().setBody(jsonBody);
     }
 }
+
+

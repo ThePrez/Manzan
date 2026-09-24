@@ -22,6 +22,14 @@ install:
 	gmake -C ile BUILDLIB=${BUILDLIB}
 	gmake -C camel install
 	install -m 600 -o qsys service-commander-def.yaml ${INSTALL_ROOT}/opt/manzan/lib/manzan.yaml
+	install -m 700 -o qsys scripts/create-instance.sh  ${INSTALL_ROOT}/opt/manzan/bin/create-instance
+	install -m 700 -o qsys scripts/list-instances.sh   ${INSTALL_ROOT}/opt/manzan/bin/list-instances
+	install -m 700 -o qsys scripts/remove-instance.sh  ${INSTALL_ROOT}/opt/manzan/bin/remove-instance
+	install -m 700 -o qsys scripts/setup-multi-instance-authorities.sh ${INSTALL_ROOT}/opt/manzan/bin/setup-authorities
+	mkdir -p ${INSTALL_ROOT}/opt/manzan/lib/templates
+	install -m 600 -o qsys config/app.ini  ${INSTALL_ROOT}/opt/manzan/lib/templates/app.ini
+	install -m 600 -o qsys config/data.ini ${INSTALL_ROOT}/opt/manzan/lib/templates/data.ini
+	install -m 600 -o qsys config/dests.ini ${INSTALL_ROOT}/opt/manzan/lib/templates/dests.ini
 
 uninstall:
 	gmake -C ile uninstall BUILDLIB=${BUILDLIB}
@@ -42,16 +50,28 @@ manzan-installer-v%.jar: /QOpenSys/pkgs/bin/zip appinstall.jar
 	system "crtlib ${BUILDLIB}"
 	system "dltlib ${BUILDLIB}"
 	: > config/app.ini
-	rm -fr /QOpenSys/etc/manzan
+	rm -fr /QOpenSys/etc/manzan-default
 	rm -fr /opt/manzan
 	gmake -C config BUILDVERSION="$*" install BUILDLIB=${BUILDLIB}
 	gmake -C ile BUILDVERSION="$*" BUILDLIB=${BUILDLIB}
 	gmake -C camel BUILDVERSION="$*" clean install
 	install -m 600 -o qsys service-commander-def.yaml ${INSTALL_ROOT}/opt/manzan/lib/manzan.yaml
+	install -m 700 -o qsys scripts/create-instance.sh  ${INSTALL_ROOT}/opt/manzan/bin/create-instance
+	install -m 700 -o qsys scripts/list-instances.sh   ${INSTALL_ROOT}/opt/manzan/bin/list-instances
+	install -m 700 -o qsys scripts/remove-instance.sh  ${INSTALL_ROOT}/opt/manzan/bin/remove-instance
+	install -m 700 -o qsys scripts/setup-multi-instance-authorities.sh ${INSTALL_ROOT}/opt/manzan/bin/setup-authorities
+	mkdir -p ${INSTALL_ROOT}/opt/manzan/lib/templates
+	install -m 600 -o qsys config/app.ini  ${INSTALL_ROOT}/opt/manzan/lib/templates/app.ini
+	install -m 600 -o qsys config/data.ini ${INSTALL_ROOT}/opt/manzan/lib/templates/data.ini
+	install -m 600 -o qsys config/dests.ini ${INSTALL_ROOT}/opt/manzan/lib/templates/dests.ini
+	mkdir -p /QOpenSys/etc/manzan-default
+	cp /opt/manzan/lib/templates/app.ini   /QOpenSys/etc/manzan-default/app.ini
+	cp /opt/manzan/lib/templates/data.ini  /QOpenSys/etc/manzan-default/data.ini
+	cp /opt/manzan/lib/templates/dests.ini /QOpenSys/etc/manzan-default/dests.ini
 	mkdir -p ${INSTALL_ROOT}/QOpenSys/etc/sc/services
 	ln -sf /opt/manzan/lib/manzan.yaml ${INSTALL_ROOT}/QOpenSys/etc/sc/services/manzan.yaml
 	mkdir -p ${INSTALL_ROOT}/opt/manzan/.install-marker
 	$(eval BUILD_TS := $(shell date +%Y%m%d-%H%M%S))
 	echo "Manzan v$* build $(BUILD_TS) - workaround for AppInstall bug" > ${INSTALL_ROOT}/opt/manzan/.install-marker/.build-$(BUILD_TS)
-	/QOpenSys/QIBM/ProdData/JavaVM/jdk80/64bit/bin/java -jar appinstall.jar -o $@ --qsys manzan --file /opt/manzan --file /QOpenSys/etc/sc/services/manzan.yaml --fileIfMissing /QOpenSys/etc/manzan/app.ini --fileIfMissing /QOpenSys/etc/manzan/data.ini --fileIfMissing /QOpenSys/etc/manzan/dests.ini --fileIfMissing /opt/manzan/.install-marker/.build-$(BUILD_TS)
+	/QOpenSys/QIBM/ProdData/JavaVM/jdk80/64bit/bin/java -jar appinstall.jar -o $@ --qsys manzan --file /opt/manzan --file /QOpenSys/etc/sc/services/manzan.yaml --fileIfMissing /QOpenSys/etc/manzan-default/app.ini --fileIfMissing /QOpenSys/etc/manzan-default/data.ini --fileIfMissing /QOpenSys/etc/manzan-default/dests.ini --fileIfMissing /opt/manzan/.install-marker/.build-$(BUILD_TS)
 	

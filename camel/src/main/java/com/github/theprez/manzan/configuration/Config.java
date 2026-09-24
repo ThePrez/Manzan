@@ -11,6 +11,7 @@ import org.ini4j.Ini;
 import org.ini4j.InvalidFileFormatException;
 
 import com.github.theprez.jcmdutils.StringUtils;
+import com.github.theprez.manzan.InstanceContext;
 import org.ini4j.Profile;
 
 public abstract class Config {
@@ -24,8 +25,67 @@ public abstract class Config {
         final String osName = System.getProperty("os.name", "Misty");
         return "os400".equalsIgnoreCase(osName) || "os/400".equalsIgnoreCase(osName);
     }
+    
+    /**
+     * Get configuration file for the default instance (backward compatibility)
+     * @deprecated Use getConfigFile(InstanceContext, String) for multi-instance support
+     */
+    @Deprecated
     protected static File getConfigFile(final String _name) throws IOException {
+        // Backward compatibility: Use default instance context
+        try {
+            InstanceContext defaultContext = InstanceContext.getDefault();
+            return getConfigFile(defaultContext, _name);
+        } catch (Exception e) {
+            // Fallback to legacy behavior if InstanceContext fails
+            return getConfigFileLegacy(_name);
+        }
+    }
+    
+    /**
+     * Get configuration file for a specific instance (multi-instance support)
+     * Security: Uses instance-specific config directory with proper permissions
+     *
+     * @param ctx Instance context
+     * @param _name Configuration file name
+     * @return Configuration file
+     * @throws IOException if file cannot be created or secured
+     */
+    protected static File getConfigFile(final InstanceContext ctx, final String _name) throws IOException {
+        if (ctx == null) {
+            throw new IllegalArgumentException("InstanceContext cannot be null");
+        }
+        
+        // Get instance-specific config directory
+        final File configDir = new File(ctx.getConfigDirectory());
+        
+        // Ensure directory exists with proper security
+        ctx.ensureConfigDirectorySecurity();
+        
+        // Create config file if it doesn't exist
+        final File ret = new File(configDir, _name);
+        if (!ret.isFile()) {
+            ret.createNewFile();
+            // Set permissions immediately and verify before delegating to validateConfigFileSecurity,
+            // so a silent setPosixFilePermissions failure is caught here rather than surfacing as a
+            // misleading "insecure permissions" error on a brand-new file.
+            setFilePermissionsTo600(ret);
+            verifyFilePermissions600(ret);
+            return ret;
+        }
 
+        // Validate file security for pre-existing files
+        ctx.validateConfigFileSecurity(ret);
+
+        return ret;
+    }
+    
+    /**
+     * Legacy config file resolution (for backward compatibility fallback)
+     * @deprecated Internal use only - use getConfigFile(InstanceContext, String)
+     */
+    @Deprecated
+    private static File getConfigFileLegacy(final String _name) throws IOException {
         final File configDir;
         final String configDirOverride = System.getProperty(DIRECTORY_OVERRIDE_PROPERTY);
         if(StringUtils.isNonEmpty(configDirOverride)) {
@@ -36,9 +96,8 @@ public abstract class Config {
 
         if (!configDir.isDirectory()) {
             if (!configDir.mkdirs()) {
-                throw new IOException("Cound not create configuration directory " + configDir.getAbsolutePath());
+                throw new IOException("Could not create configuration directory " + configDir.getAbsolutePath());
             }
-            // TODO: set appropriate permissions
         }
         final File ret = new File(configDir, _name);
         if (!ret.isFile()) {
@@ -47,6 +106,30 @@ public abstract class Config {
         }
         ensureOnlyOwnerCanReadAndWriteFile(ret);
         return ret;
+    }
+
+    /**
+     * Verify that a file's permissions are exactly 600 after an explicit set.
+     * Distinct from ensureOnlyOwnerCanReadAndWriteFile so it can be called without
+     * the UnsupportedOperationException swallowing that the legacy path uses.
+     */
+    private static void verifyFilePermissions600(File file) throws IOException {
+        Path path = file.toPath();
+        try {
+            Set<PosixFilePermission> perms = Files.getPosixFilePermissions(path);
+            Set<PosixFilePermission> expected = new HashSet<>(Arrays.asList(
+                    PosixFilePermission.OWNER_READ,
+                    PosixFilePermission.OWNER_WRITE
+            ));
+            if (!perms.equals(expected)) {
+                throw new IOException(
+                    "Failed to set permissions to 600 on newly created config file: " + file.getAbsolutePath()
+                    + ". Found: " + perms
+                );
+            }
+        } catch (UnsupportedOperationException e) {
+            // Non-POSIX system (e.g., developer workstation) — skip
+        }
     }
 
     private static void ensureOnlyOwnerCanReadAndWriteFile(File file) throws SecurityException, IOException {

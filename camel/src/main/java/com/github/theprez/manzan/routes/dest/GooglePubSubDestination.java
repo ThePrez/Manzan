@@ -9,11 +9,12 @@ import org.apache.camel.component.google.pubsub.GooglePubsubComponent;
 import org.apache.camel.component.google.pubsub.GooglePubsubConstants;
 
 import com.github.theprez.manzan.ManzanEventType;
+import com.github.theprez.manzan.InstanceContext;
 import com.github.theprez.manzan.routes.ManzanGenericCamelRoute;
 
 public class GooglePubSubDestination extends ManzanGenericCamelRoute {
-    public GooglePubSubDestination(final CamelContext _context, final String _name, final String _projectId, final String _topicName, final String _format, final Map<String, String> _componentOptions, final Map<String, String> _uriParams) {
-        super(_context, _name, "google-pubsub", _projectId + ":" + _topicName, _format, _uriParams, null, _componentOptions);
+    public GooglePubSubDestination(final CamelContext _context, final InstanceContext _ctx, final String _name, final String _projectId, final String _topicName, final String _format, final Map<String, String> _componentOptions, final Map<String, String> _uriParams) {
+        super(_context, _ctx, _name, "google-pubsub", _projectId + ":" + _topicName, _format, _uriParams, null, _componentOptions);
         GooglePubsubComponent pubsub = _context.getComponent("google-pubsub", GooglePubsubComponent.class);
         pubsub.init();
         pubsub.start();
@@ -37,3 +38,4 @@ public class GooglePubSubDestination extends ManzanGenericCamelRoute {
         exchange.getIn().setHeader(GooglePubsubConstants.ATTRIBUTES, map);
     }
 }
+

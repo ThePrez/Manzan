@@ -3,16 +3,24 @@ package com.github.theprez.manzan.routes.dest;
 import org.apache.camel.CamelContext;
 import org.apache.camel.Exchange;
 
+import com.github.theprez.manzan.InstanceContext;
 import com.github.theprez.manzan.routes.ManzanGenericCamelRoute;
 
 import java.util.Map;
 
 public class StreamDestination extends ManzanGenericCamelRoute {
+    public StreamDestination(final CamelContext _context, final InstanceContext _ctx, final String _name, final String _format, final Map<String, String> _componentOptions) {
+        super(_context, _ctx, _name, "stream", "out", _format, null, null, _componentOptions);
+    }
+
+    @Deprecated
     public StreamDestination(final CamelContext _context, final String _name, final String _format, final Map<String, String> _componentOptions) {
-        super(_context, _name, "stream", "out", _format, null, null, _componentOptions);
+        this(_context, null, _name, _format, _componentOptions);
     }
 
     @Override
     protected void customPostProcess(Exchange exchange) {
     }
 }
+
+
