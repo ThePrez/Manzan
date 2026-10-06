@@ -18,9 +18,9 @@ run:
 	sleep 10
 	echo ${TEXT} >> ${INPUT_FILE}
 	sleep 10
-	ps -ef | grep 'smtp-server/server.js' | grep -v 'grep' | awk '{ print $$2 }' | xargs kill
+	ps -ef | grep 'smtp-server/server.js' | grep -v 'grep' | awk '{ print $$2 }' | xargs -r kill || true
 
 checkresult:
 	echo "Expected output: '${EXPECTED_OUTPUT}'"
-	grep -i '${EXPECTED_OUTPUT}' ${OUTPUT_FILE}
+	grep -i "${EXPECTED_OUTPUT}" ${OUTPUT_FILE}
 	cat ${OUTPUT_FILE}

@@ -53,13 +53,17 @@ do
   
   # Kill processes
   echo -e "\tKilling processes..."
-  ps -ef | grep jre | grep "${USER:0:8}" 2>&1 | sed 's/^/\t\t/' # Get user string only up to 8th character since it gets truncated in process table
-  for pid in $(ps -ef | grep jre | grep "${USER:0:8}" | awk '{print $2}')
+  ps -ef | grep -E 'jre|jdk' | grep "${USER:0:8}" 2>&1 | sed 's/^/\t\t/' # Get user string only up to 8th character since it gets truncated in process table
+  for pid in $(ps -ef | grep -E 'jre|jdk' | grep "${USER:0:8}" | awk '{print $2}')
   do
     echo -e "\t\tkilling pid $pid"
-    kill -INT $pid 2>&1 | sed 's/^/\t\t/'
-    sleep 1
-    kill -KILL $pid 2>&1 | sed 's/^/\t\t/'
+    kill -INT $pid 2>/dev/null || true
+    # Wait up to 10s for graceful shutdown before forcing
+    for i in $(seq 1 10); do
+      kill -0 $pid 2>/dev/null || break
+      sleep 1
+    done
+    kill -KILL $pid 2>/dev/null || true
   done
 
   # Check test result
