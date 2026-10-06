@@ -48,7 +48,7 @@ jobs:
             --cmd "mkdir -p ${{ env.remote_build_dir }}" \
             --rcwd "${{ env.remote_build_dir }}" \
             --push "." \
-            --cmd "/QOpenSys/pkgs/bin/gmake BUILDLIB=${{ env.BUILDLIB }} install" \
+            --cmd "export JAVA_HOME=/QOpenSys/QIBM/ProdData/JavaVM/jdk17/64bit && export PATH=\$JAVA_HOME/bin:\$PATH && /QOpenSys/pkgs/bin/gmake BUILDLIB=${{ env.BUILDLIB }} install" \
             --cmd "find . -type f -name \"*.ini\" -exec chmod 600 {} +" \
             --cmd "find . -type f -name \"*.ini\" -exec ls -l {} +" \
         env:
