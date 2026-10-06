@@ -1,7 +1,7 @@
 package com.github.theprez.manzan.routes.dest;
 
+import java.time.Instant;
 import java.util.ArrayList;
-import java.util.Date;
 import java.util.HashMap;
 import java.util.List;
 import java.util.Map;
@@ -60,7 +60,7 @@ public class MezmoDestination extends ManzanGenericCamelRoute {
         } else {
             defaultSummary = getString(exchange, FileEvent.FILE_DATA);
             severity = "INFO";
-            timestamp = new Date().toString();
+            timestamp = Instant.now().toString();
         }
 
         // Construct log line

@@ -1,6 +1,8 @@
 package com.github.theprez.manzan.routes.dest;
 
-import java.sql.Date;
+import java.time.LocalDate;
+import java.time.ZoneOffset;
+import java.util.Date;
 import java.util.LinkedList;
 import java.util.List;
 import java.util.UUID;
@@ -83,7 +85,7 @@ public class SentryDestination extends ManzanRoute {
                     }
 
                     event.setLevel(severity);
-                    event.setTimestamp(Date.valueOf(getString(exchange, timestamp))); // TODO: Verify date is valid
+                    event.setTimestamp(Date.from(LocalDate.parse(getString(exchange, timestamp)).atStartOfDay(ZoneOffset.UTC).toInstant())); // TODO: Verify date is valid
                     event.setFingerprints(fingerprints);
                     Sentry.captureEvent(event);
                 });

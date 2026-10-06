@@ -1,6 +1,10 @@
 package com.github.theprez.manzan.routes.dest;
 
-import java.sql.Timestamp;
+import java.time.LocalDateTime;
+import java.time.ZoneId;
+import java.time.format.DateTimeFormatter;
+import java.time.format.DateTimeFormatterBuilder;
+import java.time.temporal.ChronoField;
 import java.util.Map;
 
 import com.github.theprez.manzan.InstanceContext;
@@ -37,22 +41,27 @@ public class GrafanaLokiDestination extends ManzanRoute {
                 .withBasicAuth(_username, _password)
                 .start();
 
-        Runtime.getRuntime().addShutdownHook(new Thread() {
-            @Override
-            public void run() {
-                try {
-                    logController
-                            .softStop()
-                            .hardStop();
-                } catch (final Exception e) {
-                    e.printStackTrace();
-                }
+        Runtime.getRuntime().addShutdownHook(new Thread(() -> {
+            try {
+                logController
+                        .softStop()
+                        .hardStop();
+            } catch (final Exception e) {
+                e.printStackTrace();
             }
-        });
+        }));
     }
 
+    private static final DateTimeFormatter SQL_TIMESTAMP_FMT = new DateTimeFormatterBuilder()
+            .appendPattern("yyyy-MM-dd HH:mm:ss")
+            .optionalStart().appendFraction(ChronoField.NANO_OF_SECOND, 0, 9, true).optionalEnd()
+            .toFormatter();
+
     private long timestampKeyToLong(String key, Exchange exchange) {
-        return Timestamp.valueOf(getString(exchange, key)).getTime();
+        return LocalDateTime.parse(getString(exchange, key), SQL_TIMESTAMP_FMT)
+                .atZone(ZoneId.systemDefault())
+                .toInstant()
+                .toEpochMilli();
     }
 
     private long getTimestamp(Exchange exchange) {

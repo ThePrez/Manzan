@@ -18,16 +18,13 @@ public class FluentDDestination extends ManzanRoute {
         m_host = _host;
         m_port = _port;
         m_logger = FluentLogger.getLogger(m_tag, m_host, m_port);
-        Runtime.getRuntime().addShutdownHook(new Thread() {
-            @Override
-            public void run() {
-                try {
-                    m_logger.close();
-                } catch (final Exception e) {
-                    e.printStackTrace();
-                }
+        Runtime.getRuntime().addShutdownHook(new Thread(() -> {
+            try {
+                m_logger.close();
+            } catch (final Exception e) {
+                e.printStackTrace();
             }
-        });
+        }));
     }
 
     @Override

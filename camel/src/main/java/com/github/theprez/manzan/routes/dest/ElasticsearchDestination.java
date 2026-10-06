@@ -39,16 +39,13 @@ public class ElasticsearchDestination extends ManzanRoute {
         // Create the API client
         this.esClient = new ElasticsearchClient(transport);
 
-        Runtime.getRuntime().addShutdownHook(new Thread() {
-            @Override
-            public void run() {
-                try {
-                    esClient.close();
-                } catch (final Exception e) {
-                    e.printStackTrace();
-                }
+        Runtime.getRuntime().addShutdownHook(new Thread(() -> {
+            try {
+                esClient.close();
+            } catch (final Exception e) {
+                e.printStackTrace();
             }
-        });
+        }));
     }
 
     @Override

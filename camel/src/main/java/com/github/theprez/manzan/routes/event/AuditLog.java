@@ -10,6 +10,7 @@ import com.github.theprez.manzan.routes.ManzanRoute;
 
 import java.io.IOException;
 import java.sql.Timestamp;
+import java.time.LocalDateTime;
 import java.util.*;
 
 public class AuditLog extends ManzanRoute {
@@ -103,14 +104,16 @@ public class AuditLog extends ManzanRoute {
                         exchange.setProperty("resultSet", rows);
 
                         // Find max ENTRY_TIMESTAMP
-                        Optional<Timestamp> maxTimestamp = rows.stream()
+                        Optional<LocalDateTime> maxTimestamp = rows.stream()
                                 .map(row -> (Timestamp) row.get("ENTRY_TIMESTAMP"))
                                 .filter(Objects::nonNull)
+                                .map(Timestamp::toLocalDateTime)
                                 .max(Comparator.naturalOrder());
 
                         maxTimestamp.ifPresent(ts -> {
                             // Watermark write is scoped to this instance's session ID so that
                             // concurrent instances each upsert their own row in AUDJRNTS.
+                            String tsStr = ts.toString().replace('T', ' ');
                             String mergeQuery = String.format(
                                     "MERGE INTO MANZAN.AUDJRNTS tgt " +
                                     "USING (VALUES('%s', '%s')) src(SESSION_ID, AUDTYPE) " +
@@ -119,12 +122,12 @@ public class AuditLog extends ManzanRoute {
                                     "  UPDATE SET TIME = TIMESTAMP('%s') " +
                                     "WHEN NOT MATCHED THEN " +
                                     "  INSERT (SESSION_ID, AUDTYPE, TIME) VALUES('%s', '%s', TIMESTAMP('%s'))",
-                                    m_sessionId, m_auditType, ts,
-                                    m_sessionId, m_auditType, ts
+                                    m_sessionId, m_auditType, tsStr,
+                                    m_sessionId, m_auditType, tsStr
                             );
                             exchange.getIn().setBody(mergeQuery);
                         });
-                        if (!maxTimestamp.isPresent()) {
+                        if (maxTimestamp.isEmpty()) {
                             exchange.getIn().setBody(null);
                         }
                     }

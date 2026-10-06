@@ -5,14 +5,14 @@ import java.nio.charset.StandardCharsets;
 import java.security.InvalidKeyException;
 import java.security.MessageDigest;
 import java.security.NoSuchAlgorithmException;
-import java.text.SimpleDateFormat;
+import java.time.ZoneOffset;
+import java.time.ZonedDateTime;
+import java.time.format.DateTimeFormatter;
 import java.util.ArrayList;
 import java.util.Collections;
-import java.util.Date;
 import java.util.HashMap;
 import java.util.List;
 import java.util.Map;
-import java.util.TimeZone;
 import java.util.TreeMap;
 
 import javax.crypto.Mac;
@@ -288,13 +288,11 @@ public class OpenSearchDestination extends ManzanRoute {
             }
 
             // ---- 2. Timestamps -------------------------------------------------
-            final SimpleDateFormat dateFmt = new SimpleDateFormat("yyyyMMdd");
-            dateFmt.setTimeZone(TimeZone.getTimeZone("UTC"));
-            final SimpleDateFormat isoFmt = new SimpleDateFormat("yyyyMMdd'T'HHmmss'Z'");
-            isoFmt.setTimeZone(TimeZone.getTimeZone("UTC"));
-            final Date now     = new Date();
-            final String dateStamp = dateFmt.format(now);
-            final String amzDate   = isoFmt.format(now);
+            ZonedDateTime now = ZonedDateTime.now(ZoneOffset.UTC);
+            DateTimeFormatter dateFmt = DateTimeFormatter.ofPattern("yyyyMMdd");
+            DateTimeFormatter isoFmt  = DateTimeFormatter.ofPattern("yyyyMMdd'T'HHmmss'Z'");
+            final String dateStamp = now.format(dateFmt);
+            final String amzDate   = now.format(isoFmt);
 
             // ---- 3. Collect headers to sign ------------------------------------
             // AWS always computes the canonical host without a port suffix, even for
