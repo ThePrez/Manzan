@@ -3,6 +3,7 @@ package CamelTests;
 import com.fasterxml.jackson.databind.ObjectMapper;
 import com.github.theprez.manzan.InstanceContext;
 import com.github.theprez.manzan.configuration.ApplicationConfig;
+import com.github.theprez.manzan.configuration.Config;
 import com.ibm.as400.access.AS400;
 import com.ibm.as400.access.AS400JDBCDataSource;
 import com.ibm.as400.access.AS400SecurityException;
@@ -85,15 +86,20 @@ public abstract class CamelTestHelper extends CamelTestSupport {
     protected CamelContext createCamelContext() throws Exception {
         CamelContext context = super.createCamelContext();
 
-        final AS400 as400 = ApplicationConfig.get(InstanceContext.getDefault()).getRemoteConnection();
-        as400.setGuiAvailable(false);
-        as400.validateSignon();
+        // Only connect to IBM i when actually running on IBM i.
+        // Mock-server tests (OpenSearch, OpenTelemetry, Prometheus, etc.) run on the
+        // GitHub Actions Ubuntu runner and do not need a JT400 datasource.
+        if (Config.isIBMi()) {
+            final AS400 as400 = ApplicationConfig.get(InstanceContext.getDefault()).getRemoteConnection();
+            as400.setGuiAvailable(false);
+            as400.validateSignon();
 
-        final AS400JDBCDataSource dataSource = new AS400JDBCDataSource(as400);
-        dataSource.setTransactionIsolation("none");
+            final AS400JDBCDataSource dataSource = new AS400JDBCDataSource(as400);
+            dataSource.setTransactionIsolation("none");
 
-        // Register the dataSource with the correct Camel registry
-        context.getRegistry().bind("jt400", dataSource);
+            // Register the dataSource with the correct Camel registry
+            context.getRegistry().bind("jt400", dataSource);
+        }
 
         return context;
     }
