@@ -80,12 +80,13 @@ jobs:
         if: github.actor != 'dependabot[bot]'
         working-directory: camel
         run: |
-          echo "[remote]" > app.ini
-          echo "system=${{ secrets.IBMI_HOST }}" >> app.ini
-          echo "user=${{ secrets.IBMI_USER }}" >> app.ini
-          echo "password=${{ secrets.IBMI_PASSWORD }}" >> app.ini
-          chmod 600 app.ini
-          mvn clean test -Dmanzan.configdir=$(mktemp -d) -Dsurefire.excludes="**/CamelTests/AuditLogTest/**"
+          TMPDIR=$(mktemp -d)
+          echo "[remote]" > "$TMPDIR/app.ini"
+          echo "system=${{ secrets.IBMI_HOST }}" >> "$TMPDIR/app.ini"
+          echo "user=${{ secrets.IBMI_USER }}" >> "$TMPDIR/app.ini"
+          echo "password=${{ secrets.IBMI_PASSWORD }}" >> "$TMPDIR/app.ini"
+          chmod 600 "$TMPDIR/app.ini"
+          mvn clean test -Dmanzan.configdir="$TMPDIR" -Dsurefire.excludes="**/CamelTests/AuditLogTest/**"
 
       - name: Cleanup
         if: always() && github.actor != 'dependabot[bot]'
