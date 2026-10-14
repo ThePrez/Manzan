@@ -37,6 +37,10 @@ public class ManzanInstanceManager {
         if (com.github.theprez.jcmdutils.StringUtils.isNonEmpty(override)) {
             return override;
         }
+        String configDir = System.getProperty("manzan.configdir");
+        if (com.github.theprez.jcmdutils.StringUtils.isNonEmpty(configDir)) {
+            return configDir;
+        }
         final String osName = System.getProperty("os.name", "");
         if ("os400".equalsIgnoreCase(osName) || "os/400".equalsIgnoreCase(osName)) {
             return "/QOpenSys/etc";
