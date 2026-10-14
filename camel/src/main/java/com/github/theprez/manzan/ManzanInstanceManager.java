@@ -29,9 +29,20 @@ import java.util.Set;
  */
 public class ManzanInstanceManager {
 
-    private static final String CONFIG_BASE_DIR = "/QOpenSys/etc";
     private static final String CONFIG_DIR_PREFIX = "manzan-";
     private static final String[] TEMPLATE_INI_FILES = {"app.ini", "data.ini", "dests.ini"};
+
+    public static String getConfigBaseDir() {
+        String override = System.getProperty("manzan.configbase");
+        if (com.github.theprez.jcmdutils.StringUtils.isNonEmpty(override)) {
+            return override;
+        }
+        final String osName = System.getProperty("os.name", "");
+        if ("os400".equalsIgnoreCase(osName) || "os/400".equalsIgnoreCase(osName)) {
+            return "/QOpenSys/etc";
+        }
+        return new File(System.getProperty("java.io.tmpdir"), "qopensys-etc").getAbsolutePath();
+    }
     private static final java.util.regex.Pattern VALID_INSTANCE_NAME =
             java.util.regex.Pattern.compile("^[a-z0-9_-]{1,32}$");
 
@@ -116,7 +127,7 @@ public class ManzanInstanceManager {
         // Check existence before constructing InstanceContext — fromEnvironment()
         // calls ensureConfigDirectorySecurity() which creates the directory as a
         // side effect, so checking after construction would always see it present.
-        File configDir = new File("/QOpenSys/etc/manzan-" + instanceName);
+        File configDir = new File(getConfigBaseDir(), CONFIG_DIR_PREFIX + instanceName);
         if (configDir.exists()) {
             throw new IllegalStateException(
                     "Instance '" + instanceName + "' already exists at " + configDir);
@@ -128,7 +139,7 @@ public class ManzanInstanceManager {
 
         // Seed config files — copy from the default instance if present, otherwise
         // create empty stubs so Manzan starts without errors.
-        File defaultConfigDir = new File(CONFIG_BASE_DIR, CONFIG_DIR_PREFIX + "default");
+        File defaultConfigDir = new File(getConfigBaseDir(), CONFIG_DIR_PREFIX + "default");
         for (String fileName : TEMPLATE_INI_FILES) {
             File dest = new File(configDir, fileName);
             File template = new File(defaultConfigDir, fileName);
@@ -176,7 +187,7 @@ public class ManzanInstanceManager {
         // that will never exist, so the IllegalArgumentException fires first; a
         // reserved/invalid name causes fromEnvironment() to throw SecurityException
         // before we get to the lock check anyway.
-        File configDir = new File("/QOpenSys/etc/manzan-" + instanceName);
+        File configDir = new File(getConfigBaseDir(), CONFIG_DIR_PREFIX + instanceName);
         if (!configDir.exists()) {
             throw new IllegalArgumentException(
                     "Instance '" + instanceName + "' does not exist at " + configDir);
@@ -201,7 +212,7 @@ public class ManzanInstanceManager {
         System.out.println("Removed config directory for instance '" + instanceName + "'.");
 
         // Remove this instance's stale lock file, if present.
-        File lockFile = new File("/var/run/manzan/manzan-" + instanceName + ".lock");
+        File lockFile = new File(LockFile.getLockDirectory(), "manzan-" + instanceName + ".lock");
         if (lockFile.exists() && !lockFile.delete()) {
             throw new IOException("Could not delete stale lock file: " + lockFile);
         }
@@ -226,7 +237,7 @@ public class ManzanInstanceManager {
         Set<String> seen = new HashSet<>();
 
         // 1. Discover instances from config directories.
-        File baseDir = new File(CONFIG_BASE_DIR);
+        File baseDir = new File(getConfigBaseDir());
         File[] entries = baseDir.listFiles(
                 (dir, name) -> name.startsWith(CONFIG_DIR_PREFIX) && new File(dir, name).isDirectory());
         if (entries != null) {
@@ -243,7 +254,7 @@ public class ManzanInstanceManager {
         // 2. Add any orphaned active lock entries not covered by a config directory.
         for (String name : LockFile.listActiveLocks()) {
             if (!seen.contains(name)) {
-                String configDir = CONFIG_BASE_DIR + "/" + CONFIG_DIR_PREFIX + name;
+                String configDir = getConfigBaseDir() + "/" + CONFIG_DIR_PREFIX + name;
                 result.add(buildInstanceInfo(name, configDir));
             }
         }
@@ -267,7 +278,7 @@ public class ManzanInstanceManager {
     }
 
     private static long readPidFromLockFile(String instanceName) {
-        File lockFile = new File("/var/run/manzan/manzan-" + instanceName + ".lock");
+        File lockFile = new File(LockFile.getLockDirectory(), "manzan-" + instanceName + ".lock");
         if (!lockFile.isFile()) {
             return -1;
         }

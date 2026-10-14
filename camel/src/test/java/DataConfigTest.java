@@ -33,7 +33,7 @@ public class DataConfigTest {
 
     private void cleanupTestDirectories() {
         for (String name : new String[]{INSTANCE_A, INSTANCE_B, "default"}) {
-            File dir = new File("/QOpenSys/etc/manzan-" + name);
+            File dir = new File(com.github.theprez.manzan.ManzanInstanceManager.getConfigBaseDir(), "manzan-" + name);
             if (dir.exists()) {
                 deleteDirectory(dir);
             }

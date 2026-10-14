@@ -31,8 +31,7 @@ public class LockFileTest {
     }
     
     private void cleanupLockFiles() {
-        // IBM i only: lock directory is always /var/run/manzan
-        lockDir = new File("/var/run/manzan");
+        lockDir = LockFile.getLockDirectory();
 
         if (lockDir.exists() && lockDir.isDirectory()) {
             File[] lockFiles = lockDir.listFiles((dir, name) -> name.startsWith("manzan-") && name.endsWith(".lock"));
@@ -209,8 +208,7 @@ public class LockFileTest {
         File lockFile = lock.getLockFile();
         String lockPath = lockFile.getAbsolutePath();
 
-        // IBM i only: lock directory is always /var/run/manzan
-        assertTrue("Lock file should be in /var/run/manzan", lockPath.startsWith("/var/run/manzan"));
+        assertTrue("Lock file should be in lock directory", lockPath.startsWith(LockFile.getLockDirectory().getAbsolutePath()));
 
         // Verify lock file name format
         String fileName = lockFile.getName();

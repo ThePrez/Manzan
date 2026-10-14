@@ -181,15 +181,20 @@ public class InstanceContext {
         // Read directly to avoid a circular dependency (Config already imports InstanceContext).
         String override = System.getProperty("manzan.configdir");
         if (StringUtils.isNonEmpty(override)) {
-            return new File(override).getAbsolutePath();
+            File base = new File(override);
+            if ("default".equals(instanceName) || override.endsWith("manzan-" + instanceName) || override.endsWith("manzan-" + instanceName + "/") || override.endsWith("manzan-" + instanceName + "\\")) {
+                return base.getAbsolutePath();
+            }
+            return new File(base, "manzan-" + instanceName).getAbsolutePath();
         }
         final String osName = System.getProperty("os.name", "");
         if ("os400".equalsIgnoreCase(osName) || "os/400".equalsIgnoreCase(osName)) {
             return "/QOpenSys/etc/manzan-" + instanceName;
         }
-        // Non-IBM i: use the current working directory, matching the behaviour of
-        // the old getConfigFileLegacy() and the CI workflow that writes app.ini there.
-        return new File(".").getAbsolutePath();
+        if ("default".equals(instanceName)) {
+            return new File(".").getAbsolutePath();
+        }
+        return new File(ManzanInstanceManager.getConfigBaseDir(), "manzan-" + instanceName).getAbsolutePath();
     }
 
     /**

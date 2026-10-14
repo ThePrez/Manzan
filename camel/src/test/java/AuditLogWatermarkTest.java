@@ -165,7 +165,7 @@ public class AuditLogWatermarkTest {
 
     private void cleanupTestDirectories() {
         for (String name : new String[]{INSTANCE_A, INSTANCE_B, "default"}) {
-            deleteDirectory(new File("/QOpenSys/etc/manzan-" + name));
+            deleteDirectory(new File(com.github.theprez.manzan.ManzanInstanceManager.getConfigBaseDir(), "manzan-" + name));
         }
     }
 

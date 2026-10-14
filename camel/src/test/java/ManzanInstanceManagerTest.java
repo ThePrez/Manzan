@@ -95,7 +95,7 @@ public class ManzanInstanceManagerTest {
     @Test
     public void testCreateInstanceCopiesTemplateFromDefaultInstance() throws IOException {
         // Arrange: create the default instance directory with a recognisable app.ini
-        File defaultDir = new File("/QOpenSys/etc/manzan-default");
+        File defaultDir = new File(ManzanInstanceManager.getConfigBaseDir(), "manzan-default");
         defaultDir.mkdirs();
         File defaultAppIni = new File(defaultDir, "app.ini");
         defaultAppIni.createNewFile();
@@ -154,7 +154,7 @@ public class ManzanInstanceManagerTest {
     @Test
     public void testDestroyInstanceRemovesConfigDir() throws IOException {
         ManzanInstanceManager.createInstance(INST_B);
-        File configDir = new File("/QOpenSys/etc/manzan-" + INST_B);
+        File configDir = new File(ManzanInstanceManager.getConfigBaseDir(), "manzan-" + INST_B);
         assertTrue("Config dir must exist before destroy", configDir.isDirectory());
 
         ManzanInstanceManager.destroyInstance(INST_B, false);
@@ -171,7 +171,7 @@ public class ManzanInstanceManagerTest {
     @Test
     public void testDestroyInstanceThrowsIfRunning() throws IOException {
         ManzanInstanceManager.createInstance(INST_B);
-        File configDir = new File("/QOpenSys/etc/manzan-" + INST_B);
+        File configDir = new File(ManzanInstanceManager.getConfigBaseDir(), "manzan-" + INST_B);
 
         LockFile lock = LockFile.acquire(INST_B);
         assertNotNull("Lock must be acquired to simulate a running instance", lock);
@@ -196,7 +196,7 @@ public class ManzanInstanceManagerTest {
         ManzanInstanceManager.createInstance(INST_B);
 
         // Manually plant a stale lock file (PID 0 is never a live process)
-        File lockDir = new File("/var/run/manzan");
+        File lockDir = LockFile.getLockDirectory();
         lockDir.mkdirs();
         File stale = new File(lockDir, "manzan-" + INST_B + ".lock");
         Files.write(stale.toPath(), "0".getBytes());
@@ -219,7 +219,7 @@ public class ManzanInstanceManagerTest {
         InstanceInfo found = findByName(list, INST_C);
 
         assertNotNull("listInstances must include the newly created instance", found);
-        assertEquals("Config directory must match", "/QOpenSys/etc/manzan-" + INST_C,
+        assertEquals("Config directory must match", new File(ManzanInstanceManager.getConfigBaseDir(), "manzan-" + INST_C).getAbsolutePath(),
                 found.getConfigDirectory());
         assertFalse("Instance must not appear as running when no lock file exists",
                 found.isRunning());
@@ -275,7 +275,7 @@ public class ManzanInstanceManagerTest {
         // No config directory — only a stale-but-live-looking lock file.
         // We simulate an "orphaned" entry by writing a real PID for the current
         // process so /proc/<pid> exists and LockFile.listActiveLocks() reports it.
-        File lockDir = new File("/var/run/manzan");
+        File lockDir = LockFile.getLockDirectory();
         lockDir.mkdirs();
         String orphanName = PREFIX + "orphan";
         File lockFile = new File(lockDir, "manzan-" + orphanName + ".lock");
@@ -324,11 +324,11 @@ public class ManzanInstanceManagerTest {
             PREFIX + "orphan", "default"
         };
         for (String name : names) {
-            deleteDirectory(new File("/QOpenSys/etc/manzan-" + name));
+            deleteDirectory(new File(ManzanInstanceManager.getConfigBaseDir(), "manzan-" + name));
         }
 
         // Remove all lock files created by this suite
-        File lockDir = new File("/var/run/manzan");
+        File lockDir = LockFile.getLockDirectory();
         if (lockDir.isDirectory()) {
             for (String name : names) {
                 new File(lockDir, "manzan-" + name + ".lock").delete();

@@ -44,7 +44,7 @@ public class InstanceContextTest {
             "myapp", "test"
         };
         for (String name : testInstanceNames) {
-            File dir = new File("/QOpenSys/etc/manzan-" + name);
+            File dir = new File(com.github.theprez.manzan.ManzanInstanceManager.getConfigBaseDir(), "manzan-" + name);
             if (dir.exists()) {
                 deleteDirectory(dir);
             }

@@ -11,6 +11,8 @@ import java.util.ArrayList;
 import java.util.List;
 import java.util.regex.Pattern;
 
+import com.github.theprez.jcmdutils.StringUtils;
+
 /**
  * Manages PID-based lock files to prevent duplicate instance execution.
  *
@@ -272,9 +274,16 @@ public class LockFile {
      * IBM i only: Always uses /var/run/manzan
      * Security: Standard system directory with appropriate permissions
      */
-    private static File getLockDirectory() {
-        // IBM i: Use /var/run/manzan
-        return new File(LOCK_DIR_IBMI);
+    public static File getLockDirectory() {
+        String override = System.getProperty("manzan.lockdir");
+        if (StringUtils.isNonEmpty(override)) {
+            return new File(override);
+        }
+        final String osName = System.getProperty("os.name", "");
+        if ("os400".equalsIgnoreCase(osName) || "os/400".equalsIgnoreCase(osName)) {
+            return new File(LOCK_DIR_IBMI);
+        }
+        return new File(System.getProperty("java.io.tmpdir"), "manzan-locks");
     }
     
     /**
