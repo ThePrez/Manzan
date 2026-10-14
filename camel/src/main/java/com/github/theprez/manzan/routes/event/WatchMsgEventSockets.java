@@ -2,8 +2,6 @@ package com.github.theprez.manzan.routes.event;
 
 import java.util.Map;
 
-import org.apache.camel.model.dataformat.JsonLibrary;
-
 import com.github.theprez.manzan.ManzanEventType;
 import com.github.theprez.manzan.ManzanMessageFormatter;
 import com.github.theprez.manzan.routes.ManzanRoute;
@@ -59,7 +57,7 @@ public class WatchMsgEventSockets extends ManzanRoute {
     @Override
     public void configure() {
         from(String.format("netty:tcp://%s:%d?sync=false", m_socketIp, m_socketPort))
-            .unmarshal().json(JsonLibrary.Jackson, Map.class)
+            .unmarshal().json(Map.class)
             .routeId("manzan_msg:"+m_name)
             .setHeader("session_id", simple("${body[SESSION_ID]}"))
                 .process(exchange -> {

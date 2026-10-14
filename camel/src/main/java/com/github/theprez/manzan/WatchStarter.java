@@ -3,7 +3,7 @@ package com.github.theprez.manzan;
 import java.beans.PropertyVetoException;
 import java.io.IOException;
 
-import org.apache.commons.lang3.StringUtils;
+import com.github.theprez.jcmdutils.StringUtils;
 import org.ini4j.InvalidFileFormatException;
 
 import com.github.theprez.manzan.configuration.ApplicationConfig;

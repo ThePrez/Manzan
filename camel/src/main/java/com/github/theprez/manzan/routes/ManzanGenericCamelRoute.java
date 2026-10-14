@@ -9,10 +9,10 @@ import com.github.theprez.manzan.ManzanEventType;
 import org.apache.camel.CamelContext;
 import org.apache.camel.Component;
 import org.apache.camel.Exchange;
+import org.apache.camel.support.PropertyBindingSupport;
 
 import com.github.theprez.jcmdutils.StringUtils;
 import com.github.theprez.manzan.ManzanMessageFormatter;
-import org.apache.camel.spi.PropertyConfigurer;
 
 
 public abstract class ManzanGenericCamelRoute extends ManzanRoute {
@@ -33,12 +33,9 @@ public abstract class ManzanGenericCamelRoute extends ManzanRoute {
         m_path = _path;
         m_formatter = StringUtils.isEmpty(_format) ? null : new ManzanMessageFormatter(_format);
 
-        if(componentOptions != null) {
-            Component component = _context.getComponent(_camelComponent, true, false);
-            PropertyConfigurer configurer = component.getComponentPropertyConfigurer();
-            componentOptions.forEach((key, value) -> {
-                configurer.configure(_context, component, key, value,  true);
-            });
+        if (componentOptions != null && !componentOptions.isEmpty()) {
+            final Component component = _context.getComponent(_camelComponent);
+            PropertyBindingSupport.bindProperties(_context, component, new HashMap<String, Object>(componentOptions));
         }
     }
 

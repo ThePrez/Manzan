@@ -1,7 +1,6 @@
 package com.github.theprez.manzan.routes.dest;
 
-import org.apache.commons.lang3.StringUtils;
-
+import com.github.theprez.jcmdutils.StringUtils;
 import com.github.theprez.manzan.InstanceContext;
 import com.github.theprez.manzan.ManzanEventType;
 import com.github.theprez.manzan.ManzanMessageFormatter;

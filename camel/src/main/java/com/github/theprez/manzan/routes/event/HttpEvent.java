@@ -4,8 +4,6 @@ import java.io.IOException;
 import java.util.List;
 import java.util.Map;
 
-import org.apache.camel.model.dataformat.JsonLibrary;
-
 import com.github.theprez.jcmdutils.StringUtils;
 import com.github.theprez.manzan.ManzanEventType;
 import com.github.theprez.manzan.ManzanMessageFilter;
@@ -51,7 +49,7 @@ public class HttpEvent extends ManzanRoute {
                     }
                 })
                 .to(m_url)
-                .unmarshal().json(JsonLibrary.Jackson)
+                .unmarshal().json()
                 .process(exchange -> {
                     Map<String, Object> dataMap = exchange.getIn().getBody(Map.class);
                     injectIntoDataMap(dataMap, dataMapInjection);

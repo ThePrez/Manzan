@@ -24,7 +24,7 @@
       <dependency>
         <groupId>org.apache.camel</groupId>
         <artifactId>camel-parent</artifactId>
-        <version>3.14.8</version>
+        <version>4.8.0</version>
         <scope>import</scope>
         <type>pom</type>
       </dependency>
@@ -36,7 +36,6 @@
     <dependency>
       <groupId>org.apache.camel</groupId>
       <artifactId>camel-core</artifactId>
-      <version>3.14.10</version>
     </dependency>
     <dependency>
       <groupId>com.google.guava</groupId>
@@ -46,44 +45,35 @@
     <dependency>
       <groupId>org.apache.camel</groupId>
       <artifactId>camel-google-pubsub</artifactId>
-      <version>3.14.6</version>
     </dependency>
     <dependency>
       <groupId>org.apache.camel</groupId>
       <artifactId>camel-activemq</artifactId>
-      <version>3.14.6</version>
     </dependency>
     <dependency>
       <groupId>org.apache.camel</groupId>
       <artifactId>camel-twilio</artifactId>
-      <version>3.14.10</version>
     </dependency>
     <dependency>
       <groupId>org.apache.camel</groupId>
       <artifactId>camel-splunk-hec</artifactId>
-      <version>3.14.10</version>
     </dependency>
     <dependency>
       <groupId>org.apache.camel</groupId>
-    <artifactId>camel-azure-servicebus</artifactId>
-      <version>3.14.7</version>
+      <artifactId>camel-azure-servicebus</artifactId>
     </dependency>
     <dependency>
       <groupId>org.apache.camel</groupId>
       <artifactId>camel-main</artifactId>
-      <version>3.14.10</version>
     </dependency>
-
 
     <dependency>
       <groupId>org.apache.camel</groupId>
       <artifactId>camel-exec</artifactId>
-      <version>3.14.6</version>
     </dependency>
     <dependency>
       <groupId>org.apache.camel</groupId>
       <artifactId>camel-stream</artifactId>
-      <version>3.14.10</version>
     </dependency>
     <dependency>
       <groupId>org.apache.camel</groupId>
@@ -92,46 +82,37 @@
     <dependency>
       <groupId>org.apache.camel</groupId>
       <artifactId>camel-jdbc</artifactId>
-      <version>3.14.6</version>
     </dependency>
     <dependency>
       <groupId>org.apache.camel</groupId>
       <artifactId>camel-slack</artifactId>
-      <version>3.14.7</version>
     </dependency>
     <dependency>
       <groupId>org.apache.camel</groupId>
       <artifactId>camel-mail</artifactId>
-      <version>3.14.6</version>
     </dependency>
-
 
     <dependency>
       <groupId>org.apache.camel</groupId>
       <artifactId>camel-file</artifactId>
-      <version>3.14.10</version>
     </dependency>
     <dependency>
       <groupId>org.apache.camel</groupId>
       <artifactId>camel-kafka</artifactId>
-      <version>3.14.10</version>
     </dependency>
     <dependency>
       <groupId>org.apache.camel</groupId>
       <artifactId>camel-http</artifactId>
-      <version>3.14.10</version>
     </dependency>
-
 
     <dependency>
       <groupId>org.apache.camel</groupId>
       <artifactId>camel-jt400</artifactId>
-      <version>3.22.4</version>
+      <version>4.8.0</version>
     </dependency>
     <dependency>
       <groupId>org.apache.camel</groupId>
       <artifactId>camel-jackson</artifactId>
-      <version>3.14.10</version>
     </dependency>
 
     <dependency>
@@ -162,7 +143,7 @@
     </dependency>
     <dependency>
       <groupId>org.apache.logging.log4j</groupId>
-      <artifactId>log4j-slf4j-impl</artifactId>
+      <artifactId>log4j-slf4j2-impl</artifactId>
       <scope>runtime</scope>
     </dependency>
 
@@ -229,13 +210,6 @@
       <artifactId>camel-netty-http</artifactId>
     </dependency>
 
-    <!-- testing -->
-    <dependency>
-      <groupId>org.apache.camel</groupId>
-      <artifactId>camel-test</artifactId>
-      <scope>test</scope>
-    </dependency>
-
     <!-- OpenTelemetry: OTLP exporter (HTTP + gRPC) -->
     <dependency>
       <groupId>io.opentelemetry</groupId>
@@ -267,6 +241,17 @@
           <artifactId>junit-jupiter</artifactId>
           <scope>test</scope>
       </dependency>
+      <dependency>
+          <groupId>junit</groupId>
+          <artifactId>junit</artifactId>
+          <version>4.13.2</version>
+          <scope>test</scope>
+      </dependency>
+      <dependency>
+          <groupId>org.junit.vintage</groupId>
+          <artifactId>junit-vintage-engine</artifactId>
+          <scope>test</scope>
+      </dependency>
     <!-- MockWebServer: in-process HTTP server for integration testing destinations -->
     <!-- okhttp must be declared explicitly at the same version as mockwebserver so that
          Maven's dependency resolution does not pick up an older 3.x transitive pull
@@ -288,7 +273,6 @@
       <groupId>org.apache.camel</groupId>
       <artifactId>camel-test-junit5</artifactId>
       <scope>test</scope>
-      <version>3.14.10</version>
     </dependency>
   </dependencies>
 
@@ -358,7 +342,7 @@
       <plugin>
         <groupId>org.apache.camel</groupId>
         <artifactId>camel-maven-plugin</artifactId>
-        <version>3.14.10</version>
+        <version>4.8.0</version>
         <executions>
           <execution>
             <goals>
