@@ -89,9 +89,18 @@ public class PrometheusDestinationTest extends CamelTestHelper {
 
     @Test
     public void testPrometheusMetricsContent() throws Exception {
-        // Wait for events to be processed
-        Thread.sleep(3000);
-        
+        // Send a synthetic event so the event counter has at least one label series.
+        // The Prometheus client only emits label=value lines after the first .inc() call;
+        // waiting for the WatchJobLog timer is non-deterministic in CI environments.
+        Map<String, Object> dataMap = new HashMap<>();
+        dataMap.put("MSG_TYPE", "INFORMATIONAL");
+        dataMap.put("MSG_SEVERITY", 0);
+        dataMap.put("SYSTEM_NAME", "test-system");
+        Map<String, Object> headers = new HashMap<>();
+        headers.put("data_map", dataMap);
+        headers.put("event_type", com.github.theprez.manzan.ManzanEventType.WATCH_MSG);
+        template.sendBodyAndHeaders("direct:" + "prometheus_test", "synthetic", headers);
+
         String metricsUrl = "http://localhost:" + TEST_PORT + TEST_PATH;
         HttpURLConnection conn = (HttpURLConnection) new URL(metricsUrl).openConnection();
         conn.setRequestMethod("GET");

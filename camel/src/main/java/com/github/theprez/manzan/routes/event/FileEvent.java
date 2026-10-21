@@ -73,7 +73,7 @@ public class FileEvent extends ManzanRoute {
         String CONTINUE = "CONTINUE";
 
        from("timer://foo?period=" + m_interval + "&synchronous=true")
-                .routeId(m_name)
+                .routeId(getRouteId())
                 .setHeader(EVENT_TYPE, constant(m_eventType))
                 .process(exchange -> {
                     try {
@@ -126,3 +126,4 @@ public class FileEvent extends ManzanRoute {
                 .recipientList(constant(getRecipientList())).stopOnException();
     }
 }
+

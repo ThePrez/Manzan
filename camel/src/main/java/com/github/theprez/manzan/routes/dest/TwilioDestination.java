@@ -5,11 +5,12 @@ import java.util.Map;
 import org.apache.camel.CamelContext;
 import org.apache.camel.Exchange;
 
+import com.github.theprez.manzan.InstanceContext;
 import com.github.theprez.manzan.routes.ManzanGenericCamelRoute;
 
 public class TwilioDestination extends ManzanGenericCamelRoute {
-    public TwilioDestination(final CamelContext _context, final String _name, final String _format, Map<String, String> componentOptions, final Map<String, String> _uriParams) {
-        super(_context, _name, "twilio", "message/create", _format, _uriParams, null, componentOptions);
+    public TwilioDestination(final CamelContext _context, final InstanceContext _ctx, final String _name, final String _format, Map<String, String> componentOptions, final Map<String, String> _uriParams) {
+        super(_context, _ctx, _name, "twilio", "message/create", _format, _uriParams, null, componentOptions);
     }
 
     @Override
@@ -17,3 +18,5 @@ public class TwilioDestination extends ManzanGenericCamelRoute {
         exchange.getIn().setHeader("CamelTwilio.body", getBody(exchange, String.class));
     }
 }
+
+

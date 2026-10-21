@@ -8,6 +8,7 @@ import org.apache.camel.Exchange;
 import org.apache.camel.builder.RouteBuilder;
 
 import com.github.theprez.jcmdutils.StringUtils;
+import com.github.theprez.manzan.InstanceContext;
 import com.github.theprez.manzan.ManzanEventType;
 
 public abstract class ManzanRoute extends RouteBuilder {
@@ -77,9 +78,15 @@ public abstract class ManzanRoute extends RouteBuilder {
     }
 
     protected final String m_name;
+    protected final InstanceContext m_ctx;
     private String m_recipientList = "";
 
     public ManzanRoute(final String _name) {
+        this(null, _name);
+    }
+
+    public ManzanRoute(final InstanceContext _ctx, final String _name) {
+        m_ctx = _ctx;
         m_name = _name;
     }
 
@@ -108,6 +115,13 @@ public abstract class ManzanRoute extends RouteBuilder {
 
     protected String getInUri() {
         return "direct:" + m_name;
+    }
+
+    protected String getRouteId() {
+        if (m_ctx == null) {
+            return m_name;
+        }
+        return "manzan-" + m_ctx.getInstanceName() + ":" + m_name;
     }
 
     protected String getRecipientList() {

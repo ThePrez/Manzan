@@ -1,9 +1,27 @@
 BUILDLIB?=MANZAN
 BUILDVERSION:="Development build \(built with Make\)"
 
-all: init /qsys.lib/${BUILDLIB}.lib/handler.pgm
+all: init migrate /qsys.lib/${BUILDLIB}.lib/handler.pgm grants
 
 init: /qsys.lib/${BUILDLIB}.lib /qsys.lib/${BUILDLIB}.lib/manzanaud.file /qsys.lib/${BUILDLIB}.lib/manzanmsg.file /qsys.lib/${BUILDLIB}.lib/manzanoth.file /qsys.lib/${BUILDLIB}.lib/manzanpal.file /qsys.lib/${BUILDLIB}.lib/manzanvlog.file /qsys.lib/${BUILDLIB}.lib/manzandtaq.dtaq
+
+# Schema migration steps that run after the base tables exist.
+# These statements are idempotent (IF NOT EXISTS / CREATE OR REPLACE) so they
+# are safe to re-run on upgrades of an existing installation.
+.PHONY: migrate
+migrate: init
+	system -kKv "RUNSQLSTM SRCSTMF('$(CURDIR)/install_tasks/migrate_audjrnts.sql')    COMMIT(*NONE) DFTRDBCOL(${BUILDLIB})"
+	system -kKv "RUNSQLSTM SRCSTMF('$(CURDIR)/install_tasks/multi_instance_indexes.sql') COMMIT(*NONE) DFTRDBCOL(${BUILDLIB})"
+	system -kKv "RUNSQLSTM SRCSTMF('$(CURDIR)/install_tasks/cleanup_procedures.sql')  COMMIT(*NONE) DFTRDBCOL(${BUILDLIB})"
+	system -kKv "RUNSQLSTM SRCSTMF('$(CURDIR)/install_tasks/grant_authorities.sql')   COMMIT(*NONE) DFTRDBCOL(${BUILDLIB})"
+	system -kKv "GRTOBJAUT OBJ(${BUILDLIB}/MANZANDTAQ) OBJTYPE(*DTAQ) USER(*PUBLIC) AUT(*CHANGE)"
+	echo "Migration complete"
+
+# Authority grants that require the ILE programs to exist first.
+# Runs after handler.pgm has been compiled.
+.PHONY: grants
+grants: /qsys.lib/${BUILDLIB}.lib/handler.pgm
+	system -kKv "GRTOBJAUT OBJ(${BUILDLIB}/HANDLER) OBJTYPE(*PGM) USER(*PUBLIC) AUT(*USE)"
 
 .PHONY: src/mzversion.h
 

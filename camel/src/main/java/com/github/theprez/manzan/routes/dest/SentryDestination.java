@@ -1,10 +1,13 @@
 package com.github.theprez.manzan.routes.dest;
 
-import java.sql.Date;
+import java.time.LocalDate;
+import java.time.ZoneOffset;
+import java.util.Date;
 import java.util.LinkedList;
 import java.util.List;
 import java.util.UUID;
 
+import com.github.theprez.manzan.InstanceContext;
 import com.github.theprez.manzan.ManzanEventType;
 import com.github.theprez.manzan.routes.ManzanRoute;
 
@@ -18,8 +21,8 @@ import io.sentry.protocol.User;
 public class SentryDestination extends ManzanRoute {
     private static SentryDestination m_singleton = null;
 
-    public SentryDestination(final String _name, final String _dsn) {
-        super(_name);
+    public SentryDestination(final InstanceContext _ctx, final String _name, final String _dsn) {
+        super(_ctx, _name);
         synchronized (SentryDestination.class) {
             if (null != m_singleton) {
                 throw new RuntimeException("Only one Sentry configuration is allowed");
@@ -35,7 +38,7 @@ public class SentryDestination extends ManzanRoute {
     @Override
     public void configure() {
         from(getInUri())
-                .routeId(m_name)
+                .routeId(getRouteId())
                 .convertBodyTo(String.class)
                 .process(exchange -> {
                     final SentryEvent event = new SentryEvent();
@@ -82,7 +85,7 @@ public class SentryDestination extends ManzanRoute {
                     }
 
                     event.setLevel(severity);
-                    event.setTimestamp(Date.valueOf(getString(exchange, timestamp))); // TODO: Verify date is valid
+                    event.setTimestamp(Date.from(LocalDate.parse(getString(exchange, timestamp)).atStartOfDay(ZoneOffset.UTC).toInstant())); // TODO: Verify date is valid
                     event.setFingerprints(fingerprints);
                     Sentry.captureEvent(event);
                 });
@@ -91,3 +94,5 @@ public class SentryDestination extends ManzanRoute {
     @Override
     protected void setEventType(ManzanEventType manzanEventType) {}
 }
+
+

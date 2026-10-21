@@ -1,8 +1,13 @@
 package com.github.theprez.manzan.routes.dest;
 
-import java.sql.Timestamp;
+import java.time.LocalDateTime;
+import java.time.ZoneId;
+import java.time.format.DateTimeFormatter;
+import java.time.format.DateTimeFormatterBuilder;
+import java.time.temporal.ChronoField;
 import java.util.Map;
 
+import com.github.theprez.manzan.InstanceContext;
 import com.github.theprez.manzan.ManzanEventType;
 import com.github.theprez.manzan.routes.ManzanRoute;
 
@@ -20,9 +25,9 @@ public class GrafanaLokiDestination extends ManzanRoute {
     private int maxLabels = 15;
     private String[] labels = {};
 
-    public GrafanaLokiDestination(final String _name, final String _url, final String _username, final String _password,
+    public GrafanaLokiDestination(final InstanceContext _ctx, final String _name, final String _url, final String _username, final String _password,
                                   final int _maxLabels, final String _labels) {
-        super(_name);
+        super(_ctx, _name);
 
         if (_maxLabels != -1){
             maxLabels = _maxLabels;
@@ -36,22 +41,27 @@ public class GrafanaLokiDestination extends ManzanRoute {
                 .withBasicAuth(_username, _password)
                 .start();
 
-        Runtime.getRuntime().addShutdownHook(new Thread() {
-            @Override
-            public void run() {
-                try {
-                    logController
-                            .softStop()
-                            .hardStop();
-                } catch (final Exception e) {
-                    e.printStackTrace();
-                }
+        Runtime.getRuntime().addShutdownHook(new Thread(() -> {
+            try {
+                logController
+                        .softStop()
+                        .hardStop();
+            } catch (final Exception e) {
+                e.printStackTrace();
             }
-        });
+        }));
     }
 
+    private static final DateTimeFormatter SQL_TIMESTAMP_FMT = new DateTimeFormatterBuilder()
+            .appendPattern("yyyy-MM-dd HH:mm:ss")
+            .optionalStart().appendFraction(ChronoField.NANO_OF_SECOND, 0, 9, true).optionalEnd()
+            .toFormatter();
+
     private long timestampKeyToLong(String key, Exchange exchange) {
-        return Timestamp.valueOf(getString(exchange, key)).getTime();
+        return LocalDateTime.parse(getString(exchange, key), SQL_TIMESTAMP_FMT)
+                .atZone(ZoneId.systemDefault())
+                .toInstant()
+                .toEpochMilli();
     }
 
     private long getTimestamp(Exchange exchange) {
@@ -104,7 +114,7 @@ public class GrafanaLokiDestination extends ManzanRoute {
     @Override
     public void configure() {
         from(getInUri())
-                .routeId(m_name).process(exchange -> {
+                .routeId(getRouteId()).process(exchange -> {
                     StreamBuilder builder = logController
                             .stream()
                             .l(appLabelName, appLabelValue);
@@ -119,3 +129,5 @@ public class GrafanaLokiDestination extends ManzanRoute {
     protected void setEventType(ManzanEventType manzanEventType) {
     }
 }
+
+

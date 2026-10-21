@@ -10,6 +10,7 @@ import com.fasterxml.jackson.core.JsonProcessingException;
 import com.fasterxml.jackson.databind.ObjectMapper;
 import com.github.theprez.manzan.LocalHostResolver;
 import com.github.theprez.manzan.ManzanEventType;
+import com.github.theprez.manzan.InstanceContext;
 import com.github.theprez.manzan.routes.ManzanGenericCamelRoute;
 import com.github.theprez.manzan.routes.ManzanRoute;
 import com.github.theprez.manzan.routes.event.FileEvent;
@@ -20,8 +21,8 @@ public class PagerDutyDestination extends ManzanGenericCamelRoute {
     private final String m_group;
     private final String m_classType;
 
-    public PagerDutyDestination(final CamelContext _context, final String _name, final String routingKey, final String _component, final String _group, final String _classType, final String _format) {
-        super(_context, _name, "https", "events.pagerduty.com/v2/enqueue", _format, null, null, null);
+    public PagerDutyDestination(final CamelContext _context, final InstanceContext _ctx, final String _name, final String routingKey, final String _component, final String _group, final String _classType, final String _format) {
+        super(_context, _ctx, _name, "https", "events.pagerduty.com/v2/enqueue", _format, null, null, null);
         this.m_routingKey = routingKey;
         this.m_component = _component;
         this.m_group = _group;
@@ -95,3 +96,5 @@ public class PagerDutyDestination extends ManzanGenericCamelRoute {
         exchange.getIn().setBody(jsonBody);
     }
 }
+
+

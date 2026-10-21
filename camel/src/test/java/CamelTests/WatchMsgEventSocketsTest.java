@@ -16,7 +16,9 @@ import java.util.Map;
 
 public class WatchMsgEventSocketsTest extends CamelTestHelper {
 
-    @EndpointInject("netty:tcp://0.0.0.0:8080?sync=false")
+    private static final int TEST_SOCKET_PORT = 8080;
+
+    @EndpointInject("netty:tcp://0.0.0.0:" + TEST_SOCKET_PORT + "?sync=false")
     ProducerTemplate socketProducer;
 
     @Test
@@ -61,7 +63,7 @@ public class WatchMsgEventSocketsTest extends CamelTestHelper {
         dataMapInjectionsMap.put("ALPGMR", injectedValues);
 
         return new RoutesBuilder[]{
-                new WatchMsgEventSockets(socketEvent, formatMap, destMap, eventMap, dataMapInjectionsMap),
+                new WatchMsgEventSockets(socketEvent, TEST_SOCKET_PORT, formatMap, destMap, eventMap, dataMapInjectionsMap),
                 new StreamDestination(context, testOutDest, null, componentOptions)
         };
     }

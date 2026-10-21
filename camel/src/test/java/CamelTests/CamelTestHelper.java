@@ -1,6 +1,7 @@
 package CamelTests;
 
 import com.fasterxml.jackson.databind.ObjectMapper;
+import com.github.theprez.manzan.InstanceContext;
 import com.github.theprez.manzan.configuration.ApplicationConfig;
 import com.ibm.as400.access.AS400;
 import com.ibm.as400.access.AS400JDBCDataSource;
@@ -84,7 +85,7 @@ public abstract class CamelTestHelper extends CamelTestSupport {
     protected CamelContext createCamelContext() throws Exception {
         CamelContext context = super.createCamelContext();
 
-        final AS400 as400 = ApplicationConfig.get().getRemoteConnection();
+        final AS400 as400 = ApplicationConfig.get(InstanceContext.getDefault()).getRemoteConnection();
         as400.setGuiAvailable(false);
         as400.validateSignon();
 

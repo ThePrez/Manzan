@@ -2,6 +2,7 @@ package com.github.theprez.manzan.routes.dest;
 
 import org.fluentd.logger.FluentLogger;
 
+import com.github.theprez.manzan.InstanceContext;
 import com.github.theprez.manzan.ManzanEventType;
 import com.github.theprez.manzan.routes.ManzanRoute;
 
@@ -11,28 +12,25 @@ public class FluentDDestination extends ManzanRoute {
     private final int m_port;
     private final String m_tag;
 
-    public FluentDDestination(final String _name, final String _tag, final String _host, final int _port) {
-        super(_name);
+    public FluentDDestination(final InstanceContext _ctx, final String _name, final String _tag, final String _host, final int _port) {
+        super(_ctx, _name);
         m_tag = _tag;
         m_host = _host;
         m_port = _port;
         m_logger = FluentLogger.getLogger(m_tag, m_host, m_port);
-        Runtime.getRuntime().addShutdownHook(new Thread() {
-            @Override
-            public void run() {
-                try {
-                    m_logger.close();
-                } catch (final Exception e) {
-                    e.printStackTrace();
-                }
+        Runtime.getRuntime().addShutdownHook(new Thread(() -> {
+            try {
+                m_logger.close();
+            } catch (final Exception e) {
+                e.printStackTrace();
             }
-        });
+        }));
     }
 
     @Override
     public void configure() {
         from(getInUri())
-                .routeId(m_name).process(exchange -> {
+                .routeId(getRouteId()).process(exchange -> {
                     m_logger.log(m_tag, getDataMap(exchange));
                 });
     }
@@ -41,3 +39,6 @@ public class FluentDDestination extends ManzanRoute {
     protected void setEventType(ManzanEventType manzanEventType) {}
 
 }
+
+
+

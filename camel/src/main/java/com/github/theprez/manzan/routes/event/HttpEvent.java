@@ -4,8 +4,6 @@ import java.io.IOException;
 import java.util.List;
 import java.util.Map;
 
-import org.apache.camel.model.dataformat.JsonLibrary;
-
 import com.github.theprez.jcmdutils.StringUtils;
 import com.github.theprez.manzan.ManzanEventType;
 import com.github.theprez.manzan.ManzanMessageFilter;
@@ -43,7 +41,7 @@ public class HttpEvent extends ManzanRoute {
     @Override
     public void configure() {
         from("timer://foo?period=" + m_interval + "&synchronous=true")
-                .routeId(m_name)
+                .routeId(getRouteId())
                 .setHeader(EVENT_TYPE, constant(m_eventType))
                 .process(exchange -> {
                     for (Map.Entry<String, String> header : m_headerParams.entrySet()) {
@@ -51,7 +49,7 @@ public class HttpEvent extends ManzanRoute {
                     }
                 })
                 .to(m_url)
-                .unmarshal().json(JsonLibrary.Jackson)
+                .unmarshal().json()
                 .process(exchange -> {
                     Map<String, Object> dataMap = exchange.getIn().getBody(Map.class);
                     injectIntoDataMap(dataMap, dataMapInjection);
@@ -73,3 +71,4 @@ public class HttpEvent extends ManzanRoute {
                 .recipientList(constant(getRecipientList())).stopOnException();
     }
 }
+
