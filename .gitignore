@@ -31,3 +31,4 @@ bazel-out
 bazel-testlogs
 docs/troubleshooting.md
 docs/design/*.md
+*.class
